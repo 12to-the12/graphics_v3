@@ -1,49 +1,59 @@
 use image::{ImageBuffer, Rgb, RgbImage};
 
 extern crate stopwatch;
-use stopwatch::{Stopwatch};
+use stopwatch::Stopwatch;
 
-const WIDTH: u32 = 255;
-const HEIGHT: u32 = WIDTH;
+
+const WIDTH: u32 = 3840;
+const HEIGHT: u32 = 2160;
+
+// const WIDTH: u32 = 1920;
+// const HEIGHT: u32 = 1080;
+
+// const WIDTH: u32 = 960;
+// const HEIGHT: u32 = 540;
+
+// const WIDTH: u32 = 100;
+// const HEIGHT: u32 = 100;
+
+const COLOR: u8 = 0;
 
 fn main() {
     // ImageBuffer is static, while DynamicImage is dynamic
     // new variable canvas, mutable, type RgbImage, equal to a new ImageBuffer of WIDTH and HEIGHT
     let mut canvas: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
-    
-    
+
     let sw = Stopwatch::start_new();
     // do something that takes some time
-    
-    println!("Thing took {}ms", sw.elapsed_ms());
-    draw(&mut canvas);
+    let frames = 100;
+    for _x in 0..frames {
+        draw(&mut canvas);
+    }
+    let ms = sw.elapsed_ms() as f64;
+    let seconds = ms / 1000.0;
+    let fps = frames as f64 / seconds;
+    let mp = (WIDTH as i64) * (HEIGHT as i64) * frames;
+    let giga = 1.0 / 1_000_000_000.0;
+    println!("got {}ms per frame", ms / frames as f64);
+    println!("got {} frames per second", fps);
+    println!(
+        "got {} gigapixels through per second",
+        mp as f64 / seconds * giga
+    );
+    // println!("120 fps is {}ms per frame", 1000.0/120.0);
+    println!("60 fps is {}ms per frame", 1000.0/60.0);
+    println!("30 fps is {}ms per frame", 1000.0/30.0);
+    // println!("15 fps is {}ms per frame", 1000.0/15.0);
     canvas.save("output.png").unwrap();
 }
 
 fn draw(canvas: &mut RgbImage) {
-    // put a pixel on canvas
     for x in 0..WIDTH {
         for y in 0..HEIGHT {
-            // println!("{}", x);
-            // println!("{}", y);
-            let r = 255;
-            let g = 1 * (x as u8);
-            let b = 1 * (y as u8);
-            let colors = [r, g, b];
-            // println!("{}", r);
-            // println!("{}", g);
-            // println!("{}", b);
-            // println!("end");
-            canvas.put_pixel(x, y, Rgb(colors));
+            // println!("{}",(y ;
+                canvas.put_pixel(x, y, Rgb([COLOR,COLOR,COLOR]));
+
+            // canvas.put_pixel(x, y, Rgb([(y as f64/8.0) as u8, 255, (x as f64/8.0) as u8]));
         }
     }
-    // canvas.put_pixel(0, 0, Rgb([0, 0, 0]));
-    // canvas.put_pixel(0, 1, Rgb([0, 0, 255]));
-    // canvas.put_pixel(0, 2, Rgb([0, 255, 0]));
-    // canvas.put_pixel(1, 0, Rgb([0, 255, 255]));
-    // canvas.put_pixel(1, 1, Rgb([255, 0, 0]));
-    // canvas.put_pixel(1, 2, Rgb([255, 0, 255]));
-    // canvas.put_pixel(2, 0, Rgb([255, 255, 0]));
-    // canvas.put_pixel(2, 1, Rgb([255, 255, 255]));
-    // canvas.put_pixel(2, 2, Rgb([0, 0, 0]));
 }
