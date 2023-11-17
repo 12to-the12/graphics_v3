@@ -59,7 +59,7 @@ pub fn build_scale_matrix(scale: Vector) -> Transform {
 }
 pub fn build_x_rotation_matrix(θ: f32) -> Transform {
     let matrix = arr2(&[
-        [0.0, 0.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0, 0.0],
         [0.0, cos(θ), sin(θ), 0.0],
         [0.0, -sin(θ), cos(θ), 0.0],
         [0.0, 0.0, 0.0, 1.0],

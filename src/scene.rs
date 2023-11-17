@@ -50,7 +50,7 @@ pub fn simple_scene() -> Scene {
     let lights = vec![light];
     let mut mesh = unit_cube(vector(0.0, 0.0, 5.0));
     // mesh.add_transform(build_scale_matrix(vector(2.0, 1.0, 1.0)));
-    mesh.add_transform(build_x_rotation_matrix(2.0f32.to_radians()));
+    mesh.add_transform(build_x_rotation_matrix(20.0f32.to_radians()));
 
 
     let meshes = vec![mesh];
