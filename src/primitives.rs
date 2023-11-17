@@ -1,10 +1,11 @@
 // use image::{ImageBuffer, Rgb, RgbImage};
 use image::{Rgb, RgbImage};
+use ndarray::Array1;
 
 use crate::{coordinate_space::Orientation, line_plotting::plot_line};
 
 use crate::coordinate_space::Polar;
-use crate::transformations::{apply_transform, compile_transforms, Transform};
+use crate::transformations::{build_translation_matrix, compile_transforms, Transform};
 
 /// point in 3D space
 #[derive(Clone, Debug, PartialEq)]
@@ -34,10 +35,24 @@ impl Vertex {
         // println!("result: {:?}",self);
         // println!("");
     }
+    pub fn as_array(&self) -> [f32; 3] {
+        [self.x, self.y, self.z]
+    }
+    pub fn as_homogenous_array(&self) -> [f32; 4] {
+        [self.x, self.y, self.z, 1.0]
+    }
 }
 
 pub fn vertex(x: f32, y: f32, z: f32) -> Vertex {
     return Vertex { x, y, z };
+}
+
+pub fn vertex_from_array(arr: Array1<f32>) -> Vertex {
+    return Vertex {
+        x: arr[0],
+        y: arr[1],
+        z: arr[2],
+    };
 }
 /// direction and magnitude in 3D space
 #[derive(Clone, Debug)]
@@ -62,6 +77,12 @@ impl Vector {
         self.x /= mag;
         self.y /= mag;
         self.z /= mag;
+    }
+    pub fn as_array(&self) -> [f32; 3] {
+        [self.x, self.y, self.z]
+    }
+    pub fn as_homogenous_array(&self) -> [f32; 4] {
+        [self.x, self.y, self.z, 1.0]
     }
 }
 
@@ -116,7 +137,7 @@ pub struct Mesh {
     pub transform_log: Vec<Transform>,
 }
 
-pub fn unit_cube() -> Mesh {
+pub fn unit_cube(position: Vector) -> Mesh {
     // let a: Vertex = vertex(-1.0, -1.0, -1.0); //  left down bottom from above
     // let b: Vertex = vertex(1.0, -1.0, -1.0); // right down bottom from above
     // let c: Vertex = vertex(-1.0, 1.0, -1.0); //  left   up bottom from above
@@ -150,7 +171,7 @@ pub fn unit_cube() -> Mesh {
         vec![3, 5, 7], // left
     ];
     let mesh = Mesh {
-        position: vector(0.0, 0.0, 3.0),
+        position,
         vertices: vec![a, b, c, d, e, f, g, h],
         polygons,
         output_vertices: Vec::new(),
@@ -178,11 +199,13 @@ impl Mesh {
     /// transforms are kept as a list of transforms to be done, which is much more efficient
     pub fn apply_transformations(&mut self) {
         // println!("applying transformations");
+        // println!("transform log length: {:?}",self.transform_log.len());
         let transform = compile_transforms(&self.transform_log);
+        println!("{:?}",transform.matrix);
         // println!("{:?}", transform);
         self.output_vertices = self.vertices.clone();
         // println!("{:?}", self.output_vertices);
-        apply_transform(&mut self.output_vertices, transform);
+        self.output_vertices = transform.process(self.output_vertices.clone());
         // println!("{:?}", self.output_vertices);
     }
 }
@@ -213,8 +236,30 @@ impl Triangle {
         let b: &Point = &self.b;
         let c: &Point = &self.c;
 
+        #[cfg(debug_assertions)]
+        assert!(a.x as u32 <= canvas.dimensions().0);
+
+        #[cfg(debug_assertions)]
+        assert!(a.y as u32 <= canvas.dimensions().1);
+
+        #[cfg(debug_assertions)]
+        assert!(b.x as u32 <= canvas.dimensions().0);
+
+        #[cfg(debug_assertions)]
+        assert!(b.y as u32 <= canvas.dimensions().1);
+
+        #[cfg(debug_assertions)]
+        assert!(c.x as u32 <= canvas.dimensions().0);
+
+        #[cfg(debug_assertions)]
+        assert!(c.y as u32 <= canvas.dimensions().1);
+
+
         plot_line(canvas, a, b, color);
         plot_line(canvas, b, c, color);
         plot_line(canvas, c, a, color);
     }
 }
+
+#[derive(Clone, Debug)]
+pub struct Angle(f32); // simple shit

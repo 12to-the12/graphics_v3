@@ -1,0 +1,13 @@
+#!/bin/bash
+echo "" > tmp
+cargo clean &&\
+/usr/bin/time -f "real: %E CPUs kernel: %S CPUs user: %U" -o tmp\
+ cargo build --release 2>/dev/null
+echo "" >> timing.txt
+cat tmp >> timing.txt
+
+# echo "" > tmp
+# cargo clean &&\
+# /usr/bin/time -o tmp cargo-clif build --release 2>/dev/null
+# echo "" >> timing.txt
+# cat tmp >> timing.txt

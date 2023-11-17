@@ -1,6 +1,8 @@
 // use crate::coordinate_space::Orientation;
 use crate::primitives::{Vertex,vertex};
 use std::f32::consts::PI as π;
+
+#[derive(Clone)]
 pub struct Camera {
     pub position: Vertex,
     // orientation: Orientation, // some object that implements get_orientation?
@@ -10,6 +12,7 @@ pub struct Camera {
 
 /// models a camera lens
 /// used to capture the zoom
+#[derive(Clone)]
 pub struct Lens {
     pub aperture: f32, // is ƒ-stop
     // ƒ-stop is focal length / aperture pupil diameter https://www.wikiwand.com/en/F-number
@@ -20,6 +23,7 @@ pub struct Lens {
 /// models a camera sensor
 /// notably used to accurately model the frequency response
 /// I would like to implememnt a number of predefined lenses in addition to offering a generic
+#[derive(Clone)]
 pub struct Sensor {
     pub width: f32,  // the width of the sensor in millimeters
     // pub height: f32, // it might be better to define this in terms of a ratio to the width

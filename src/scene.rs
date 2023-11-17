@@ -15,6 +15,7 @@ use crate::transformations::Transform;
 ///
 /// I have settled on unified
 /// To implement a unified mesh, references need to stay valid
+#[derive(Clone)]
 pub struct Scene {
     pub camera: Camera,
     pub lights: Vec<Light>,
@@ -47,7 +48,7 @@ pub fn simple_scene() -> Scene {
     };
     let light = sun_light(vertex(0.0, 0.0, 0.0), 1.0);
     let lights = vec![light];
-    let mesh = unit_cube();
+    let mesh = unit_cube(vector(3.0, 3.0, 10.0));
 
     let meshes = vec![mesh];
     let scene = Scene {

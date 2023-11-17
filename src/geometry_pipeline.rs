@@ -1,13 +1,13 @@
 use crate::line_plotting::plot_line;
-use crate::primitives::{Point, Polygon, Triangle, Vertex, Vector, vector};
+use crate::primitives::{vector, Point, Polygon, Triangle, Vector, Vertex};
 // use crate::primitives::LineCollection;
 use crate::scene::Scene;
 // use crate::primitives::PolygonCollection;
+use crate::transformations::build_translation_matrix;
 use image::{ImageBuffer, Rgb, RgbImage};
-use crate::transformations::Transform;
 
 fn application(scene: &Scene) -> &Scene {
-    println!("The application step does nothing!");
+    // println!("The application step does nothing!");
     return scene;
 }
 
@@ -18,22 +18,16 @@ fn application(scene: &Scene) -> &Scene {
 
 //         scene.unified_mesh.append(&mut mesh.polygons.clone())
 //     }
-//     println!("successfully went through amalgamate geometry");
-//     println!("{:?}", scene.unified_vertices);
-//     println!("{:?}", scene.unified_mesh);
+
 // }
 
 fn calculate_global_space(scene: &mut Scene) {
-
-
     // let translation = Transform::Translation(vector(0.0, 0.0, -10.0));
     // let translation = Transform::Translation(vector(0.0, -5.0, -10.0));
     for mesh in &mut scene.meshes {
-            let transform: Transform = Transform::Translation(mesh.position.clone());
-            mesh.transform_log.push(transform.clone());
-
+        let transform = build_translation_matrix(mesh.position.clone());
+        mesh.transform_log.push(transform);
     }
-
 }
 // fn calculate_screen_space(scene: &mut Scene) {}
 // fn calculate_device_space(scene: &mut Scene) {
@@ -84,31 +78,22 @@ fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
 
     let hres = camera.sensor.horizontal_res as f32;
     let vres = camera.sensor.vertical_res as f32;
-    // println!("hfactor: {hfactor}");
-    // println!("vfactor: {vfactor}");
 
     for mut mesh in scene.meshes {
-        // println!("{:?}", mesh.polygons);
         mesh.apply_transformations();
         for (i, vertex) in mesh.output_vertices.clone().iter().enumerate() {
-            // println!("{:?}", vertex);
             let z = vertex.z;
-            println!("{:?}\n", vertex);
-            let x = vertex.x / -z / hfactor; // negative z on purpose
-            let y = vertex.y / z / vfactor; // positive z on purpose
+
+            let x = vertex.x / z / hfactor; // positive z on purpose
+            let y = vertex.y / -z / vfactor; // negative z on purpose
             let foreshortened = Vertex { x, y, z };
 
             mesh.output_vertices[i] = foreshortened;
         }
-        // println!("{:?}", mesh.output_vertices);
         for poly in mesh.polygons {
             let a = &mesh.output_vertices[poly[0]]; // currently vertexes;
             let b = &mesh.output_vertices[poly[1]];
             let c = &mesh.output_vertices[poly[2]];
-            println!("{:?}", a);
-            println!("{:?}", b);
-            println!("{:?}", c);
-            println!("");
 
             let a = Point {
                 x: (((a.x + 1.0) / 2.0) * hres) as i32,
@@ -122,13 +107,10 @@ fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
                 x: (((c.x + 1.0) / 2.0) * hres) as i32,
                 y: (((c.y + 1.0) / 2.0) * vres) as i32,
             };
-            // println!("{:?}", a);
-            // println!("{:?}", b);
-            // println!("{:?}", c);
+
             Triangle { a, b, c }.draw(canvas, color);
         }
     }
-    // println!("{}", scene.camera.horizontal_field_of_view());
     // for line in scene.unified_mesh {
     // plot_line(canvas, &line.a, &line.b, color);
     // }
@@ -171,8 +153,8 @@ fn render(canvas: &mut RgbImage, scene: Scene) {
 ///
 /// Currently, this is a purely software implementation that runs on a single core
 pub fn geometry_pipeline(mut scene: Scene) -> RgbImage {
-    application(&scene);
-    geometry(&mut scene);
+    application(&scene); // arrives at the geometry to render
+    geometry(&mut scene); // projections
     let horizontal_res = scene.camera.sensor.horizontal_res;
     let vertical_res = scene.camera.sensor.vertical_res;
     let mut canvas: RgbImage = ImageBuffer::new(horizontal_res, vertical_res);

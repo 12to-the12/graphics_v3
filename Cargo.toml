@@ -1,13 +1,13 @@
 [package]
-name = "graphics-rust"
+name = "graphics_v3"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cargo-update = "13.2.0"
 image = "0.24.6"
+ndarray = "0.15.6"
 serde = "1.0.192"
 serde_derive = "1.0.192"
 stopwatch = "0.0.7"
@@ -18,8 +18,14 @@ toml = "0.8.8"
 # env_logger = "0.10"
 # log = "0.4"
 # wgpu = "0.17"
+[dev-dependencies]
+criterion = "0.5.1"
+cargo-update = "13.2.0"
+iai = "0.1.1"
 
-
+[[bench]]
+name = "example"
+harness = false
 
 [profile.release]
 # lto = "fat"
@@ -30,3 +36,5 @@ debug = false
 
 # [build]
 # rustflags = ["-Z", "threads=8"]
+
+

@@ -6,7 +6,7 @@ camera ->
 screen ->
 display
 
-every step includes a translation, rotation, and scaling segment, in that order
+every step includes a scaling, rotation, aand translation segment, in that order
 
 
 still not sure why there is a distinction between screen and display
