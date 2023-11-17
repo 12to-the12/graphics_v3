@@ -47,9 +47,8 @@ pub fn simple_scene() -> Scene {
     };
     let light = sun_light(vertex(0.0, 0.0, 0.0), 1.0);
     let lights = vec![light];
-    let mut mesh = unit_cube();
-    let translation = Transform::Translation(vector(0.0, -5.0, -10.0));
-    mesh.transform_log.push(translation);
+    let mesh = unit_cube();
+
     let meshes = vec![mesh];
     let scene = Scene {
         camera,

@@ -1,9 +1,10 @@
 use crate::line_plotting::plot_line;
-use crate::primitives::{Point, Polygon, Triangle, Vertex};
+use crate::primitives::{Point, Polygon, Triangle, Vertex, Vector, vector};
 // use crate::primitives::LineCollection;
 use crate::scene::Scene;
 // use crate::primitives::PolygonCollection;
 use image::{ImageBuffer, Rgb, RgbImage};
+use crate::transformations::Transform;
 
 fn application(scene: &Scene) -> &Scene {
     println!("The application step does nothing!");
@@ -21,6 +22,18 @@ fn application(scene: &Scene) -> &Scene {
 //     println!("{:?}", scene.unified_vertices);
 //     println!("{:?}", scene.unified_mesh);
 // }
+
+fn calculate_global_space(scene: &mut Scene) {
+
+
+    let translation = Transform::Translation(vector(0.0, 0.0, -10.0));
+    // let translation = Transform::Translation(vector(0.0, -5.0, -10.0));
+    for mesh in &mut scene.meshes {
+            mesh.transform_log.push(translation.clone());
+
+    }
+
+}
 // fn calculate_screen_space(scene: &mut Scene) {}
 // fn calculate_device_space(scene: &mut Scene) {
 //     // scene.device_space();
@@ -37,7 +50,7 @@ fn application(scene: &Scene) -> &Scene {
 /// but for now, everything is going to be instantiated many times
 fn geometry(scene: &mut Scene) {
     // almalgamate_geometry(scene);
-    // calculate_global_space(scene);
+    calculate_global_space(scene);
     // calculate_camera_space(scene);
     // calculate_screen_space(scene);
     // calculate_device_space(scene);
