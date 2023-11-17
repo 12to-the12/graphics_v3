@@ -102,8 +102,9 @@ fn zero_tiny(x: &f32) -> f32 {
 
 fn round_6(x: &f32) -> f32 {
     // *x * 1e7 / 1e7
+    let factor = 1e5;
     let x = *x;
-    (x * 1e6).round() / 1e6
+    (x * factor).round() / factor
 }
 
 pub fn compile_transforms(transforms: &Vec<Transform>) -> Transform {
@@ -153,7 +154,15 @@ mod tests {
         assert_eq!(arr1(&[-169.0, 0.0, 729.7, 1.0]), vertex);
     }
     #[test]
-    fn transform_matrix_integrity() {
+    fn verify_identity_implementation() {
+        let transform = build_identity_matrix();
+        let myvertex = arr1(&[-169.0, 0.0, 729.7, 1.0]);
+        let vertex_list = vec![vertex_from_array(myvertex)];
+        let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
+        assert_eq!(vertex(-169.0, 0.0, 729.7), myvertex);
+    }
+    #[test]
+    fn translation_matrix_integrity() {
         let transform = arr2(&[
             [1.0, 0.0, 0.0, 1.1],
             [0.0, 1.0, 0.0, 0.0],
@@ -163,6 +172,14 @@ mod tests {
         let mut vertex = arr1(&[1.0, 2.0, 3.0, 1.0]);
         vertex = transform.dot(&vertex);
         assert_eq!(arr1(&[2.1, 2.0, -4.6, 1.0]), vertex);
+    }
+    #[test]
+    fn verify_translation_implementation() {
+        let transform = build_translation_matrix(vector(1.1, 0.0, -7.6));
+        let myvertex = arr1(&[1.0, 2.0, 3.0, 1.0]);
+        let vertex_list = vec![vertex_from_array(myvertex)];
+        let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
+        assert_eq!(vertex(2.1, 2.0, -4.6), myvertex);
     }
     #[test]
     fn scale_matrix_integrity() {
@@ -176,6 +193,16 @@ mod tests {
         vertex = transform.dot(&vertex);
         vertex = vertex.map(|x| *x * 10.0 / 10.0); // because of rounding errors
         assert_eq!(arr1(&[3.0, -4.0, 6.6, 1.0]), vertex);
+    }
+    #[test]
+    fn verify_scale_implementation() {
+        let transform = build_scale_matrix(vector(3.0, -2.0, 2.2));
+        let myvertex = arr1(&[1.0, 2.0, 3.0, 1.0]);
+        let vertex_list = vec![vertex_from_array(myvertex)];
+        let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
+        let myvertex = arr1(&myvertex.as_array());
+        let myvertex = myvertex.map(round_6);
+        assert_eq!(arr1(&[3.0, -4.0, 6.6]), myvertex);
     }
 
     #[test]
@@ -195,5 +222,15 @@ mod tests {
         vertex = vertex.map(round_6); // because of rounding errors
         vertex = vertex.map(zero_tiny); // because of other errors
         assert_eq!(arr1(&[-2.0, 1.0, 3.0, 1.0]), vertex);
+    }
+    #[test]
+    fn verify_rotation_implementation() {
+        let transform = build_z_rotation_matrix(90f32.to_radians());
+        let myvertex = arr1(&[1.0, 2.0, 3.0, 1.0]);
+        let vertex_list = vec![vertex_from_array(myvertex)];
+        let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
+        let myvertex = arr1(&myvertex.as_array());
+        let myvertex = myvertex.map(round_6);
+        assert_eq!(arr1(&[-2.0, 1.0, 3.0]), myvertex);
     }
 }
