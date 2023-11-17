@@ -1,0 +1,2 @@
+#!/bin/bash
+cargo bench && firefox target/criterion/test\ scene/report/index.html
