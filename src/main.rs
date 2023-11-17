@@ -85,7 +85,7 @@ fn main_loop() {
 
         render = render_scene(scene);
         save_image(render);
-        sleep(100);
+        sleep(41);
         counter += 1.0;
     }
 }
