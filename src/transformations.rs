@@ -57,15 +57,17 @@ pub fn build_scale_matrix(scale: Vector) -> Transform {
     ]);
     Transform { matrix }
 }
-// fn build_x_rotation_matrix(θ: f32) -> Array2<f32> {
-//     return arr2(&[
-//         [0.0, 0.0, 0.0, 0.0],
-//         [0.0, cos(θ), sin(θ), 0.0],
-//         [0.0, -sin(θ), cos(θ), 0.0],
-//         [0.0, 0.0, 0.0, 1.0],
-//     ]);
-// }
-// fn build_y_rotation_matrix(θ: f32) -> Array2<f32> {
+pub fn build_x_rotation_matrix(θ: f32) -> Transform {
+    let matrix = arr2(&[
+        [0.0, 0.0, 0.0, 0.0],
+        [0.0, cos(θ), sin(θ), 0.0],
+        [0.0, -sin(θ), cos(θ), 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+    ]);
+    Transform { matrix }
+
+}
+// pub fn build_y_rotation_matrix(θ: f32) -> Array2<f32> {
 //     return arr2(&[
 //         [cos(θ), 0.0, -sin(θ), 0.0],
 //         [0.0, 1.0, 0.0, 0.0],
@@ -73,7 +75,7 @@ pub fn build_scale_matrix(scale: Vector) -> Transform {
 //         [0.0, 0.0, 0.0, 1.0],
 //     ]);
 // }
-// fn build_z_rotation_matrix(θ: f32) -> Array2<f32> {
+// fpub n build_z_rotation_matrix(θ: f32) -> Array2<f32> {
 //     return arr2(&[
 //         [cos(θ), -sin(θ), 0.0, 0.0],
 //         [sin(θ), cos(θ), 0.0, 0.0],
