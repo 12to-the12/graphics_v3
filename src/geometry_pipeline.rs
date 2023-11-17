@@ -7,7 +7,6 @@ use crate::transformations::build_translation_matrix;
 use image::{ImageBuffer, Rgb, RgbImage};
 
 fn application(scene: &Scene) -> &Scene {
-    // println!("The application step does nothing!");
     return scene;
 }
 

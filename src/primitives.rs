@@ -24,16 +24,10 @@ impl Vertex {
         };
     }
     pub fn add(&mut self, other: &Vector) {
-        // println!("");
-        // println!("other: {:?}",other);
+
         self.x += other.x;
         self.y += other.y;
         self.z += other.z;
-        // println!("{}",other.z);
-        // println!("{}",self.z);
-        // self.z = other.z;
-        // println!("result: {:?}",self);
-        // println!("");
     }
     pub fn as_array(&self) -> [f32; 3] {
         [self.x, self.y, self.z]
@@ -198,15 +192,9 @@ impl Mesh {
     /// for now we'll keep it to simple translations
     /// transforms are kept as a list of transforms to be done, which is much more efficient
     pub fn apply_transformations(&mut self) {
-        // println!("applying transformations");
-        // println!("transform log length: {:?}",self.transform_log.len());
         let transform = compile_transforms(&self.transform_log);
-        println!("{:?}", transform.matrix);
-        // println!("{:?}", transform);
         self.output_vertices = self.vertices.clone();
-        // println!("{:?}", self.output_vertices);
         self.output_vertices = transform.process(self.output_vertices.clone());
-        // println!("{:?}", self.output_vertices);
     }
     pub fn add_transform(&mut self, transform: Transform) -> () {
         self.transform_log.push(transform);

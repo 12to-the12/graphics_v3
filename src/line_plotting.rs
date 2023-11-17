@@ -14,7 +14,6 @@ fn plot_line_low(canvas: &mut RgbImage, p0: &Point, p1: &Point, color: Rgb<u8>) 
     }
     let mut d = (2 * dy) - dx;
     let mut y = p0.y;
-    // println!("{}, {}, {}, {}", p0.x, p0.y, p1.x, p1.y);
     for x in p0.x..p1.x {
         canvas.put_pixel(x as u32, y as u32, color);
         if d > 0 {
@@ -38,7 +37,6 @@ fn plot_line_high(canvas: &mut RgbImage, p0: &Point, p1: &Point, color: Rgb<u8>)
     let mut d = (2 * dx) - dy;
     let mut x = p0.x;
 
-    // println!("{}, {}, {}, {}", p0.x, p0.y, p1.x, p1.y);
     for y in p0.y..p1.y {
         canvas.put_pixel(x as u32, y as u32, color);
         if d > 0 {
@@ -80,7 +78,6 @@ pub fn plot_line_naive(canvas: &mut RgbImage, p0: &Point, p1: &Point, color: Rgb
     } else {
         m = (end_y - start_y) / (end_x - start_x);
     }
-    // println!("{:?}", m);
     let b = start_y as f32 - (m * start_x as f32);
 
     for x in p0.x..p1.x + 1 {

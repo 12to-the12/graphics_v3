@@ -13,7 +13,7 @@ use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
 use crate::primitives::vector;
 // extern crate ndarray;
 
-mod benchmark;
+
 mod coordinate_space;
 mod line_plotting;
 pub mod primitives;
