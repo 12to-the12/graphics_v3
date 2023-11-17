@@ -85,10 +85,15 @@ fn main_loop() {
 
         render = render_scene(scene);
         save_image(render);
-        sleep(41);
+        sleep(REST);
         counter += 1.0;
     }
 }
+const REST: u64 = 1000/8 as u64;// ms/frame @ 8 fps
+// const REST: u64 = 1000/12 as u64;// ms/frame @ 12 fps
+// const REST: u64 = 1000/24 as u64;// ms/frame @ 24 fps
+// const REST: u64 = 1000/60 as u64;// ms/frame @ 60 fps
+
 fn main() {
     check_debug();
 
