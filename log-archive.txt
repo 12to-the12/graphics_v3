@@ -1,0 +1,475 @@
+<start>
+<importing modules>
+<body>
+<main>
+__________<>__________
+total time elapsed: 2167.58 ms
+time elapsed:      209.67ms ±  3.31ms
+total inner: 2096.67ms with   10 repetitions
+__________<>__________
+total time elapsed: 474.55 ms
+time elapsed:       42.23ms ±  2.78ms
+total inner: 422.26ms with   10 repetitions
+__________<>__________
+total time elapsed: 332.63 ms
+time elapsed:       10.14ms ±  0.16ms
+total inner: 101.35ms with   10 repetitions
+__________<>__________
+
+naive mean: 13.87791 ms
+fast mean: 19.72722 ms
+naive mean: 1.8886228 ms
+fast mean: 1.2052941 ms
+<start>
+<importing modules>
+<body>
+<main>
+__________<>__________
+total time elapsed: 2141.67 ms
+time elapsed:      207.28ms ±  3.70ms
+total inner: 2072.76ms with   10 repetitions
+__________<>__________
+total time elapsed: 471.27 ms
+time elapsed:       41.81ms ±  3.41ms
+total inner: 418.13ms with   10 repetitions
+__________<>__________
+total time elapsed: 341.58 ms
+time elapsed:       10.50ms ±  0.19ms
+total inner: 105.01ms with   10 repetitions
+__________<>__________
+
+naive mean: 14.281796 ms
+fast mean: 21.543509 ms
+naive mean: 1.9231379 ms
+fast mean: 1.1217464 ms
+<body>
+python: 206.48ms ±  6.11ms
+__________<>__________
+python:  41.64ms ±  3.39ms
+__________<>__________
+python:  10.96ms ±  0.18ms
+__________<>__________
+
+__________<>__________
+naive mean: 14.815254 ms
+fast mean: 20.28921 ms
+__________<>__________
+
+__________<>__________
+__________<>__________
+naive mean: 2.4481313 ms
+fast mean: 1.6775743 ms
+__________<>__________
+python: 216.78ms ±  6.28ms
+__________<>__________
+python:  44.21ms ±  2.82ms
+__________<>__________
+python:  10.13ms ±  0.16ms
+__________<>__________
+
+__________<>__________
+__________<>__________
+__________<>__________
+__________<>__________
+
+__________<>__________
+__________<>__________
+__________<>__________
+python: 210.52ms ±  7.06ms
+__________<>__________
+python:  56.51ms ±  8.45ms
+__________<>__________
+python:  10.72ms ±  0.67ms
+__________<>__________
+
+__________<>__________
+__________<>__________
+naive mean: 1.8363919 ms
+fast mean: 1.1707844 ms
+__________<>__________
+python: 213.51ms ±  9.05ms
+__________<>__________
+python:  43.74ms ±  3.57ms
+__________<>__________
+python:  11.86ms ±  1.73ms
+__________<>__________
+
+__________<>__________
+__________<>__________
+naive mean: 2.6370597 ms
+fast mean: 1.2939515 ms
+__________<>__________
+python: 210.23ms ±  3.10ms
+__________<>__________
+python:  61.03ms ± 12.98ms
+__________<>__________
+python:  10.43ms ±  0.25ms
+__________<>__________
+
+__________<>__________
+naive mean: 14.975951 ms
+fast mean: 21.193676 ms
+__________<>__________
+naive mean: 1.9688252 ms
+fast mean: 1.0931944 ms
+__________<>__________
+python: 218.63ms ±  3.10ms
+__________<>__________
+python:  42.21ms ±  3.11ms
+__________<>__________
+python:  10.37ms ±  0.92ms
+__________<>__________
+
+__________<>__________
+naive mean: 16.552202 ms
+fast mean: 21.783298 ms
+__________<>__________
+naive mean: 2.1602688 ms
+fast mean: 1.2119297 ms
+__________<>__________
+python: 208.59ms ±  4.16ms
+__________<>__________
+python:  42.35ms ±  2.50ms
+__________<>__________
+python:  10.21ms ±  0.20ms
+__________<>__________
+
+__________<>__________
+naive mean: 17.880753 ms
+fast mean: 24.11073 ms
+__________<>__________
+naive mean: 3.8072126 ms
+fast mean: 2.5040607 ms
+__________<>__________
+python: 223.96ms ± 27.43ms
+__________<>__________
+python:  52.87ms ± 11.75ms
+__________<>__________
+python:  16.39ms ±  3.13ms
+__________<>__________
+
+__________<>__________
+naive mean: 19.39106 ms @ 100 iterations
+fast mean: 21.875547 ms @ 100 iterations
+__________<>__________
+naive mean: 1.750429 ms @ 100 iterations
+fast mean: 1.1333479 ms @ 100 iterations
+__________<>__________
+python: 204.91ms ±  5.22ms
+__________<>__________
+python:  40.70ms ±  2.68ms
+__________<>__________
+python:  11.16ms ±  0.88ms
+__________<>__________
+
+__________<>__________
+naive mean: 19.828281 ms @ 100 iterations
+fast mean: 20.230558 ms @ 100 iterations
+sum: 2023.0558 ms
+__________<>__________
+naive mean: 1.9037099 ms @ 100 iterations
+fast mean: 1.6654325 ms @ 100 iterations
+sum: 166.54324 ms
+__________<>__________
+python: 212.22ms ±  8.40ms
+__________<>__________
+
+__________<>__________
+naive mean: 16.438002 ms @ 100 iterations
+
+__________<>__________
+naive mean: 17.058437 ms @ 100 iterations
+fast mean: 21.642979 ms @ 100 iterations
+sum: 2164.2976 ms
+__________<>__________
+naive mean: 2.20003 ms @ 100 iterations
+fast mean: 1.6964577 ms @ 100 iterations
+sum: 169.64578 ms
+__________<>__________
+python: 219.67ms ±  6.59ms
+__________<>__________
+python:  46.03ms ±  4.97ms
+__________<>__________
+python:  11.09ms ±  0.71ms
+__________<>__________
+
+__________<>__________
+naive mean: 17.352425 ms @ 100 iterations
+fast mean: 21.224766 ms @ 100 iterations
+sum: 2122.4766 ms
+__________<>__________
+naive mean: 3.212333 ms @ 100 iterations
+fast mean: 2.207524 ms @ 100 iterations
+sum: 220.7524 ms
+__________<>__________
+python: 219.30ms ±  3.62ms
+__________<>__________
+python:  43.21ms ±  4.83ms
+__________<>__________
+python:  10.49ms ±  0.45ms
+__________<>__________
+
+__________<>__________
+__________<>__________
+naive mean: 1.7885132 ms @ 100 iterations
+fast mean: 1.7828064 ms @ 100 iterations
+sum: 178.28064 ms
+__________<>__________
+
+__________<>__________
+naive mean: 14.392161 ms @ 100 iterations
+fast mean: 19.436848 ms @ 100 iterations
+sum: 1943.6848 ms
+__________<>__________
+naive mean: 1.8443965 ms @ 100 iterations
+fast mean: 1.6036185 ms @ 100 iterations
+sum: 160.36186 ms
+__________<>__________
+python: 204.47ms ±  3.70ms
+__________<>__________
+python:  39.99ms ±  2.44ms
+__________<>__________
+python:  10.59ms ±  0.97ms
+__________<>__________
+
+__________<>__________
+naive mean: 14.737486 ms @ 100 iterations
+fast mean: 19.174547 ms @ 100 iterations
+sum: 1917.4547 ms
+__________<>__________
+naive mean: 1.7990756 ms @ 100 iterations
+fast mean: 1.6343837 ms @ 100 iterations
+sum: 163.43837 ms
+__________<>__________
+python: 203.56ms ±  1.75ms
+__________<>__________
+python:  43.49ms ±  3.94ms
+__________<>__________
+python:  10.79ms ±  1.31ms
+__________<>__________
+
+__________<>__________
+naive mean: 16.085377 ms @ 100 iterations
+sum: 1608.5377 ms
+fast mean: 22.889288 ms @ 100 iterations
+sum: 2288.9287 ms
+__________<>__________
+naive mean: 3.0952594 ms @ 100 iterations
+sum: 309.52594 ms
+fast mean: 2.4695601 ms @ 100 iterations
+sum: 246.95601 ms
+__________<>__________
+python: 202.89ms ±  3.43ms
+__________<>__________
+python:  42.78ms ±  2.77ms
+__________<>__________
+python:  10.44ms ±  0.28ms
+__________<>__________
+
+__________<>__________
+__________<>__________
+__________<>__________
+python: 211.47ms ±  4.32ms
+__________<>__________
+python:  50.18ms ±  5.62ms
+__________<>__________
+python:  16.95ms ±  1.32ms
+__________<>__________
+
+__________<>__________
+__________<>__________
+__________<>__________
+
+__________<>__________
+__________<>__________
+__________<>__________
+python: 206.22ms ±  3.55ms
+__________<>__________
+python:  44.38ms ±  3.20ms
+__________<>__________
+python:  12.65ms ±  3.29ms
+__________<>__________
+
+__________<>__________
+naive mean: 14.453466 ms @ 100 iterations
+sum: 1445.3466 ms
+fast mean: 19.41346 ms @ 100 iterations
+sum: 1941.3461 ms
+7.398899014s
+__________<>__________
+naive mean: 1.8982954 ms @ 100 iterations
+sum: 189.82953 ms
+fast mean: 1.5678468 ms @ 100 iterations
+sum: 156.78467 ms
+369.56082ms
+__________<>__________
+python: 206.60ms ±  3.90ms
+__________<>__________
+python:  42.78ms ±  3.36ms
+__________<>__________
+python:  10.62ms ±  0.66ms
+__________<>__________
+
+__________<>__________
+naive mean: 15.404742 ms @ 10 iterations
+sum: 154.04742 ms
+fast mean: 25.287964 ms @ 10 iterations
+sum: 252.87965 ms
+4.292927942s
+__________<>__________
+naive mean: 3.3441522 ms @ 10 iterations
+sum: 33.44152 ms
+fast mean: 1.4417968 ms @ 10 iterations
+sum: 14.417968 ms
+70.636841ms
+__________<>__________
+python: 217.24ms ± 17.69ms
+__________<>__________
+python:  55.50ms ± 12.25ms
+__________<>__________
+python:  12.40ms ±  2.85ms
+__________<>__________
+
+__________<>__________
+init: 0
+naive mean: 16.607315 ms @ 10 iterations
+sum: 166.07315 ms
+fast mean: 19.163366 ms @ 10 iterations
+sum: 191.63367 ms
+total: 3836
+total: 4194
+__________<>__________
+init: 0
+naive mean: 3.2708316 ms @ 10 iterations
+sum: 32.708317 ms
+fast mean: 1.4944785 ms @ 10 iterations
+sum: 14.944785 ms
+total: 21
+total: 69
+__________<>__________
+python: 205.20ms ±  2.25ms
+__________<>__________
+python:  42.00ms ±  2.50ms
+__________<>__________
+python:  10.90ms ±  0.93ms
+__________<>__________
+
+__________<>__________
+init: 0
+naive mean: 22.900204 ms @ 10 iterations
+sum: 229.00204 ms
+fast mean: 25.590525 ms @ 10 iterations
+sum: 255.90523 ms
+image_save: 4.091162384s
+total: 4.576318298s
+__________<>__________
+init: 0
+naive mean: 4.512504 ms @ 10 iterations
+sum: 45.12504 ms
+fast mean: 2.8189056 ms @ 10 iterations
+sum: 28.189056 ms
+image_save: 23.075857ms
+total: 96.570212ms
+__________<>__________
+python: 203.72ms ±  1.65ms
+__________<>__________
+python:  44.63ms ±  3.13ms
+__________<>__________
+python:  13.05ms ±  1.56ms
+__________<>__________
+
+__________<>__________
+init: 0
+naive mean: 20.014992 ms @ 10 iterations
+sum: 200.14992 ms
+fast mean: 20.222637 ms @ 10 iterations
+sum: 202.22638 ms
+image_save: 3.927665267s
+total: 4.330290812s
+__________<>__________
+init: 0
+naive mean: 3.5209992 ms @ 10 iterations
+sum: 35.20999 ms
+fast mean: 2.1351388 ms @ 10 iterations
+sum: 21.351389 ms
+image_save: 22.344471ms
+total: 79.089465ms
+__________<>__________
+python: 219.39ms ± 11.25ms
+__________<>__________
+python:  44.04ms ±  1.94ms
+__________<>__________
+python:  11.17ms ±  2.03ms
+__________<>__________
+
+__________<>__________
+init: 0
+naive mean: 18.60122 ms @ 10 iterations
+sum: 186.0122 ms
+fast mean: 19.67324 ms @ 10 iterations
+sum: 196.7324 ms
+image_save: 3.879188933s
+total: 4.262130777s
+__________<>__________
+init: 0
+naive mean: 2.4529755 ms @ 10 iterations
+sum: 24.529757 ms
+fast mean: 1.5675052 ms @ 10 iterations
+sum: 15.675053 ms
+image_save: 22.279588ms
+total: 62.613116ms
+__________<>__________
+python: 202.24ms ±  2.58ms
+__________<>__________
+python:  43.61ms ±  4.09ms
+__________<>__________
+python:   9.90ms ±  0.17ms
+__________<>__________
+
+__________<>__________
+init: 0
+naive mean: 15.545315 ms @ 10 iterations
+sum: 155.45316 ms
+fast mean: 19.728374 ms @ 10 iterations
+sum: 197.28374 ms
+image_save: 3.917901359s
+total: 4.270839301s
+__________<>__________
+init: 0
+naive mean: 2.835346 ms @ 10 iterations
+sum: 28.35346 ms
+fast mean: 1.803564 ms @ 10 iterations
+sum: 18.03564 ms
+image_save: 22.856972ms
+total: 69.413489ms
+__________<>__________
+python: 205.48ms ±  3.46ms
+__________<>__________
+python:  44.63ms ±  3.59ms
+__________<>__________
+python:  10.38ms ±  0.88ms
+__________<>__________
+
+__________<>__________
+init: 0
+naive mean: 16.11142 ms @ 10 iterations
+sum: 161.1142 ms
+fast mean: 20.17921 ms @ 10 iterations
+sum: 201.7921 ms
+image_save: 3.869908822s
+total: 4.233020294s
+__________<>__________
+init: 0
+naive mean: 4.8859277 ms @ 10 iterations
+sum: 48.859276 ms
+fast mean: 2.7095263 ms @ 10 iterations
+sum: 27.095263 ms
+image_save: 23.642554ms
+total: 99.773375ms
+__________<>__________
+python: 205.16ms ±  3.03ms
+__________<>__________
+python:  42.84ms ±  3.50ms
+__________<>__________
+python:  10.30ms ±  0.47ms
+__________<>__________

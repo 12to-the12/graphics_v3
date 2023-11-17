@@ -1,0 +1,32 @@
+[package]
+name = "graphics-rust"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cargo-update = "13.2.0"
+image = "0.24.6"
+serde = "1.0.192"
+serde_derive = "1.0.192"
+stopwatch = "0.0.7"
+toml = "0.8.8"
+
+# # for windowing tutorial
+# winit = "0.28"
+# env_logger = "0.10"
+# log = "0.4"
+# wgpu = "0.17"
+
+
+
+[profile.release]
+# lto = "fat"
+# codegen-units = 1
+opt-level = 3
+debug = false
+# target-cpu = "native"
+
+# [build]
+# rustflags = ["-Z", "threads=8"]
