@@ -26,10 +26,11 @@ fn application(scene: &Scene) -> &Scene {
 fn calculate_global_space(scene: &mut Scene) {
 
 
-    let translation = Transform::Translation(vector(0.0, 0.0, -10.0));
+    // let translation = Transform::Translation(vector(0.0, 0.0, -10.0));
     // let translation = Transform::Translation(vector(0.0, -5.0, -10.0));
     for mesh in &mut scene.meshes {
-            mesh.transform_log.push(translation.clone());
+            let transform: Transform = Transform::Translation(mesh.position.clone());
+            mesh.transform_log.push(transform.clone());
 
     }
 

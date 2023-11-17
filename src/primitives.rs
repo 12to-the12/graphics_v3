@@ -107,7 +107,7 @@ pub struct Line3D {
 
 #[derive(Clone, Debug)]
 pub struct Mesh {
-    pub position: Vertex,
+    pub position: Vector,
     // pub orientation: ,
     pub vertices: Vec<Vertex>, // a mesh owns it's vertex information
     // pub polygons: Vec<Polygon>, // it also owns it's polygon information
@@ -150,7 +150,7 @@ pub fn unit_cube() -> Mesh {
         vec![3, 5, 7], // left
     ];
     let mesh = Mesh {
-        position: vertex(0.0, 0.0, 3.0),
+        position: vector(0.0, 0.0, 3.0),
         vertices: vec![a, b, c, d, e, f, g, h],
         polygons,
         output_vertices: Vec::new(),
