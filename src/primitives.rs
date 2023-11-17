@@ -201,12 +201,15 @@ impl Mesh {
         // println!("applying transformations");
         // println!("transform log length: {:?}",self.transform_log.len());
         let transform = compile_transforms(&self.transform_log);
-        println!("{:?}",transform.matrix);
+        println!("{:?}", transform.matrix);
         // println!("{:?}", transform);
         self.output_vertices = self.vertices.clone();
         // println!("{:?}", self.output_vertices);
         self.output_vertices = transform.process(self.output_vertices.clone());
         // println!("{:?}", self.output_vertices);
+    }
+    pub fn add_transform(&mut self, transform: Transform) -> () {
+        self.transform_log.push(transform);
     }
 }
 
@@ -253,7 +256,6 @@ impl Triangle {
 
         #[cfg(debug_assertions)]
         assert!(c.y as u32 <= canvas.dimensions().1);
-
 
         plot_line(canvas, a, b, color);
         plot_line(canvas, b, c, color);

@@ -24,7 +24,7 @@ impl Transform {
     }
 }
 
-fn build_identity_matrix() -> Transform {
+pub fn build_identity_matrix() -> Transform {
     let matrix = arr2(&[
         [1.0, 0.0, 0.0, 0.0],
         [0.0, 1.0, 0.0, 0.0],
@@ -45,17 +45,18 @@ pub fn build_translation_matrix(translation: Vector) -> Transform {
     ]);
     Transform { matrix }
 }
-// fn build_scale_matrix(scale: Vector) -> Array2<f32> {
-//     let x = scale.x;
-//     let y = scale.y;
-//     let z = scale.z;
-//     return arr2(&[
-//         [x, 0.0, 0.0, 0.0],
-//         [0.0, y, 0.0, 0.0],
-//         [0.0, 0.0, z, 0.0],
-//         [0.0, 0.0, 0.0, 1.0],
-//     ]);
-// }
+pub fn build_scale_matrix(scale: Vector) -> Transform {
+    let x = scale.x;
+    let y = scale.y;
+    let z = scale.z;
+    let matrix = arr2(&[
+        [x, 0.0, 0.0, 0.0],
+        [0.0, y, 0.0, 0.0],
+        [0.0, 0.0, z, 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+    ]);
+    Transform { matrix }
+}
 // fn build_x_rotation_matrix(θ: f32) -> Array2<f32> {
 //     return arr2(&[
 //         [0.0, 0.0, 0.0, 0.0],
@@ -104,7 +105,7 @@ fn round_6(x: &f32) -> f32 {
 
 pub fn compile_transforms(transforms: &Vec<Transform>) -> Transform {
     let mut composure = build_identity_matrix();
-    for transform in transforms {
+    for transform in transforms.iter().rev() {
         // this needs to be reversed
         let matrix = composure.matrix.dot(&transform.matrix);
 

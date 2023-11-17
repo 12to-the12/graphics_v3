@@ -3,7 +3,7 @@ use crate::camera::{Camera, Lens, Sensor};
 use crate::primitives::{unit_cube, vector, vertex, Mesh, Polygon, Vertex};
 // use crate::primitives::Object;
 use crate::lighting::{sun_light, Light};
-use crate::transformations::Transform;
+use crate::transformations::{Transform, build_scale_matrix};
 
 /// I am not sure what the responsibilities of this construction should be
 /// should it be concerned with intermediate rendering data?
@@ -48,7 +48,8 @@ pub fn simple_scene() -> Scene {
     };
     let light = sun_light(vertex(0.0, 0.0, 0.0), 1.0);
     let lights = vec![light];
-    let mesh = unit_cube(vector(3.0, 3.0, 10.0));
+    let mut mesh = unit_cube(vector(0.0, 0.0, 5.0));
+    mesh.add_transform(build_scale_matrix(vector(2.0, 1.0, 1.0)));
 
     let meshes = vec![mesh];
     let scene = Scene {
