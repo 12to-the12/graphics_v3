@@ -1,7 +1,7 @@
 use std::vec;
 
 use crate::application::application;
-use crate::primitives::{vector, Point, Polygon, Triangle, Vector, Vertex};
+use crate::primitives::{vector, Point, Polygon, Triangle, triangle, Vector, Vertex};
 // use crate::primitives::LineCollection;
 use crate::scene::Scene;
 // use crate::primitives::PolygonCollection;
@@ -79,20 +79,7 @@ fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
             let b = &mesh.output_vertices[poly[1]];
             let c = &mesh.output_vertices[poly[2]];
 
-            let a = Point {
-                x: a.x as i32,
-                y: a.y as i32,
-            };
-            let b = Point {
-                x: b.x as i32,
-                y: b.y as i32,
-            };
-            let c = Point {
-                x: c.x as i32,
-                y: c.y as i32,
-            };
-
-            Triangle { a, b, c }.draw(canvas, color);
+            triangle(a, b, c).draw(canvas, color);
         }
     }
 }

@@ -262,5 +262,22 @@ impl Triangle {
     }
 }
 
+pub fn triangle(a: &Vertex, b: &Vertex, c: &Vertex) -> Triangle {
+    let a = Point {
+        x: a.x as i32,
+        y: a.y as i32,
+    };
+    let b = Point {
+        x: b.x as i32,
+        y: b.y as i32,
+    };
+    let c = Point {
+        x: c.x as i32,
+        y: c.y as i32,
+    };
+
+    Triangle { a, b, c }
+}
+
 #[derive(Clone, Debug)]
 pub struct Angle(f32); // simple shit
