@@ -1,18 +1,5 @@
 #![allow(mixed_script_confusables)] // allows unicode characters
                                     // use std::time::Duration;
-
-// use image::open;
-
-extern crate stopwatch;
-use crate::transformations::{
-    build_scale_transform, build_x_rotation_transform, build_y_rotation_transform, build_z_rotation_transform,
-    Transform,
-};
-use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
-
-use crate::primitives::{vector,Mesh};
-// extern crate ndarray;
-
 mod coordinate_space;
 mod line_plotting;
 pub mod primitives;
@@ -23,18 +10,16 @@ mod camera;
 mod geometry_pipeline;
 mod lighting;
 mod scene;
+mod application;
 
-// use std::io;
+extern crate stopwatch;
 
 use std::{thread, time::Duration};
-
+use image::{ImageBuffer, ImageFormat, Rgb};
 use stopwatch::Stopwatch;
 
-// mod import_config;
-// use import_config::Config;
 use crate::geometry_pipeline::geometry_pipeline;
-
-use crate::scene::{simple_scene, Scene};
+use crate::scene::simple_scene;
 
 fn sleep(ms: u64) {
     thread::sleep(Duration::from_millis(ms as u64));
@@ -59,28 +44,15 @@ pub fn check_debug() {
     println!("Debugging disabled");
 }
 
-pub fn render_scene(scene: Scene) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
-    let mut render_time = Stopwatch::start_new();
-    let render = geometry_pipeline(scene);
-    render_time.stop();
-    println!("render: {:?}", render_time.elapsed());
-    render
-}
-
-fn transform(scene: &mut Scene, counter: f32) {
-    let mesh = &mut scene.meshes[0];
-    mesh.add_transform(build_y_rotation_transform(-counter.to_radians()));
-    mesh.add_transform(build_z_rotation_transform(-0.5 * counter.to_radians()));
-}
 fn main_loop() {
     let mut scene;
-    let mut render: ImageBuffer<Rgb<u8>, Vec<u8>>;
     let mut counter: f32 = 0.0;
     loop {
         scene = simple_scene();
-        transform(&mut scene, counter);
-
-        render = render_scene(scene);
+        let mut render_time = Stopwatch::start_new();
+        let render = geometry_pipeline(scene, counter);
+        render_time.stop();
+        println!("render: {:?}", render_time.elapsed());
         save_image(render);
         sleep(REST);
         counter += 1.0;
@@ -89,7 +61,7 @@ fn main_loop() {
 // const REST: u64 = 1000 / 8 as u64; // ms/frame @ 8 fps
 // const REST: u64 = 1000 / 12 as u64; // const REST: u64 = 1000/12 as u64;// ms/frame @ 12 fps
 const REST: u64 = 1000 / 24 as u64; // const REST: u64 = 1000/24 as u64;// ms/frame @ 24 fps
-// const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000/60 as u64;// ms/frame @ 60 fps
+                                    // const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000/60 as u64;// ms/frame @ 60 fps
 
 fn main() {
     check_debug();

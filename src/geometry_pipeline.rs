@@ -1,4 +1,4 @@
-use crate::line_plotting::plot_line;
+use crate::application::application;
 use crate::primitives::{vector, Point, Polygon, Triangle, Vector, Vertex};
 // use crate::primitives::LineCollection;
 use crate::scene::Scene;
@@ -8,19 +8,9 @@ use crate::transformations::{
 };
 use image::{ImageBuffer, Rgb, RgbImage};
 
-fn application(scene: &Scene) -> &Scene {
-    return scene;
-}
 
-// fn almalgamate_geometry(scene: &mut Scene) {
-//     for mesh in  &mut scene.meshes{
-//         mesh.apply_transformations();
-//         scene.unified_vertices.append(&mut mesh.global_vertices.clone());
 
-//         scene.unified_mesh.append(&mut mesh.polygons.clone())
-//     }
 
-// }
 
 /// transforms from world space to camera space
 fn build_camera_space_transform(scene: &Scene) -> Transform {
@@ -136,8 +126,8 @@ fn render(canvas: &mut RgbImage, scene: Scene) {
 /// animations, real time, whatever. It serves as an abstraction
 ///
 /// Currently, this is a purely software implementation that runs on a single core
-pub fn geometry_pipeline(mut scene: Scene) -> RgbImage {
-    application(&scene); // arrives at the geometry to render
+pub fn geometry_pipeline(mut scene: Scene, counter: f32) -> RgbImage {
+    application(&mut scene, counter); // arrives at the geometry to render
     vertex_shader(&mut scene); // projections
 
     let horizontal_res = scene.camera.sensor.horizontal_res;
