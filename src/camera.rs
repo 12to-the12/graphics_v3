@@ -8,6 +8,8 @@ pub struct Camera {
     // orientation: Orientation, // some object that implements get_orientation?
     pub lens: Lens,
     pub sensor: Sensor,
+    pub near_clipping_plane: f32,
+    pub far_clipping_plane: f32,
 }
 
 /// models a camera lens
@@ -70,6 +72,8 @@ mod tests {
             position: vertex(0.0, 0.0, 0.0),
             lens: lens,
             sensor: sensor,
+            near_clipping_plane: 1e-1,
+            far_clipping_plane: 1e6
         };
         assert_eq!(camera.horizontal_field_of_view().round(), 40.0); // 39.59775
         assert_eq!(camera.vertical_field_of_view().round(), 27.0); // 39.59775

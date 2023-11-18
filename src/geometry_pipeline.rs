@@ -3,7 +3,9 @@ use crate::primitives::{vector, Point, Polygon, Triangle, Vector, Vertex};
 // use crate::primitives::LineCollection;
 use crate::scene::Scene;
 // use crate::primitives::PolygonCollection;
-use crate::transformations::build_translation_matrix;
+use crate::transformations::{
+    build_projection_transform, build_translation_transform, compile_transforms, Transform,
+};
 use image::{ImageBuffer, Rgb, RgbImage};
 
 fn application(scene: &Scene) -> &Scene {
@@ -20,45 +22,43 @@ fn application(scene: &Scene) -> &Scene {
 
 // }
 
-fn calculate_global_space(scene: &mut Scene) {
-    // let translation = Transform::Translation(vector(0.0, 0.0, -10.0));
-    // let translation = Transform::Translation(vector(0.0, -5.0, -10.0));
-    for mesh in &mut scene.meshes {
-        let transform = build_translation_matrix(mesh.position.clone());
-        mesh.transform_log.push(transform);
-    }
+/// transforms from world space to camera space
+fn build_camera_space_transform(scene: &Scene) -> Transform {
+    let camera = &scene.camera;
+    return build_translation_transform(camera.position.inv());
+
+    // the camera rotation needs to be added
 }
-// fn calculate_screen_space(scene: &mut Scene) {}
-// fn calculate_device_space(scene: &mut Scene) {
-//     // scene.device_space();
+
+fn build_to_projection_transform(scene: &Scene) -> Transform {
+    return build_projection_transform(&scene.camera);
+}
+
+// fn build_to_clip_transform(scene: &Scene) -> Transform {
+//     return build_clip_transform(&scene.camera);
 // }
+fn vertex_shader(scene: &mut Scene) {
+    // calculate_global_space(scene);
+    // view transform that goes from global space to clip space
 
-/// transform object local space to global space
-/// camera to global position and orientation
-/// everything then gets transformed to camera space
-/// and to screen space after that
-///
-/// return a list of lines to draw for this mvp implementation
-///
-/// in the future everything will be constructed of references,
-/// but for now, everything is going to be instantiated many times
-fn geometry(scene: &mut Scene) {
-    // almalgamate_geometry(scene);
-    calculate_global_space(scene);
-    // calculate_camera_space(scene);
-    // calculate_screen_space(scene);
-    // calculate_device_space(scene);
+    // world -> camera translation
+    // world -> camera rotation
+    // camera -> projection operation
 
-    // all objects -> global space
-    // for mesh in scene.meshes{
-    //     mesh.calculate_global();
-    // }
-    // for mesh in scene.meshes{
-    //     mesh.calculate_camera
-    // }
-    // all objects -> camera space
-    // all objects -> screen space
-    //
+    // --> clip coordinates
+    let mut uniform_view_transforms: Vec<Transform> = Vec::new();
+
+    uniform_view_transforms.push(build_camera_space_transform(scene));
+    uniform_view_transforms.push(build_to_projection_transform(scene));
+    // println!("{:?}",uniform_view_transforms);
+    let uniform_view_transform = compile_transforms(&uniform_view_transforms);
+    // println!("{:?}",uniform_view_transform);
+    for mesh in &mut scene.meshes {
+        let transform = build_translation_transform(mesh.position.clone());
+        mesh.add_transform(transform);
+        mesh.add_transform(uniform_view_transform.clone());
+        println!("transforms: {:?}\n\n", mesh.get_transforms());
+    }
 }
 
 /// this takes input data that has lines, and paints the canvas
@@ -68,27 +68,12 @@ fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
     let color = Rgb([0, 255, 0]);
 
     let camera = &scene.camera;
-    // let hfov = camera.horizontal_field_of_view();
-    let hfov = 90.0;
-
-    let hfactor = hfov / 90.0; // for every meter away
-
-    let vfactor = hfov / 90.0 / camera.sensor.aspect_ratio(); // for every meter away
 
     let hres = camera.sensor.horizontal_res as f32;
     let vres = camera.sensor.vertical_res as f32;
 
     for mut mesh in scene.meshes {
         mesh.apply_transformations();
-        for (i, vertex) in mesh.output_vertices.clone().iter().enumerate() {
-            let z = vertex.z;
-
-            let x = vertex.x / z / hfactor; // positive z on purpose
-            let y = vertex.y / -z / vfactor; // negative z on purpose
-            let foreshortened = Vertex { x, y, z };
-
-            mesh.output_vertices[i] = foreshortened;
-        }
         for poly in mesh.polygons {
             let a = &mesh.output_vertices[poly[0]]; // currently vertexes;
             let b = &mesh.output_vertices[poly[1]];
@@ -153,7 +138,8 @@ fn render(canvas: &mut RgbImage, scene: Scene) {
 /// Currently, this is a purely software implementation that runs on a single core
 pub fn geometry_pipeline(mut scene: Scene) -> RgbImage {
     application(&scene); // arrives at the geometry to render
-    geometry(&mut scene); // projections
+    vertex_shader(&mut scene); // projections
+
     let horizontal_res = scene.camera.sensor.horizontal_res;
     let vertical_res = scene.camera.sensor.vertical_res;
     let mut canvas: RgbImage = ImageBuffer::new(horizontal_res, vertical_res);

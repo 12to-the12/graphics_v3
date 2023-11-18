@@ -462,8 +462,6 @@ dependencies = [
  "iai",
  "image",
  "ndarray",
- "serde",
- "serde_derive",
  "stopwatch",
  "toml 0.8.8",
 ]

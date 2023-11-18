@@ -1,7 +1,7 @@
 from camera:
 up is +Y
 right is +Y
-into the scene is +Z
+into the scene is *-Z*
 
 same as Blender
 

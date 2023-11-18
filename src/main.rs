@@ -5,7 +5,7 @@
 
 extern crate stopwatch;
 use crate::transformations::{
-    build_scale_matrix, build_x_rotation_matrix, build_y_rotation_matrix, build_z_rotation_matrix,
+    build_scale_transform, build_x_rotation_transform, build_y_rotation_transform, build_z_rotation_transform,
     Transform,
 };
 use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
@@ -69,8 +69,8 @@ pub fn render_scene(scene: Scene) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
 
 fn transform(scene: &mut Scene, counter: f32) {
     let mesh = &mut scene.meshes[0];
-    mesh.add_transform(build_y_rotation_matrix(-counter.to_radians()));
-    mesh.add_transform(build_z_rotation_matrix(-0.5 * counter.to_radians()));
+    mesh.add_transform(build_y_rotation_transform(-counter.to_radians()));
+    mesh.add_transform(build_z_rotation_transform(-0.5 * counter.to_radians()));
 }
 fn main_loop() {
     let mut scene;
@@ -86,10 +86,10 @@ fn main_loop() {
         counter += 1.0;
     }
 }
-const REST: u64 = 1000 / 8 as u64; // ms/frame @ 8 fps
-                                   // const REST: u64 = 1000/12 as u64;// ms/frame @ 12 fps
-                                   // const REST: u64 = 1000/24 as u64;// ms/frame @ 24 fps
-                                   // const REST: u64 = 1000/60 as u64;// ms/frame @ 60 fps
+// const REST: u64 = 1000 / 8 as u64; // ms/frame @ 8 fps
+// const REST: u64 = 1000 / 12 as u64; // const REST: u64 = 1000/12 as u64;// ms/frame @ 12 fps
+const REST: u64 = 1000 / 24 as u64; // const REST: u64 = 1000/24 as u64;// ms/frame @ 24 fps
+// const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000/60 as u64;// ms/frame @ 60 fps
 
 fn main() {
     check_debug();

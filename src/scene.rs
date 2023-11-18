@@ -3,7 +3,7 @@ use crate::camera::{Camera, Lens, Sensor};
 use crate::primitives::{unit_cube, vector, vertex, Mesh, Polygon, Vertex};
 // use crate::primitives::Object;
 use crate::lighting::{sun_light, Light};
-use crate::transformations::{Transform, build_scale_matrix, build_x_rotation_matrix, build_y_rotation_matrix, build_z_rotation_matrix};
+use crate::transformations::{Transform, build_scale_transform, build_x_rotation_transform, build_y_rotation_transform, build_z_rotation_transform};
 
 /// I am not sure what the responsibilities of this construction should be
 /// should it be concerned with intermediate rendering data?
@@ -38,17 +38,19 @@ pub fn simple_scene() -> Scene {
         width: 36.0,
         // height: 24.0,
         horizontal_res: 400,
-        vertical_res: 300,
+        vertical_res: 400,
     };
     let camera = Camera {
         position: vertex(0.0, 0.0, 0.0),
         // orientation: Polar
         lens,
         sensor,
+        near_clipping_plane: 1e-1,
+        far_clipping_plane: 1e6
     };
     let light = sun_light(vertex(0.0, 0.0, 0.0), 1.0);
     let lights = vec![light];
-    let mut mesh = unit_cube(vector(0.0, 0.0, 5.0));
+    let mesh = unit_cube(vector(0.0, 0.0, -5.0));
 
 
     let meshes = vec![mesh];

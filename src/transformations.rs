@@ -1,6 +1,6 @@
 use std::ops::Mul;
 
-use crate::primitives::{vector, vertex, vertex_from_array, Angle, Vector, Vertex};
+use crate::{primitives::{vector, vertex, vertex_from_array, Angle, Vector, Vertex}, camera::Camera};
 
 use ndarray::{arr1, arr2, Array1, Array2, Axis};
 
@@ -15,16 +15,17 @@ impl Transform {
             // processes vertex by vertex
             let vertex = vertex.as_homogenous_array();
             let vertex = arr1(&vertex);
+            println!("in vertex: {:?}", vertex);
             let transform = &self.matrix;
             let out_vertex = transform.dot(&vertex); // the resulting vertex
-
+            println!("out vertex: {:?}\n\n", out_vertex);
             out.push(vertex_from_array(out_vertex)); // output a vertex
         }
         return out;
     }
 }
 
-pub fn build_identity_matrix() -> Transform {
+pub fn build_identity_transform() -> Transform {
     let matrix = arr2(&[
         [1.0, 0.0, 0.0, 0.0],
         [0.0, 1.0, 0.0, 0.0],
@@ -33,7 +34,7 @@ pub fn build_identity_matrix() -> Transform {
     ]);
     Transform { matrix }
 }
-pub fn build_translation_matrix(translation: Vector) -> Transform {
+pub fn build_translation_transform(translation: Vector) -> Transform {
     let x = translation.x;
     let y = translation.y;
     let z = translation.z;
@@ -45,7 +46,7 @@ pub fn build_translation_matrix(translation: Vector) -> Transform {
     ]);
     Transform { matrix }
 }
-pub fn build_scale_matrix(scale: Vector) -> Transform {
+pub fn build_scale_transform(scale: Vector) -> Transform {
     let x = scale.x;
     let y = scale.y;
     let z = scale.z;
@@ -57,7 +58,23 @@ pub fn build_scale_matrix(scale: Vector) -> Transform {
     ]);
     Transform { matrix }
 }
-pub fn build_x_rotation_matrix(θ: f32) -> Transform {
+/// still trying to figure this one out
+pub fn build_projection_transform(camera: &Camera) -> Transform {
+    let hfov = 45.0;
+    let hfactor = hfov / 90.0; // for every meter away
+    let _vfactor = hfov / 90.0 / camera.sensor.aspect_ratio(); // for every meter away
+
+
+    let matrix = arr2(&[
+        //*x + *y + *z + *1
+        [1.0, 0.0, 0.0, 0.0], // composes the x value
+        [0.0, 1.0, 0.0, 0.0], // composes the y value
+        [0.0, 0.0, 1.0, 0.0],  // composes the z value
+        [0.0, 0.0, hfactor, 0.0],
+    ]);
+    Transform { matrix }
+}
+pub fn build_x_rotation_transform(θ: f32) -> Transform {
     let matrix = arr2(&[
         [1.0, 0.0, 0.0, 0.0],
         [0.0, cos(θ), sin(θ), 0.0],
@@ -66,7 +83,7 @@ pub fn build_x_rotation_matrix(θ: f32) -> Transform {
     ]);
     Transform { matrix }
 }
-pub fn build_y_rotation_matrix(θ: f32) -> Transform {
+pub fn build_y_rotation_transform(θ: f32) -> Transform {
     let matrix = arr2(&[
         [cos(θ), 0.0, -sin(θ), 0.0],
         [0.0, 1.0, 0.0, 0.0],
@@ -75,7 +92,7 @@ pub fn build_y_rotation_matrix(θ: f32) -> Transform {
     ]);
     Transform { matrix }
 }
-pub fn build_z_rotation_matrix(θ: f32) -> Transform {
+pub fn build_z_rotation_transform(θ: f32) -> Transform {
     let matrix = arr2(&[
         [cos(θ), -sin(θ), 0.0, 0.0],
         [sin(θ), cos(θ), 0.0, 0.0],
@@ -84,6 +101,18 @@ pub fn build_z_rotation_matrix(θ: f32) -> Transform {
     ]);
     Transform { matrix }
 }
+
+// /// the input vector is the shear coefficient along each axis,
+// /// where a value of 0 does nothing and a value of one
+// pub fn build_shear_matrix(θ: f32) -> Transform {
+//     let matrix = arr2(&[
+//         [cos(θ), -sin(θ), 0.0, 0.0],
+//         [sin(θ), cos(θ), 0.0, 0.0],
+//         [0.0, 0.0, 1.0, 0.0],
+//         [0.0, 0.0, 0.0, 1.0],
+//     ]);
+//     Transform { matrix }
+// }
 
 fn cos(θ: f32) -> f32 {
     θ.cos()
@@ -108,7 +137,7 @@ fn round_6(x: &f32) -> f32 {
 }
 
 pub fn compile_transforms(transforms: &Vec<Transform>) -> Transform {
-    let mut composure = build_identity_matrix();
+    let mut composure = build_identity_transform();
     for transform in transforms.iter().rev() {
         // this needs to be reversed
         let matrix = composure.matrix.dot(&transform.matrix);
@@ -124,7 +153,7 @@ mod tests {
 
     use ndarray::linalg::Dot;
 
-    use crate::primitives::vertex;
+    use crate::{primitives::vertex, scene::simple_scene};
 
     use super::*;
 
@@ -135,7 +164,7 @@ mod tests {
         // let offset = vector(-1.0, 3.0, -7.3);
         // let mytransform = Transform::Translation(offset);
         // apply_transform(&mut myvertexlist, mytransform);
-        let mytransform = build_translation_matrix(vector(-1.0, 3.0, -7.3));
+        let mytransform = build_translation_transform(vector(-1.0, 3.0, -7.3));
         let myvertexlist = mytransform.process(myvertexlist);
         assert_eq!(myvertexlist[0], vertex(0.0, 5.0, -4.3));
         assert_ne!(myvertexlist[0], vertex(1.0, 2.0, 3.0));
@@ -155,7 +184,7 @@ mod tests {
     }
     #[test]
     fn verify_identity_implementation() {
-        let transform = build_identity_matrix();
+        let transform = build_identity_transform();
         let myvertex = arr1(&[-169.0, 0.0, 729.7, 1.0]);
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
@@ -175,7 +204,7 @@ mod tests {
     }
     #[test]
     fn verify_translation_implementation() {
-        let transform = build_translation_matrix(vector(1.1, 0.0, -7.6));
+        let transform = build_translation_transform(vector(1.1, 0.0, -7.6));
         let myvertex = arr1(&[1.0, 2.0, 3.0, 1.0]);
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
@@ -196,7 +225,7 @@ mod tests {
     }
     #[test]
     fn verify_scale_implementation() {
-        let transform = build_scale_matrix(vector(3.0, -2.0, 2.2));
+        let transform = build_scale_transform(vector(3.0, -2.0, 2.2));
         let myvertex = arr1(&[1.0, 2.0, 3.0, 1.0]);
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
@@ -225,12 +254,25 @@ mod tests {
     }
     #[test]
     fn verify_rotation_implementation() {
-        let transform = build_z_rotation_matrix(90f32.to_radians());
+        let transform = build_z_rotation_transform(90f32.to_radians());
         let myvertex = arr1(&[1.0, 2.0, 3.0, 1.0]);
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
         let myvertex = arr1(&myvertex.as_array());
         let myvertex = myvertex.map(round_6);
         assert_eq!(arr1(&[-2.0, 1.0, 3.0]), myvertex);
+    }
+
+    #[test]
+    fn verify_projection_implementation() {
+        let transform = build_projection_transform(simple_scene().camera);
+        println!("{:?}",transform);
+        let myvertex = arr1(&[10.0, 10.0, 5.0, 1.0]);
+        let vertex_list = vec![vertex_from_array(myvertex)];
+        let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
+        println!("{:?}",myvertex);
+        let myvertex = arr1(&myvertex.as_array());
+        let myvertex = myvertex.map(round_6);
+        assert_eq!(arr1(&[2.0, 2.0, 1.0]), myvertex);
     }
 }

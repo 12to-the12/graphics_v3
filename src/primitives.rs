@@ -5,7 +5,7 @@ use ndarray::Array1;
 use crate::{coordinate_space::Orientation, line_plotting::plot_line};
 
 use crate::coordinate_space::Polar;
-use crate::transformations::{build_translation_matrix, compile_transforms, Transform};
+use crate::transformations::{build_translation_transform, compile_transforms, Transform};
 
 /// point in 3D space
 #[derive(Clone, Debug, PartialEq)]
@@ -24,7 +24,6 @@ impl Vertex {
         };
     }
     pub fn add(&mut self, other: &Vector) {
-
         self.x += other.x;
         self.y += other.y;
         self.z += other.z;
@@ -35,6 +34,12 @@ impl Vertex {
     pub fn as_homogenous_array(&self) -> [f32; 4] {
         [self.x, self.y, self.z, 1.0]
     }
+    pub fn inv(&self) -> Vector {
+        let x = self.x * -1.0;
+        let y = self.y * -1.0;
+        let z = self.z * -1.0;
+        Vector { x, y, z }
+    }
 }
 
 pub fn vertex(x: f32, y: f32, z: f32) -> Vertex {
@@ -42,10 +47,11 @@ pub fn vertex(x: f32, y: f32, z: f32) -> Vertex {
 }
 
 pub fn vertex_from_array(arr: Array1<f32>) -> Vertex {
+    let w = arr[3];
     return Vertex {
-        x: arr[0],
-        y: arr[1],
-        z: arr[2],
+        x: arr[0] / w,
+        y: arr[1] / w,
+        z: arr[2] / w,
     };
 }
 /// direction and magnitude in 3D space
@@ -128,7 +134,26 @@ pub struct Mesh {
     // pub polygons: Vec<Polygon>, // it also owns it's polygon information
     pub polygons: Vec<Vec<usize>>,
     pub output_vertices: Vec<Vertex>,
-    pub transform_log: Vec<Transform>,
+    transform_log: Vec<Transform>,
+}
+impl Mesh {
+    /// I need to learn matrix math for this one
+    /// for now we'll keep it to simple translations
+    /// transforms are kept as a list of transforms to be done, which is much more efficient
+    pub fn apply_transformations(&mut self) {
+        let transform = compile_transforms(&self.transform_log);
+        // println!("{:?}", transform.matrix);
+        println!("compiled transform:{:?}", transform);
+
+        self.output_vertices = self.vertices.clone();
+        self.output_vertices = transform.process(self.output_vertices.clone());
+    }
+    pub fn add_transform(&mut self, transform: Transform) -> () {
+        self.transform_log.push(transform);
+    }
+    pub fn get_transforms(&self) -> &Vec<Transform> {
+        return &self.transform_log;
+    }
 }
 
 pub fn unit_cube(position: Vector) -> Mesh {
@@ -185,20 +210,6 @@ pub fn unit_cube(position: Vector) -> Mesh {
     // mesh.polygons.push(polygon(&b, &d, &f)); // right bdfh
     // mesh.polygons.push(polygon(&d, &f, &h)); // right
     return mesh;
-}
-
-impl Mesh {
-    /// I need to learn matrix math for this one
-    /// for now we'll keep it to simple translations
-    /// transforms are kept as a list of transforms to be done, which is much more efficient
-    pub fn apply_transformations(&mut self) {
-        let transform = compile_transforms(&self.transform_log);
-        self.output_vertices = self.vertices.clone();
-        self.output_vertices = transform.process(self.output_vertices.clone());
-    }
-    pub fn add_transform(&mut self, transform: Transform) -> () {
-        self.transform_log.push(transform);
-    }
 }
 
 /// 2D line
