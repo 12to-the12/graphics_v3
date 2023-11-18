@@ -1,6 +1,6 @@
 use image::{Rgb, RgbImage};
 
-use crate::primitives::Point;
+use crate::primitives::{Point, Triangle};
 
 
 fn plot_line_low(canvas: &mut RgbImage, p0: &Point, p1: &Point, color: Rgb<u8>) {
@@ -84,4 +84,32 @@ pub fn plot_line_naive(canvas: &mut RgbImage, p0: &Point, p1: &Point, color: Rgb
         let y = (m * x as f32 + b).round();
         canvas.put_pixel(x as u32, y as u32, color);
     }
+}
+
+pub fn plot_triangle(triangle: Triangle, canvas: &mut RgbImage, color: Rgb<u8>) {
+        let a: &Point = &triangle.a;
+        let b: &Point = &triangle.b;
+        let c: &Point = &triangle.c;
+
+        #[cfg(debug_assertions)]
+        assert!(a.x as u32 <= canvas.dimensions().0);
+
+        #[cfg(debug_assertions)]
+        assert!(a.y as u32 <= canvas.dimensions().1);
+
+        #[cfg(debug_assertions)]
+        assert!(b.x as u32 <= canvas.dimensions().0);
+
+        #[cfg(debug_assertions)]
+        assert!(b.y as u32 <= canvas.dimensions().1);
+
+        #[cfg(debug_assertions)]
+        assert!(c.x as u32 <= canvas.dimensions().0);
+
+        #[cfg(debug_assertions)]
+        assert!(c.y as u32 <= canvas.dimensions().1);
+
+        plot_line(canvas, a, b, color);
+        plot_line(canvas, b, c, color);
+        plot_line(canvas, c, a, color);
 }

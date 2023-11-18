@@ -232,35 +232,6 @@ pub struct Triangle {
     pub c: Point,
 }
 
-impl Triangle {
-    pub fn draw(&self, canvas: &mut RgbImage, color: Rgb<u8>) {
-        let a: &Point = &self.a;
-        let b: &Point = &self.b;
-        let c: &Point = &self.c;
-
-        #[cfg(debug_assertions)]
-        assert!(a.x as u32 <= canvas.dimensions().0);
-
-        #[cfg(debug_assertions)]
-        assert!(a.y as u32 <= canvas.dimensions().1);
-
-        #[cfg(debug_assertions)]
-        assert!(b.x as u32 <= canvas.dimensions().0);
-
-        #[cfg(debug_assertions)]
-        assert!(b.y as u32 <= canvas.dimensions().1);
-
-        #[cfg(debug_assertions)]
-        assert!(c.x as u32 <= canvas.dimensions().0);
-
-        #[cfg(debug_assertions)]
-        assert!(c.y as u32 <= canvas.dimensions().1);
-
-        plot_line(canvas, a, b, color);
-        plot_line(canvas, b, c, color);
-        plot_line(canvas, c, a, color);
-    }
-}
 
 pub fn triangle(a: &Vertex, b: &Vertex, c: &Vertex) -> Triangle {
     let a = Point {

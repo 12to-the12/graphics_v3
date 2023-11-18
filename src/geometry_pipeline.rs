@@ -10,7 +10,7 @@ use crate::transformations::{
     compile_transforms, Transform,
 };
 use image::{ImageBuffer, Rgb, RgbImage};
-
+use crate::line_plotting::plot_triangle;
 use stopwatch::Stopwatch;
 
 /// transforms from world space to camera space
@@ -79,7 +79,7 @@ fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
             let b = &mesh.output_vertices[poly[1]];
             let c = &mesh.output_vertices[poly[2]];
 
-            triangle(a, b, c).draw(canvas, color);
+            plot_triangle(triangle(a, b, c), canvas, color)
         }
     }
 }
