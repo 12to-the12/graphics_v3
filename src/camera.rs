@@ -44,10 +44,10 @@ impl Sensor{
 }
 impl Camera {
     pub fn horizontal_field_of_view(&self) -> f32 {
-        return (self.sensor.width / (2.0 * self.lens.focal_length)).atan() * 2.0 * (180.0 / π);
+        return ((self.sensor.width / (2.0 * self.lens.focal_length)).atan() * 2.0).to_degrees();
     }
     pub fn vertical_field_of_view(&self) -> f32 {
-        return (self.sensor.height() / (2.0 * self.lens.focal_length)).atan() * 2.0 * (180.0 / π);
+        return ((self.sensor.height() / (2.0 * self.lens.focal_length)).atan() * 2.0).to_degrees();
     }
 
 }

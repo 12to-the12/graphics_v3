@@ -1,7 +1,9 @@
 use std::ops::Mul;
 
-use crate::{primitives::{vector, vertex, vertex_from_array, Angle, Vector, Vertex}, camera::Camera};
-
+use crate::{
+    camera::Camera,
+    primitives::{vector, vertex, vertex_from_array, Angle, Vector, Vertex},
+};
 use ndarray::{arr1, arr2, Array1, Array2, Axis};
 
 #[derive(Clone, Debug)]
@@ -18,7 +20,7 @@ impl Transform {
             // println!("in vertex: {:?}", vertex);
             let transform = &self.matrix;
             let out_vertex = transform.dot(&vertex); // the resulting vertex
-            // println!("out vertex: {:?}\n\n", out_vertex);
+                                                     // println!("out vertex: {:?}\n\n", out_vertex);
             out.push(vertex_from_array(out_vertex)); // output a vertex
         }
         return out;
@@ -62,14 +64,13 @@ pub fn build_scale_transform(scale: Vector) -> Transform {
 pub fn build_projection_transform(camera: &Camera) -> Transform {
     let hfov = camera.horizontal_field_of_view();
     let hfactor = hfov / 90.0; // for every meter away
-    let _vfactor = hfov / 90.0 / camera.sensor.aspect_ratio(); // for every meter away
-
+    let vfactor = hfactor / camera.sensor.aspect_ratio(); // for every meter away
 
     let matrix = arr2(&[
         //*x + *y + *z + *1
         [1.0, 0.0, 0.0, 0.0], // composes the x value
         [0.0, 1.0, 0.0, 0.0], // composes the y value
-        [0.0, 0.0, 1.0, 0.0],  // composes the z value
+        [0.0, 0.0, 1.0, 0.0], // composes the z value
         [0.0, 0.0, hfactor, 0.0],
     ]);
     Transform { matrix }
@@ -149,6 +150,8 @@ pub fn compile_transforms(transforms: &Vec<Transform>) -> Transform {
 
 #[cfg(test)]
 mod tests {
+    use crate::camera::{Camera, Lens, Sensor};
+
     use std::ops::Mul;
 
     use ndarray::linalg::Dot;
@@ -265,14 +268,49 @@ mod tests {
 
     #[test]
     fn verify_projection_implementation() {
-        let transform = build_projection_transform(simple_scene().camera);
-        println!("{:?}",transform);
+        let lens = Lens {
+            aperture: 30.0,
+            focal_length: 18.0,
+            focus_distance: 2.0,
+        };
+        let sensor = Sensor {
+            width: 36.0,
+            horizontal_res: 400,
+            vertical_res: 300,
+        };
+        let camera = Camera {
+            position: vertex(0.0, 0.0, 0.0),
+            // orientation: Polar
+            lens,
+            sensor,
+            near_clipping_plane: 1e-1,
+            far_clipping_plane: 1e6,
+        };
+        let transform = build_projection_transform(&camera);
+        println!("{:?}",camera.horizontal_field_of_view());
+        println!("{:?}", transform);
         let myvertex = arr1(&[10.0, 10.0, 5.0, 1.0]);
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
-        println!("{:?}",myvertex);
+        println!("{:?}", myvertex);
         let myvertex = arr1(&myvertex.as_array());
         let myvertex = myvertex.map(round_6);
         assert_eq!(arr1(&[2.0, 2.0, 1.0]), myvertex);
+
+        let myvertex = arr1(&[015.0, 0.0, 3.0, 1.0]);
+        let vertex_list = vec![vertex_from_array(myvertex)];
+        let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
+        println!("{:?}", myvertex);
+        let myvertex = arr1(&myvertex.as_array());
+        let myvertex = myvertex.map(round_6);
+        assert_eq!(arr1(&[05.0, 0.0, 1.0]), myvertex);
+
+        let myvertex = arr1(&[10.0, 10.0, 1.0, 1.0]);
+        let vertex_list = vec![vertex_from_array(myvertex)];
+        let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
+        println!("{:?}", myvertex);
+        let myvertex = arr1(&myvertex.as_array());
+        let myvertex = myvertex.map(round_6);
+        assert_eq!(arr1(&[10.0, 10.0, 1.0]), myvertex);
     }
 }

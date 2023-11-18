@@ -1,16 +1,16 @@
 use std::vec;
 
 use crate::application::application;
-use crate::primitives::{vector, Point, Polygon, Triangle, triangle, Vector, Vertex};
+use crate::primitives::{triangle, vector, Point, Polygon, Triangle, Vector, Vertex};
 // use crate::primitives::LineCollection;
 use crate::scene::Scene;
 // use crate::primitives::PolygonCollection;
+use crate::line_plotting::plot_triangle;
 use crate::transformations::{
     build_projection_transform, build_scale_transform, build_translation_transform,
     compile_transforms, Transform,
 };
 use image::{ImageBuffer, Rgb, RgbImage};
-use crate::line_plotting::plot_triangle;
 use stopwatch::Stopwatch;
 
 /// transforms from world space to camera space
@@ -31,11 +31,14 @@ fn build_to_projection_transform(scene: &Scene) -> Transform {
 
 fn build_to_display_transform(scene: &Scene) -> Transform {
     let camera = &scene.camera;
+    let aspect_ratio = camera.sensor.aspect_ratio();
     let hres = camera.sensor.horizontal_res as f32;
     let vres = camera.sensor.vertical_res as f32;
 
     let mut display = Vec::new();
     // to de center the coordinates
+    display.push(build_scale_transform(vector(1.0, aspect_ratio, 1.0)));
+
     display.push(build_translation_transform(vector(1.0, 1.0, 0.0)));
     display.push(build_scale_transform(vector(0.5, 0.5, 1.0)));
 
