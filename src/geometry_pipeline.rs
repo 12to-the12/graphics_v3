@@ -1,16 +1,17 @@
+use std::vec;
+
 use crate::application::application;
 use crate::primitives::{vector, Point, Polygon, Triangle, Vector, Vertex};
 // use crate::primitives::LineCollection;
 use crate::scene::Scene;
 // use crate::primitives::PolygonCollection;
 use crate::transformations::{
-    build_projection_transform, build_translation_transform, compile_transforms, Transform,
+    build_projection_transform, build_scale_transform, build_translation_transform,
+    compile_transforms, Transform,
 };
 use image::{ImageBuffer, Rgb, RgbImage};
 
-
-
-
+use stopwatch::Stopwatch;
 
 /// transforms from world space to camera space
 fn build_camera_space_transform(scene: &Scene) -> Transform {
@@ -27,6 +28,22 @@ fn build_to_projection_transform(scene: &Scene) -> Transform {
 // fn build_to_clip_transform(scene: &Scene) -> Transform {
 //     return build_clip_transform(&scene.camera);
 // }
+
+fn build_to_display_transform(scene: &Scene) -> Transform {
+    let camera = &scene.camera;
+    let hres = camera.sensor.horizontal_res as f32;
+    let vres = camera.sensor.vertical_res as f32;
+
+    let mut display = Vec::new();
+    // to de center the coordinates
+    display.push(build_translation_transform(vector(1.0, 1.0, 0.0)));
+    display.push(build_scale_transform(vector(0.5, 0.5, 1.0)));
+
+    // to make them correct
+    display.push(build_scale_transform(vector(hres, vres, 1.0)));
+    compile_transforms(&display)
+}
+
 fn vertex_shader(scene: &mut Scene) {
     // calculate_global_space(scene);
     // view transform that goes from global space to clip space
@@ -40,6 +57,8 @@ fn vertex_shader(scene: &mut Scene) {
 
     uniform_view_transforms.push(build_camera_space_transform(scene));
     uniform_view_transforms.push(build_to_projection_transform(scene));
+    uniform_view_transforms.push(build_to_display_transform(scene));
+
     // println!("{:?}",uniform_view_transforms);
     let uniform_view_transform = compile_transforms(&uniform_view_transforms);
     // println!("{:?}",uniform_view_transform);
@@ -47,20 +66,14 @@ fn vertex_shader(scene: &mut Scene) {
         let transform = build_translation_transform(mesh.position.clone());
         mesh.add_transform(transform);
         mesh.add_transform(uniform_view_transform.clone());
-        println!("transforms: {:?}\n\n", mesh.get_transforms());
+        // println!("transforms: {:?}\n\n", mesh.get_transforms());
     }
 }
 
-/// this takes input data that has lines, and paints the canvas
-/// all of the input geometry is already scaled to the canvas properly
-/// all it does is paint the canvas
 fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
     let color = Rgb([0, 255, 0]);
 
     let camera = &scene.camera;
-
-    let hres = camera.sensor.horizontal_res as f32;
-    let vres = camera.sensor.vertical_res as f32;
 
     for mut mesh in scene.meshes {
         mesh.apply_transformations();
@@ -70,16 +83,16 @@ fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
             let c = &mesh.output_vertices[poly[2]];
 
             let a = Point {
-                x: (((a.x + 1.0) / 2.0) * hres) as i32,
-                y: (((a.y + 1.0) / 2.0) * vres) as i32,
+                x: a.x as i32,
+                y: a.y as i32,
             };
             let b = Point {
-                x: (((b.x + 1.0) / 2.0) * hres) as i32,
-                y: (((b.y + 1.0) / 2.0) * vres) as i32,
+                x: b.x as i32,
+                y: b.y as i32,
             };
             let c = Point {
-                x: (((c.x + 1.0) / 2.0) * hres) as i32,
-                y: (((c.y + 1.0) / 2.0) * vres) as i32,
+                x: c.x as i32,
+                y: c.y as i32,
             };
 
             Triangle { a, b, c }.draw(canvas, color);
@@ -128,11 +141,20 @@ fn render(canvas: &mut RgbImage, scene: Scene) {
 /// Currently, this is a purely software implementation that runs on a single core
 pub fn geometry_pipeline(mut scene: Scene, counter: f32) -> RgbImage {
     application(&mut scene, counter); // arrives at the geometry to render
+
+    let mut vertex_shade = Stopwatch::start_new();
+
     vertex_shader(&mut scene); // projections
+    vertex_shade.stop();
+    println!("vertex_shade: {:?}", vertex_shade.elapsed());
 
     let horizontal_res = scene.camera.sensor.horizontal_res;
     let vertical_res = scene.camera.sensor.vertical_res;
     let mut canvas: RgbImage = ImageBuffer::new(horizontal_res, vertical_res);
+
+    let mut render_time = Stopwatch::start_new();
     render(&mut canvas, scene);
+    render_time.stop();
+    println!("render: {:?}", render_time.elapsed());
     canvas
 }

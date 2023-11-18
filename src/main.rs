@@ -2,10 +2,8 @@
                                     // use std::time::Duration;
 mod coordinate_space;
 mod line_plotting;
-pub mod primitives;
+mod primitives;
 mod transformations;
-// mod window;
-// mod draw_box;
 mod camera;
 mod geometry_pipeline;
 mod lighting;
@@ -48,20 +46,20 @@ fn main_loop() {
     let mut scene;
     let mut counter: f32 = 0.0;
     loop {
+        println!("");
         scene = simple_scene();
-        let mut render_time = Stopwatch::start_new();
+
         let render = geometry_pipeline(scene, counter);
-        render_time.stop();
-        println!("render: {:?}", render_time.elapsed());
         save_image(render);
         sleep(REST);
         counter += 1.0;
+        counter %= 360.0;
     }
 }
 // const REST: u64 = 1000 / 8 as u64; // ms/frame @ 8 fps
 // const REST: u64 = 1000 / 12 as u64; // const REST: u64 = 1000/12 as u64;// ms/frame @ 12 fps
-const REST: u64 = 1000 / 24 as u64; // const REST: u64 = 1000/24 as u64;// ms/frame @ 24 fps
-                                    // const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000/60 as u64;// ms/frame @ 60 fps
+// const REST: u64 = 1000 / 24 as u64; // const REST: u64 = 1000/24 as u64;// ms/frame @ 24 fps
+const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000/60 as u64;// ms/frame @ 60 fps
 
 fn main() {
     check_debug();

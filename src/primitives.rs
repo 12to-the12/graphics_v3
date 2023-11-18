@@ -143,7 +143,7 @@ impl Mesh {
     pub fn apply_transformations(&mut self) {
         let transform = compile_transforms(&self.transform_log);
         // println!("{:?}", transform.matrix);
-        println!("compiled transform:{:?}", transform);
+        // println!("compiled transform:{:?}", transform);
 
         self.output_vertices = self.vertices.clone();
         self.output_vertices = transform.process(self.output_vertices.clone());
