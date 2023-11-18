@@ -72,9 +72,6 @@ fn vertex_shader(scene: &mut Scene) {
 
 fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
     let color = Rgb([0, 255, 0]);
-
-    let camera = &scene.camera;
-
     for mut mesh in scene.meshes {
         mesh.apply_transformations();
         for poly in mesh.polygons {
@@ -98,9 +95,6 @@ fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
             Triangle { a, b, c }.draw(canvas, color);
         }
     }
-    // for line in scene.unified_mesh {
-    // plot_line(canvas, &line.a, &line.b, color);
-    // }
 }
 
 /// the function that actually paints the scene into an image
