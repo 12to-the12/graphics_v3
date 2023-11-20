@@ -11,6 +11,7 @@ mod scene;
 mod application;
 mod rasterization;
 mod pixel_shader;
+mod path_tracing;
 
 extern crate stopwatch;
 

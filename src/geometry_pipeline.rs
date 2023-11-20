@@ -1,12 +1,12 @@
 use std::vec;
-
+use crate::camera::Camera;
 use crate::application::application;
 use crate::primitives::{triangle, vector, Point, Polygon, Triangle, Vector, Vertex};
 // use crate::primitives::LineCollection;
 use crate::scene::Scene;
 // use crate::primitives::PolygonCollection;
 use crate::line_plotting::plot_triangle;
-use crate::pixel_shader::{toy_shader, shade_pixels};
+use crate::pixel_shader::{shade_pixels, toy_shader};
 use crate::rasterization::rasterize_triangle;
 use crate::transformations::{
     build_projection_transform, build_scale_transform, build_translation_transform,
@@ -16,8 +16,7 @@ use image::{ImageBuffer, Rgb, RgbImage};
 use stopwatch::Stopwatch;
 
 /// transforms from world space to camera space
-fn build_camera_space_transform(scene: &Scene) -> Transform {
-    let camera = &scene.camera;
+fn build_camera_space_transform(camera: &Camera) -> Transform {
     return build_translation_transform(camera.position.inv());
 
     // the camera rotation needs to be added
@@ -41,10 +40,12 @@ fn build_to_display_transform(scene: &Scene) -> Transform {
     // to de center the coordinates
     display.push(build_scale_transform(vector(1.0, aspect_ratio, 1.0)));
 
+    display.push(build_scale_transform(vector(-1.0, 1.0, 0.0)));
+
     display.push(build_translation_transform(vector(1.0, 1.0, 0.0)));
     display.push(build_scale_transform(vector(0.5, 0.5, 1.0)));
 
-    // to make them correct
+    // to make them pixel correct
     display.push(build_scale_transform(vector(hres, vres, 1.0)));
     compile_transforms(&display)
 }
@@ -60,7 +61,7 @@ fn vertex_shader(scene: &mut Scene) {
     // --> clip coordinates
     let mut uniform_view_transforms: Vec<Transform> = Vec::new();
 
-    uniform_view_transforms.push(build_camera_space_transform(scene));
+    uniform_view_transforms.push(build_camera_space_transform(&scene.camera));
     uniform_view_transforms.push(build_to_projection_transform(scene));
     uniform_view_transforms.push(build_to_display_transform(scene));
 
@@ -117,11 +118,25 @@ fn solid(canvas: &mut RgbImage, scene: Scene) {
 /// the geometry id
 /// the material associated with that geometry
 /// the associated images maps and the corresponding coordinates
-fn rasterize(canvas: &mut RgbImage, scene: Scene) {
+fn rasterize(canvas: &mut RgbImage, mut scene: Scene) {
+    let mut vertex_shade = Stopwatch::start_new();
+
+    vertex_shader(&mut scene); // projections
+    vertex_shade.stop();
+    println!("vertex_shade: {:?}", vertex_shade.elapsed());
+
     solid(canvas, scene);
 }
 
-fn ray_trace(canvas: &mut RgbImage, scene: Scene) {
+fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
+    for mesh in &mut scene.meshes {
+        // for mesh in scene.meshes.iter_mut() {
+        let transform = build_translation_transform(mesh.position.clone());
+        mesh.add_transform(transform);
+        mesh.add_transform(build_camera_space_transform(&scene.camera));
+
+        mesh.apply_transformations();
+    }
     shade_pixels(canvas, &scene, toy_shader);
 }
 
@@ -145,12 +160,6 @@ fn render(canvas: &mut RgbImage, scene: Scene) {
 /// Currently, this is a purely software implementation that runs on a single core
 pub fn geometry_pipeline(mut scene: Scene, counter: f32) -> RgbImage {
     application(&mut scene, counter); // arrives at the geometry to render
-
-    let mut vertex_shade = Stopwatch::start_new();
-
-    vertex_shader(&mut scene); // projections
-    vertex_shade.stop();
-    println!("vertex_shade: {:?}", vertex_shade.elapsed());
 
     let horizontal_res = scene.camera.sensor.horizontal_res;
     let vertical_res = scene.camera.sensor.vertical_res;

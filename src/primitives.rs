@@ -40,6 +40,12 @@ impl Vertex {
         let z = self.z * -1.0;
         Vector { x, y, z }
     }
+    pub fn as_vector(&self) -> Vector {
+        let x = self.x;
+        let y = self.y;
+        let z = self.z;
+        Vector { x, y, z }
+    }
 }
 
 pub fn vertex(x: f32, y: f32, z: f32) -> Vertex {
@@ -84,6 +90,27 @@ impl Vector {
     pub fn as_homogenous_array(&self) -> [f32; 4] {
         [self.x, self.y, self.z, 1.0]
     }
+    pub fn dot(&self, other: &Vector) -> f32 {
+        self.x * other.x + self.y * other.y + self.z * other.z
+    }
+    pub fn minus(&self, other: &Vector) -> Vector {
+        let x = self.x - other.x;
+        let y = self.y - other.y;
+        let z = self.z - other.z;
+        Vector { x, y, z }
+    }
+    pub fn times(&self, factor: f32) -> Vector {
+        let x = self.x * factor;
+        let y = self.y * factor;
+        let z = self.z * factor;
+        Vector { x, y, z }
+    }
+    pub fn is_origin(&self) -> bool {
+        if self.x == 0. && self.y == 0. && self.z == 0. {
+            return true;
+        }
+        false
+    }
 }
 
 pub fn vector(x: f32, y: f32, z: f32) -> Vector {
@@ -111,6 +138,20 @@ impl Polygon {
         plot_line(canvas, a, b, color);
         plot_line(canvas, b, c, color);
         plot_line(canvas, c, a, color);
+    }
+    /// ONLY WORKS FOR TRIGON
+    pub fn get_normal(&self) -> Vector {
+        let a = &self.b.as_vector().minus(&self.a.as_vector());
+        let b = &self.c.as_vector().minus(&self.a.as_vector());
+        // let c = &self.c;
+        let x = a.y * b.z - a.z * b.y;
+        let y = a.z * b.x - a.x * b.z;
+        let z = a.x * b.y - a.y * b.x;
+
+
+        let mut out = vector(x, y, z);
+        out.norm();
+        out
     }
 }
 
@@ -157,15 +198,6 @@ impl Mesh {
 }
 
 pub fn unit_cube(position: Vector) -> Mesh {
-    // let a: Vertex = vertex(-1.0, -1.0, -1.0); //  left down bottom from above
-    // let b: Vertex = vertex(1.0, -1.0, -1.0); // right down bottom from above
-    // let c: Vertex = vertex(-1.0, 1.0, -1.0); //  left   up bottom from above
-    // let d: Vertex = vertex(1.0, 1.0, -1.0); // right   up bottom from above
-    // let e: Vertex = vertex(-1.0, -1.0, 1.0); //  left down    top from above
-    // let f: Vertex = vertex(1.0, -1.0, 1.0); // right down    top from above
-    // let g: Vertex = vertex(-1.0, 1.0, 1.0); //  left   up    top from above
-    // let h: Vertex = vertex(1.0, 1.0, 1.0); // right   up    top from above
-
     let a: Vertex = vertex(-1.0, -1.0, -1.0); //0  left down bottom from above
     let b: Vertex = vertex(1.0, -1.0, -1.0); //1 right down bottom from above
     let c: Vertex = vertex(-1.0, 1.0, -1.0); //2  left   up bottom from above
@@ -196,26 +228,13 @@ pub fn unit_cube(position: Vector) -> Mesh {
         output_vertices: Vec::new(),
         transform_log: Vec::new(),
     };
-    // mesh.polygons.push(polygon(&mesh.vertices[0], &mesh.vertices[0], &mesh.vertices[0]));
-    // mesh.polygons.push(polygon(&e, &f, &g)); // top
-    // mesh.polygons.push(polygon(&f, &g, &h)); // top
-    // mesh.polygons.push(polygon(&a, &b, &c)); // bottom
-    // mesh.polygons.push(polygon(&b, &c, &d)); // bottom
-    // mesh.polygons.push(polygon(&c, &d, &g)); // up (+y) cdgh
-    // mesh.polygons.push(polygon(&d, &g, &h)); // up (+y)
-    // mesh.polygons.push(polygon(&a, &b, &e)); // down (-y) abef
-    // mesh.polygons.push(polygon(&b, &e, &f)); // down (-y)
-    // mesh.polygons.push(polygon(&a, &c, &e)); // left aceg
-    // mesh.polygons.push(polygon(&c, &e, &g)); // left
-    // mesh.polygons.push(polygon(&b, &d, &f)); // right bdfh
-    // mesh.polygons.push(polygon(&d, &f, &h)); // right
     return mesh;
 }
 
 pub fn sample_mesh(position: Vector) -> Mesh {
-    let a: Vertex = vertex(0.0, 0.0, 0.0); //0  left down bottom from above
-    let b: Vertex = vertex(1.0, 0.0, 0.0); //1 right down bottom from above
-    let c: Vertex = vertex(0.0, 1.0, 0.0); //2  left   up bottom from above
+    let a: Vertex = vertex(0., 0., 0.); //0  left down bottom from above
+    let b: Vertex = vertex(1., 0., 0.); //1 right down bottom from above
+    let c: Vertex = vertex(0., 0.5, 0.); //2  left   up bottom from above
 
     let polygons = vec![
         vec![0, 1, 2], // bottom 0123
@@ -287,6 +306,7 @@ pub fn triangle(a: &Vertex, b: &Vertex, c: &Vertex) -> Triangle {
 #[derive(Clone, Debug)]
 pub struct Angle(f32); // simple shit
 
+#[derive(Clone, Debug)]
 pub struct Ray {
     pub position: Vector,
     pub direction: Vector,
