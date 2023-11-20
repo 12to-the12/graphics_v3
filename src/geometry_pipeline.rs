@@ -6,6 +6,8 @@ use crate::primitives::{triangle, vector, Point, Polygon, Triangle, Vector, Vert
 use crate::scene::Scene;
 // use crate::primitives::PolygonCollection;
 use crate::line_plotting::plot_triangle;
+use crate::pixel_shader::{toy_shader, shade_pixels};
+use crate::rasterization::rasterize_triangle;
 use crate::transformations::{
     build_projection_transform, build_scale_transform, build_translation_transform,
     compile_transforms, Transform,
@@ -87,6 +89,19 @@ fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
     }
 }
 
+fn solid(canvas: &mut RgbImage, scene: Scene) {
+    for mut mesh in scene.meshes {
+        mesh.apply_transformations();
+        for poly in mesh.polygons {
+            let a = &mesh.output_vertices[poly[0]]; // currently vertexes;
+            let b = &mesh.output_vertices[poly[1]];
+            let c = &mesh.output_vertices[poly[2]];
+
+            rasterize_triangle(triangle(a, b, c), canvas);
+        }
+    }
+}
+
 /// the function that actually paints the scene into an image
 /// this takes a reference to a canvas and paints upon it
 ///
@@ -103,7 +118,11 @@ fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
 /// the material associated with that geometry
 /// the associated images maps and the corresponding coordinates
 fn rasterize(canvas: &mut RgbImage, scene: Scene) {
-    wire_frame(canvas, scene)
+    solid(canvas, scene);
+}
+
+fn ray_trace(canvas: &mut RgbImage, scene: Scene) {
+    shade_pixels(canvas, &scene, toy_shader);
 }
 
 /// this serves as an abstraction away from rasterization, so that ray tracing can be dropped into the pipeline
@@ -111,7 +130,8 @@ fn rasterize(canvas: &mut RgbImage, scene: Scene) {
 /// I am unsure of the best way to pass it information
 ///
 fn render(canvas: &mut RgbImage, scene: Scene) {
-    rasterize(canvas, scene);
+    // rasterize(canvas, scene);
+    ray_trace(canvas, scene);
 }
 
 /// Application

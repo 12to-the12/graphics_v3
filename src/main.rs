@@ -9,6 +9,8 @@ mod geometry_pipeline;
 mod lighting;
 mod scene;
 mod application;
+mod rasterization;
+mod pixel_shader;
 
 extern crate stopwatch;
 
@@ -56,10 +58,11 @@ fn main_loop() {
         counter %= 360.0;
     }
 }
+// const REST: u64 = 1000 / 1 as u64; // ms/frame @ 1 fps
 // const REST: u64 = 1000 / 8 as u64; // ms/frame @ 8 fps
-// const REST: u64 = 1000 / 12 as u64; // const REST: u64 = 1000/12 as u64;// ms/frame @ 12 fps
+const REST: u64 = 1000 / 12 as u64; // const REST: u64 = 1000/12 as u64;// ms/frame @ 12 fps
 // const REST: u64 = 1000 / 24 as u64; // const REST: u64 = 1000/24 as u64;// ms/frame @ 24 fps
-const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000/60 as u64;// ms/frame @ 60 fps
+// const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000/60 as u64;// ms/frame @ 60 fps
 
 fn main() {
     check_debug();

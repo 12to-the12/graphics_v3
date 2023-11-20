@@ -212,6 +212,24 @@ pub fn unit_cube(position: Vector) -> Mesh {
     return mesh;
 }
 
+pub fn sample_mesh(position: Vector) -> Mesh {
+    let a: Vertex = vertex(0.0, 0.0, 0.0); //0  left down bottom from above
+    let b: Vertex = vertex(1.0, 0.0, 0.0); //1 right down bottom from above
+    let c: Vertex = vertex(0.0, 1.0, 0.0); //2  left   up bottom from above
+
+    let polygons = vec![
+        vec![0, 1, 2], // bottom 0123
+    ];
+    let mesh = Mesh {
+        position,
+        vertices: vec![a, b, c],
+        polygons,
+        output_vertices: Vec::new(),
+        transform_log: Vec::new(),
+    };
+    return mesh;
+}
+
 /// 2D line
 pub struct Line {
     pub a: Point,
@@ -225,14 +243,30 @@ pub struct Point {
     pub y: i32,
 }
 
+pub struct BoundingBox2D {
+    pub min: Point,
+    pub max: Point,
+}
 /// 2D
+#[derive(Clone)]
 pub struct Triangle {
     pub a: Point,
     pub b: Point,
     pub c: Point,
 }
 
-
+impl Triangle {
+    // fn points(&self) ->
+    pub fn get_bounding_box(&self) -> BoundingBox2D {
+        let x = *vec![self.a.x, self.b.x, self.c.x].iter().min().unwrap();
+        let y = *vec![self.a.y, self.b.y, self.c.y].iter().min().unwrap();
+        let min = Point { x, y };
+        let x = *vec![self.a.x, self.b.x, self.c.x].iter().max().unwrap();
+        let y = *vec![self.a.y, self.b.y, self.c.y].iter().max().unwrap();
+        let max = Point { x, y };
+        BoundingBox2D { min, max }
+    }
+}
 pub fn triangle(a: &Vertex, b: &Vertex, c: &Vertex) -> Triangle {
     let a = Point {
         x: a.x as i32,
@@ -252,3 +286,16 @@ pub fn triangle(a: &Vertex, b: &Vertex, c: &Vertex) -> Triangle {
 
 #[derive(Clone, Debug)]
 pub struct Angle(f32); // simple shit
+
+pub struct Ray {
+    pub position: Vector,
+    pub direction: Vector,
+}
+
+pub fn ray(position: Vector, direction: Vector) -> Ray {
+    direction.clone().norm();
+    Ray {
+        position,
+        direction,
+    }
+}
