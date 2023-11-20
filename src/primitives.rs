@@ -198,28 +198,33 @@ impl Mesh {
 }
 
 pub fn unit_cube(position: Vector) -> Mesh {
-    let a: Vertex = vertex(-1.0, -1.0, -1.0); //0  left down bottom from above
-    let b: Vertex = vertex(1.0, -1.0, -1.0); //1 right down bottom from above
-    let c: Vertex = vertex(-1.0, 1.0, -1.0); //2  left   up bottom from above
-    let d: Vertex = vertex(1.0, 1.0, -1.0); //3 right   up bottom from above
-    let e: Vertex = vertex(-1.0, -1.0, 1.0); //4  left down    top from above
-    let f: Vertex = vertex(1.0, -1.0, 1.0); //5 right down    top from above
-    let g: Vertex = vertex(-1.0, 1.0, 1.0); //6  left   up    top from above
-    let h: Vertex = vertex(1.0, 1.0, 1.0); //7 right   up    top from above
+    let a: Vertex = vertex(-1.0, -1.0, -1.0); //0  left down far from above
+    let b: Vertex = vertex(1.0, -1.0, -1.0); //1 right down far from above
+    let c: Vertex = vertex(-1.0, 1.0, -1.0); //2  left   up far from above
+    let d: Vertex = vertex(1.0, 1.0, -1.0); //3 right   up far from above
+    let e: Vertex = vertex(-1.0, -1.0, 1.0); //4  left down    close from above
+    let f: Vertex = vertex(1.0, -1.0, 1.0); //5 right down    close from above
+    let g: Vertex = vertex(-1.0, 1.0, 1.0); //6  left   up    close from above
+    let h: Vertex = vertex(1.0, 1.0, 1.0); //7 right   up    close from above
 
     let polygons = vec![
-        vec![0, 1, 2], // bottom 0123
+        vec![0, 2, 1], // bottom 0123
         vec![1, 2, 3], // bottom
-        vec![4, 5, 6], // top 4567
-        vec![5, 6, 7], // top
+
+        vec![4, 5, 6], // close 4567
+        vec![6, 5, 7], // close
+
         vec![0, 1, 4], // down 01 45
-        vec![1, 4, 5], // down
-        vec![2, 3, 6], // up 23 67
+        vec![4, 1, 5], // down
+
+        vec![2, 6, 3], // up 23 67
         vec![3, 6, 7], // up
-        vec![0, 2, 4], // right 0 2 4 6
+
+        vec![0, 4, 2], // right 0 2 4 6
         vec![2, 4, 6], // right
+
         vec![1, 3, 5], // left 1 3 5 7
-        vec![3, 5, 7], // left
+        vec![5, 3, 7], // left
     ];
     let mesh = Mesh {
         position,

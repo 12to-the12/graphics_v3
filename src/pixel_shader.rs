@@ -24,6 +24,7 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
 
 pub fn toy_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = pixel_to_ray(x, y, scene);
+    let mut hit = false;
     for mesh in scene.meshes.clone() {
         for poly in mesh.polygons {
             // println!("{:?}\n\n\n", mesh.output_vertices);
@@ -32,15 +33,15 @@ pub fn toy_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             let c = mesh.output_vertices[poly[2]].clone();
             let polygon = polygon(a, b, c);
             if ray_polygon_intersection_test(&ray, &polygon) {
-                return Rgb([255, 0, 0]);
-            } else {
-                return Rgb([0, 0, 0]);
-            }
+                hit = true}
+            // } else {
+            //     return Rgb([0, 0, 0]);
+            // }
             // return ray_polygon_intersection_test(&ray, &polygon);
         }
     }
-    return Rgb([0, 150, 0]); // only happens if there is no geometry to check against
-                             // Rgb([x, y, y])
+    if hit {return Rgb([255,255,255])}  
+    else{return Rgb([0,0,0])}                           // Rgb([x, y, y])
 }
 
 /// yeah, the math was hard for me too 2023-11-20

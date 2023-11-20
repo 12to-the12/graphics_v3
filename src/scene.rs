@@ -40,8 +40,8 @@ pub fn simple_scene() -> Scene {
     let sensor = Sensor {
         width: 36.0,
         // height: 24.0,
-        horizontal_res: 400,
-        vertical_res: 300,
+        horizontal_res: 80,
+        vertical_res: 60,
     };
     let camera = Camera {
         position: vertex(0.0, 0.0, 0.0),
@@ -53,8 +53,8 @@ pub fn simple_scene() -> Scene {
     };
     let light = sun_light(vertex(0.0, 0.0, 0.0), 1.0);
     let lights = vec![light];
-    // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
-    let mesh = sample_mesh(vector(0.0, 0.0, -3.0));
+    let mesh = unit_cube(vector(0.0, 0.0, -5.0));
+    // let mesh = sample_mesh(vector(0.0, 0.0, -3.0));
 
     let meshes = vec![mesh];
     let scene = Scene {
