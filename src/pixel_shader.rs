@@ -12,7 +12,7 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
     scene: &Scene,
     closure: F,
 ) {
-    println!("{}",scene.camera.sensor.horizontal_res);
+    println!("{}", scene.camera.sensor.horizontal_res);
     let (width, height) = canvas.dimensions();
     for y in 0..height {
         for x in 0..width {
@@ -33,15 +33,19 @@ pub fn solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             let c = mesh.output_vertices[poly[2]].clone();
             let polygon = polygon(a, b, c);
             if ray_polygon_intersection_test(&ray, &polygon) {
-                hit = true}
+                hit = true
+            }
             // } else {
             //     return Rgb([0, 0, 0]);
             // }
             // return ray_polygon_intersection_test(&ray, &polygon);
         }
     }
-    if hit {return Rgb([255,255,255])}  
-    else{return Rgb([0,0,0])}                           // Rgb([x, y, y])
+    if hit {
+        return Rgb([255, 255, 255]);
+    } else {
+        return Rgb([0, 0, 0]);
+    } // Rgb([x, y, y])
 }
 
 pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
@@ -69,11 +73,26 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 
     if hit {
         let light_angle = vector(0., 0., -1.);
-        let θ = light_angle.dot(&surface_normal).cosh().to_degrees();
-        let mag = (θ * (256. / 90.)) as u8;
-        return Rgb([mag,mag,mag])
-    }  
-    else{return Rgb([0,0,0])}                           // Rgb([x, y, y])
+        let θ = light_angle.dot(&surface_normal).acos().to_degrees();
+        // if θ < 90. {return Rgb([255,0,0])}
+        // if θ < 60. {return Rgb([255,0,0])}
+        // println!("");
+
+        // println!("{θ}");
+        // println!("{:?}", surface_normal);
+        // println!("{:?}", light_angle.dot(&surface_normal).acos());
+        // println!("controlled angle:{}",vector(0., 0., -1.).dot(&vector(0., 0., 1.)).acos().to_degrees());
+
+        let mut mag = θ;
+        mag -= 90.;
+        mag /= 90.;
+
+        mag *= 255.;
+        let mag = mag as u8;
+        return Rgb([mag, mag, mag]);
+    } else {
+        return Rgb([0, 0, 0]);
+    } // Rgb([x, y, y])
 }
 
 /// yeah, the math was hard for me too 2023-11-20
