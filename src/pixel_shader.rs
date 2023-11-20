@@ -31,12 +31,12 @@ pub fn toy_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             let b = mesh.output_vertices[poly[1]].clone();
             let c = mesh.output_vertices[poly[2]].clone();
             let polygon = polygon(a, b, c);
-            // if ray_polygon_intersection_test(&ray, &polygon) {
-            //     return Rgb([255, 0, 0]);
-            // } else {
-            //     return Rgb([0, 0, 0]);
-            // }
-            return ray_polygon_intersection_test(&ray, &polygon);
+            if ray_polygon_intersection_test(&ray, &polygon) {
+                return Rgb([255, 0, 0]);
+            } else {
+                return Rgb([0, 0, 0]);
+            }
+            // return ray_polygon_intersection_test(&ray, &polygon);
         }
     }
     return Rgb([0, 150, 0]); // only happens if there is no geometry to check against

@@ -5,7 +5,7 @@ use image::{Rgb, RgbImage};
 
 
 
-pub fn ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> Rgb<u8> {
+pub fn ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> bool {
     // println!("{:?}\n\n\n",polygon);
     // first, if the ray is parallel to the plane the polygon lies in, they do not intersect
     // you can also discard backfacing normals
@@ -26,8 +26,8 @@ pub fn ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> Rgb<u8> {
     // if np.all(I == 0):
     //     return False
     if I.is_origin() {
-        // return false;
-        return Rgb([0,255,0]);
+        return false;
+        // return Rgb([0,255,0]);
     }
     // A, B, C = points
     let A = polygon.a.as_vector();
@@ -97,21 +97,21 @@ pub fn ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> Rgb<u8> {
     // if np.any(barycentric_coordinates < 0):
     //     return False
     if a < 0. || b < 0. || c < 0. {
-        // return false;
+        return false;
         // println!("{},{},{} for {:?}",a,b,c,ray.direction);
-        return Rgb([255,0,0]);
+        // return Rgb([255,0,0]);
     }
     // if np.any(barycentric_coordinates > 1):
     //     return False
     if a > 1. || b > 1. || c > 1. {
-        // return false;
-        return Rgb([0,0,255]);
+        return false;
+        // return Rgb([0,0,255]);
 
     }
 
     // return True
-    // true
-    return Rgb([255,255,255]);
+    true
+    // return Rgb([255,255,255]);
 
 }
 
