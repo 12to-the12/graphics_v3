@@ -22,7 +22,7 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
     }
 }
 
-pub fn toy_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
+pub fn solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = pixel_to_ray(x, y, scene);
     let mut hit = false;
     for mesh in scene.meshes.clone() {
