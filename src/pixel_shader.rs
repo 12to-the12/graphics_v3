@@ -44,6 +44,38 @@ pub fn solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     else{return Rgb([0,0,0])}                           // Rgb([x, y, y])
 }
 
+pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
+    let ray = pixel_to_ray(x, y, scene);
+    let mut hit = false;
+    let mut surface_normal: Vector;
+    surface_normal = vector(1., 1., 1.);
+    for mesh in scene.meshes.clone() {
+        for poly in mesh.polygons {
+            // println!("{:?}\n\n\n", mesh.output_vertices);
+            let a = mesh.output_vertices[poly[0]].clone();
+            let b = mesh.output_vertices[poly[1]].clone();
+            let c = mesh.output_vertices[poly[2]].clone();
+            let polygon = polygon(a, b, c);
+            if ray_polygon_intersection_test(&ray, &polygon) {
+                hit = true;
+                surface_normal = polygon.get_normal();
+            }
+            // } else {
+            //     return Rgb([0, 0, 0]);
+            // }
+            // return ray_polygon_intersection_test(&ray, &polygon);
+        }
+    }
+
+    if hit {
+        let light_angle = vector(0., 0., -1.);
+        let θ = light_angle.dot(&surface_normal).cosh().to_degrees();
+        let mag = (θ * (256. / 90.)) as u8;
+        return Rgb([mag,mag,mag])
+    }  
+    else{return Rgb([0,0,0])}                           // Rgb([x, y, y])
+}
+
 /// yeah, the math was hard for me too 2023-11-20
 pub fn pixel_to_ray(x: u32, y: u32, scene: &Scene) -> Ray {
     let x = (x as f32) + 0.5; // centers the pixels

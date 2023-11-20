@@ -6,7 +6,7 @@ use crate::primitives::{triangle, vector, Point, Polygon, Triangle, Vector, Vert
 use crate::scene::Scene;
 // use crate::primitives::PolygonCollection;
 use crate::line_plotting::plot_triangle;
-use crate::pixel_shader::{shade_pixels, toy_shader};
+use crate::pixel_shader::{shade_pixels, solid_shader, lit_shader};
 use crate::rasterization::rasterize_triangle;
 use crate::transformations::{
     build_projection_transform, build_scale_transform, build_translation_transform,
@@ -137,7 +137,7 @@ fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
 
         mesh.apply_transformations();
     }
-    shade_pixels(canvas, &scene, toy_shader);
+    shade_pixels(canvas, &scene, lit_shader);
 }
 
 /// this serves as an abstraction away from rasterization, so that ray tracing can be dropped into the pipeline
