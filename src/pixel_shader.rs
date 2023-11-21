@@ -97,7 +97,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             let mut mag = θ; // [0 -> 180]
 
             if mag > 0. {
-                return Rgb([0, 10, 0]);
+                return Rgb([0, 100, 0]);
 
             }
 
