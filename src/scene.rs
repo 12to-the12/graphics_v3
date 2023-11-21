@@ -2,6 +2,7 @@ use crate::camera::{Camera, Lens, Sensor};
 // use crate::coordinate_space::Polar;
 use crate::primitives::{sample_mesh, unit_cube, vector, vertex, Mesh, Polygon, Vertex};
 // use crate::primitives::Object;
+use crate::load_object_file::load_obj;
 use crate::lighting::{sun_light, Light};
 use crate::transformations::{
     build_scale_transform, build_x_rotation_transform, build_y_rotation_transform,
@@ -53,9 +54,12 @@ pub fn simple_scene() -> Scene {
     };
     let light = sun_light(vertex(0.0, 0.0, 0.0), 1.0);
     let lights = vec![light];
-    let mesh = unit_cube(vector(0.0, 0.0, -5.0));
+    // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
     // let mesh = sample_mesh(vector(0.0, 0.0, -3.0));
+    let mut mesh = load_obj("models/cube.obj".to_string());
+    mesh.position = vector(0.0, 0.0, -5.0);
 
+    println!("polygons: {:?}",mesh.polygons);
     let meshes = vec![mesh];
     let scene = Scene {
         camera,

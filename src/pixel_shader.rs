@@ -1,6 +1,6 @@
 use crate::camera::{Camera, Lens, Sensor};
 use crate::line_plotting::plot_triangle;
-use crate::path_tracing::ray_polygon_intersection_test;
+use crate::path_tracing::{probe_ray_polygon_intersection, ray_polygon_intersection_test};
 use crate::primitives::{polygon, ray, vector, vertex, Point, Polygon, Ray, Triangle, Vector};
 use crate::scene::Scene;
 use image::{Rgb, RgbImage};
@@ -51,6 +51,7 @@ pub fn solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = pixel_to_ray(x, y, scene);
     let mut hit = false;
+    let mut closest = 1e6;
     let mut surface_normal: Vector;
     surface_normal = vector(1., 1., 1.);
     for mesh in scene.meshes.clone() {
@@ -60,7 +61,9 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             let b = mesh.output_vertices[poly[1]].clone();
             let c = mesh.output_vertices[poly[2]].clone();
             let polygon = polygon(a, b, c);
-            if ray_polygon_intersection_test(&ray, &polygon) {
+            let (b, I, dist) = probe_ray_polygon_intersection(&ray, &polygon);
+            if b && dist < closest {
+                closest = dist;
                 hit = true;
                 surface_normal = polygon.get_normal();
             }
@@ -72,22 +75,34 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     }
 
     if hit {
-        let light_angle = vector(0., 0., -1.);
+        let light_angle = vector(-1., 0., 0.);
         let θ = light_angle.dot(&surface_normal).acos().to_degrees();
-        // if θ < 90. {return Rgb([255,0,0])}
-        // if θ < 60. {return Rgb([255,0,0])}
-        // println!("");
-
-        // println!("{θ}");
-        // println!("{:?}", surface_normal);
-        // println!("{:?}", light_angle.dot(&surface_normal).acos());
-        // println!("controlled angle:{}",vector(0., 0., -1.).dot(&vector(0., 0., 1.)).acos().to_degrees());
 
         let mut mag = θ;
         mag -= 90.;
         mag /= 90.;
 
+        mag -= 0.5;
+        mag *= -1.;
+        mag += 0.5;
+
         mag *= 255.;
+        // let mag = mag as u8;
+
+        // let light_angleb = vector(0., 1., -1.);
+        // let θ = light_angleb.dot(&surface_normal).acos().to_degrees();
+        // let mut mag2 = θ;
+        // mag2 -= 90.;
+        // mag2 /= 90.; // I want 90 to equal 0 and 0 90
+        // mag2 *= -1.; // 0 to one and one to zero
+
+        // mag2 -= 0.5;
+        // mag2 *= -1.;
+        // mag2 += 0.5;
+
+        // mag2 *= 255.;
+
+        // let mag = ((mag + mag2) / 2.).clamp(0., 255.) as u8;
         let mag = mag as u8;
         return Rgb([mag, mag, mag]);
     } else {
@@ -146,17 +161,23 @@ mod tests {
         ray = pixel_to_ray(0, 2, &scene);
 
         println!("direction: {:?}", ray.direction);
-        assert_eq!(ray.direction.x, -0.3333333); //
-        assert_eq!(ray.direction.y, -0.3333333); //
-        assert_eq!(ray.direction.z, -0.5); //
+
+        let mut foil = vector(-0.3333333, -0.3333333, -0.5);
+        foil.norm();
+        assert_eq!(ray.direction.x, foil.x); //
+        assert_eq!(ray.direction.y, foil.y); //
+        assert_eq!(ray.direction.z, foil.z); //
 
         scene.camera.sensor.horizontal_res = 1;
         scene.camera.sensor.vertical_res = 1;
         ray = pixel_to_ray(0, 0, &scene);
 
         println!("direction: {:?}", ray.direction);
-        assert_eq!(ray.direction.x, 0.0); //
-        assert_eq!(ray.direction.y, 0.0); //
-        assert_eq!(ray.direction.z, -0.5); //
+
+        let mut foil = vector(00.0, 0.0, -0.5);
+        foil.norm();
+        assert_eq!(ray.direction.x, foil.x); //
+        assert_eq!(ray.direction.y, foil.y); //
+        assert_eq!(ray.direction.z, foil.z); //
     }
 }

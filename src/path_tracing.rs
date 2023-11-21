@@ -3,9 +3,11 @@ use std::vec;
 use crate::primitives::{vector, Polygon, Ray, Vector};
 use image::{Rgb, RgbImage};
 
-
-
 pub fn ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> bool {
+    let (b, I, dist) = probe_ray_polygon_intersection(ray, polygon);
+    b
+}
+pub fn probe_ray_polygon_intersection(ray: &Ray, polygon: &Polygon) -> (bool, Vector, f32) {
     // println!("{:?}\n\n\n",polygon);
     // first, if the ray is parallel to the plane the polygon lies in, they do not intersect
     // you can also discard backfacing normals
@@ -21,12 +23,18 @@ pub fn ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> bool {
     // # print(f'points:{points}')
     // # print()
     // I = ray_plane_intersection(ray, points)  # the point of intersection
-    let I = ray_plane_intersection(ray, polygon);
+    let result = ray_plane_intersection(ray, polygon);
+    if result.is_none() {
+        return (false, vector(0., 0., 0.), 0.);
+    }
+
+    let (I,dist) = result.unwrap();
+
     // # print(f'I:{I}')
     // if np.all(I == 0):
     //     return False
     if I.is_origin() {
-        return false;
+        return (false, I, dist);
         // return Rgb([0,255,0]);
     }
     // A, B, C = points
@@ -97,22 +105,20 @@ pub fn ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> bool {
     // if np.any(barycentric_coordinates < 0):
     //     return False
     if a < 0. || b < 0. || c < 0. {
-        return false;
+        return (false, I, dist);
         // println!("{},{},{} for {:?}",a,b,c,ray.direction);
         // return Rgb([255,0,0]);
     }
     // if np.any(barycentric_coordinates > 1):
     //     return False
     if a > 1. || b > 1. || c > 1. {
-        return false;
+        return (false, I, dist);
         // return Rgb([0,0,255]);
-
     }
 
     // return True
-    true
+    (true, I, dist)
     // return Rgb([255,255,255]);
-
 }
 
 fn project_vector(a: &Vector, b: &Vector) -> Vector {
@@ -120,7 +126,7 @@ fn project_vector(a: &Vector, b: &Vector) -> Vector {
     a.times(a.dot(&b) / a.dot(&a))
 }
 
-fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Vector {
+fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Option<(Vector,f32)> {
     let origin = vector(0., 0., 0.);
     let ray = &ray.direction;
     // ray_origin = np.array([0, 0, 0])
@@ -138,10 +144,12 @@ fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Vector {
     //     # print('the plane normal is facing away from the ray')
     //     return np.array([0., 0., 0.])
     if ray.dot(&N) > 0. {
-        return origin;
+        return None;
+        // return origin;
     }
     if ray.dot(&N).abs() <= 1e-4 {
-        return origin;
+        return None;
+        // return origin;
     }
     // if abs(dot(ray, N)) <= 1e-4:
     //     # print('the plane normal and ray are at right angles, no intersection is possible')
@@ -164,21 +172,26 @@ fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Vector {
     // if k < 0:
     //     return np.array([0., 0., 0.])  # ray is facing away from plaen
     if k < 0. {
-        return origin;
+        return None;
+        // return origin;
     }
     // if k == 0:
     //     return np.array([0., 0., 0.])  # ray is on plane I think
     if k == 0. {
-        return origin;
+        return None;
+        // return origin;
     }
     // # print ('distance:',k)
-    I
+    return Some((I,k));
     // return I  # returns the intersection point
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{scene::simple_scene, primitives::{polygon, vertex}};
+    use crate::{
+        primitives::{polygon, vertex},
+        scene::simple_scene,
+    };
 
     use super::*;
 
@@ -188,7 +201,6 @@ mod tests {
         // let a = vertex(x, y, z);
         // let a = vertex(x, y, z);
         // let a = vertex(x, y, z);
-
 
         // polygon(a, b, c)
         assert_eq!(1, 1); //

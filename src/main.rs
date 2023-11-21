@@ -12,6 +12,7 @@ mod application;
 mod rasterization;
 mod pixel_shader;
 mod path_tracing;
+mod load_object_file;
 
 extern crate stopwatch;
 
@@ -21,6 +22,8 @@ use stopwatch::Stopwatch;
 
 use crate::geometry_pipeline::geometry_pipeline;
 use crate::scene::simple_scene;
+
+use crate::load_object_file::load_obj;
 
 fn sleep(ms: u64) {
     thread::sleep(Duration::from_millis(ms as u64));
@@ -67,6 +70,6 @@ const REST: u64 = 1000 / 12 as u64; // const REST: u64 = 1000/12 as u64;// ms/fr
 
 fn main() {
     check_debug();
-
+    // load_obj("models/cube.obj".to_string());
     main_loop()
 }

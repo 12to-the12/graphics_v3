@@ -148,7 +148,6 @@ impl Polygon {
         let y = a.z * b.x - a.x * b.z;
         let z = a.x * b.y - a.y * b.x;
 
-
         let mut out = vector(x, y, z);
         out.norm();
         out
@@ -171,7 +170,7 @@ pub struct Line3D {
 pub struct Mesh {
     pub position: Vector,
     // pub orientation: ,
-    pub vertices: Vec<Vertex>, // a mesh owns it's vertex information
+    vertices: Vec<Vertex>, // a mesh owns it's vertex information
     // pub polygons: Vec<Polygon>, // it also owns it's polygon information
     pub polygons: Vec<Vec<usize>>,
     pub output_vertices: Vec<Vertex>,
@@ -196,7 +195,15 @@ impl Mesh {
         return &self.transform_log;
     }
 }
-
+pub fn mesh(position: Vector, vertices: Vec<Vertex>, polygons: Vec<Vec<usize>>) -> Mesh {
+    Mesh {
+        position,
+        vertices,
+        polygons,
+        output_vertices: Vec::new(),
+        transform_log: Vec::new(),
+    }
+}
 pub fn unit_cube(position: Vector) -> Mesh {
     let a: Vertex = vertex(-1.0, -1.0, -1.0); //0  left down far from above
     let b: Vertex = vertex(1.0, -1.0, -1.0); //1 right down far from above
@@ -210,19 +217,14 @@ pub fn unit_cube(position: Vector) -> Mesh {
     let polygons = vec![
         vec![0, 2, 1], // bottom 0123
         vec![1, 2, 3], // bottom
-
         vec![4, 5, 6], // close 4567
         vec![6, 5, 7], // close
-
         vec![0, 1, 4], // down 01 45
         vec![4, 1, 5], // down
-
         vec![2, 6, 3], // up 23 67
         vec![3, 6, 7], // up
-
         vec![0, 4, 2], // right 0 2 4 6
         vec![2, 4, 6], // right
-
         vec![1, 3, 5], // left 1 3 5 7
         vec![5, 3, 7], // left
     ];
