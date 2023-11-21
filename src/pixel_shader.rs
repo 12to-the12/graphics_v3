@@ -79,51 +79,41 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     }
 
     if hit {
-        let light_angle = vector(0., -1., 0.);
-        let θ = light_angle.dot(&surface_normal).acos().to_degrees();
+        let mut r = 0.;
+        let mut g = 0.;
+        let mut b = 0.;
 
-        let mut mag = θ; // [0 -> 180]
-        // 180 is full brightness, 90-0 is no brightness
-        mag -= 90.; // [-90 -> 90]
-        // if mag > 90. {
-        //     println!("{mag}")
-        // }
-        if mag < 0. {
-            return Rgb([0, 10, 0]);
+        for light in scene.lights.clone() {
+            // let light_angle = vector(0., -1., 0.);
+            let light_angle = light.direction;
+            // let θ = light_angle.dot(&surface_normal).acos().cos().to_degrees();
+            let θ = light_angle.dot(&surface_normal);
+            
+            if θ < -1. || θ > 1. {
+                println!("{θ}");
 
-            println!("{mag}")
+            }
+
+            let mut mag = θ; // [0 -> 180]
+
+            if mag > 0. {
+                return Rgb([0, 10, 0]);
+
+            }
+
+            // mag /= 90.; // [0 -> 1]
+
+            mag *= -255.;
+            r += mag;
+            g += mag;
+            b += mag;
         }
-
-        mag /= 90.; // [0 -> 1]
-
-        // mag -= 0.5; // [-0.5 -> 0.5]
-        // mag *= -1.; // [0.5 -> -0.5]
-        // mag += 0.5; // [1 -> 0]
-
-        mag *= 255.; // [255 -> 0]
-                     // if mag > 254. {
-                     //     println!("{mag}")
-                     // }
-                     // let mag = mag as u8;
-
-        // let light_angleb = vector(0., 1., -1.);
-        // let θ = light_angleb.dot(&surface_normal).acos().to_degrees();
-        // let mut mag2 = θ;
-        // mag2 -= 90.;
-        // mag2 /= 90.; // I want 90 to equal 0 and 0 90
-        // mag2 *= -1.; // 0 to one and one to zero
-
-        // mag2 -= 0.5;
-        // mag2 *= -1.;
-        // mag2 += 0.5;
-
-        // mag2 *= 255.;
-
-        // let mag = ((mag + mag2) / 2.).clamp(0., 255.) as u8;
-        let mag = mag as u8;
-        return Rgb([mag, mag, mag]);
+        let r = r as u8;
+        let g = g as u8;
+        let b = b as u8;
+        return Rgb([r, g, b]);
     } else {
-        return Rgb([0, 0, 0]);
+        return scene.background;
     } // Rgb([x, y, y])
 }
 

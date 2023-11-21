@@ -8,6 +8,8 @@ use crate::transformations::{
     build_scale_transform, build_x_rotation_transform, build_y_rotation_transform,
     build_z_rotation_transform, Transform,
 };
+use image::{ImageFormat, Rgb, RgbImage};
+
 
 /// I am not sure what the responsibilities of this construction should be
 /// should it be concerned with intermediate rendering data?
@@ -30,6 +32,7 @@ pub struct Scene {
     // pub time: Time, // timestamp to render at
     // pub settings: Settings,
     // geometry: <T,Mesh>,
+    pub background: Rgb<u8>
 }
 
 pub fn simple_scene() -> Scene {
@@ -59,12 +62,14 @@ pub fn simple_scene() -> Scene {
     let mut mesh = load_obj("models/teapot.obj".to_string());
     mesh.position = vector(0.0, 0.0, -10.0);
 
+    let background = Rgb([0,0,0]);
     // println!("polygons: {:?}",mesh.polygons);
     let meshes = vec![mesh];
     let scene = Scene {
         camera,
         lights,
         meshes,
+        background
         // unified_mesh: Vec::new(),
         // unified_vertices: Vec::new(),
     };
