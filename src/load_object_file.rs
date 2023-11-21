@@ -33,7 +33,8 @@ pub fn load_obj(path: String) -> Mesh {
                 .split_ascii_whitespace();
             let mut polygon: Vec<usize> = Vec::new();
             for number in numbers {
-                let number: usize = number.parse().unwrap();
+                let mut number: usize = number.parse().unwrap();
+                number -= 1; // because obj starts at 1 which is stupid
                 polygon.push(number)
             }
             polygons.push(polygon);
