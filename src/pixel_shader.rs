@@ -3,7 +3,7 @@ use crate::line_plotting::plot_triangle;
 use crate::path_tracing::{probe_ray_polygon_intersection, ray_polygon_intersection_test};
 use crate::primitives::{polygon, ray, vector, vertex, Point, Polygon, Ray, Triangle, Vector};
 use crate::scene::Scene;
-use image::{Rgb, RgbImage};
+use image::{ImageFormat, Rgb, RgbImage};
 use ndarray::{arr1, arr2, Array1, Array2, Axis};
 use rand::distributions::{Distribution, Uniform}; // 0.6.5
 
@@ -17,7 +17,11 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
     for y in 0..height {
         for x in 0..width {
             let color = closure(x, y, scene);
-            canvas.put_pixel(x as u32, y as u32, color)
+            canvas.put_pixel(x as u32, y as u32, color);
+            // canvas
+            // .save_with_format("rust-output.bmp", ImageFormat::Bmp)
+            // .unwrap();
+            // println!("px");
         }
     }
 }
@@ -75,19 +79,32 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     }
 
     if hit {
-        let light_angle = vector(-1., 0., 0.);
+        let light_angle = vector(0., -1., 0.);
         let θ = light_angle.dot(&surface_normal).acos().to_degrees();
 
-        let mut mag = θ;
-        mag -= 90.;
-        mag /= 90.;
+        let mut mag = θ; // [0 -> 180]
+        // 180 is full brightness, 90-0 is no brightness
+        mag -= 90.; // [-90 -> 90]
+        // if mag > 90. {
+        //     println!("{mag}")
+        // }
+        if mag < 0. {
+            return Rgb([0, 10, 0]);
 
-        mag -= 0.5;
-        mag *= -1.;
-        mag += 0.5;
+            println!("{mag}")
+        }
 
-        mag *= 255.;
-        // let mag = mag as u8;
+        mag /= 90.; // [0 -> 1]
+
+        // mag -= 0.5; // [-0.5 -> 0.5]
+        // mag *= -1.; // [0.5 -> -0.5]
+        // mag += 0.5; // [1 -> 0]
+
+        mag *= 255.; // [255 -> 0]
+                     // if mag > 254. {
+                     //     println!("{mag}")
+                     // }
+                     // let mag = mag as u8;
 
         // let light_angleb = vector(0., 1., -1.);
         // let θ = light_angleb.dot(&surface_normal).acos().to_degrees();

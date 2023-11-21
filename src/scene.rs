@@ -41,8 +41,8 @@ pub fn simple_scene() -> Scene {
     let sensor = Sensor {
         width: 36.0,
         // height: 24.0,
-        horizontal_res: 400,
-        vertical_res: 300,
+        horizontal_res: 160,
+        vertical_res: 120,
     };
     let camera = Camera {
         position: vertex(0.0, 0.0, 0.0),
@@ -56,8 +56,8 @@ pub fn simple_scene() -> Scene {
     let lights = vec![light];
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
     // let mesh = sample_mesh(vector(0.0, 0.0, -3.0));
-    let mut mesh = load_obj("models/cube.obj".to_string());
-    mesh.position = vector(0.0, 0.0, -5.0);
+    let mut mesh = load_obj("models/teapot.obj".to_string());
+    mesh.position = vector(0.0, 0.0, -10.0);
 
     // println!("polygons: {:?}",mesh.polygons);
     let meshes = vec![mesh];
