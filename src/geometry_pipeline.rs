@@ -145,8 +145,8 @@ fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
 /// I am unsure of the best way to pass it information
 ///
 fn render(canvas: &mut RgbImage, scene: Scene) {
-    // rasterize(canvas, scene);
-    ray_trace(canvas, scene);
+    rasterize(canvas, scene);
+    // ray_trace(canvas, scene);
 }
 
 /// Application
