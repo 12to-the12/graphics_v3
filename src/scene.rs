@@ -56,8 +56,8 @@ pub fn simple_scene() -> Scene {
     let lights = vec![light];
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
     // let mesh = sample_mesh(vector(0.0, 0.0, -3.0));
-    let mut mesh = load_obj("models/cube.obj".to_string());
-    mesh.position = vector(0.0, 0.0, -5.0);
+    let mut mesh = load_obj("models/teapot.obj".to_string());
+    mesh.position = vector(0.0, 0.0, -20.0);
 
     println!("polygons: {:?}",mesh.polygons);
     let meshes = vec![mesh];
