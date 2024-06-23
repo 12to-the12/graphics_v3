@@ -2,11 +2,17 @@ use std::vec;
 
 use crate::primitives::{vector, Polygon, Ray, Vector};
 use image::{Rgb, RgbImage};
+use stopwatch::Stopwatch;
 
 pub fn ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> bool {
+    let mut probe = Stopwatch::start_new();
     let (b, I, dist) = probe_ray_polygon_intersection(ray, polygon);
+    probe.stop();
+    println!("  probe: {:?}", probe.elapsed());
     b
 }
+
+/// returns whether it intersects, the ray, and the distance
 pub fn probe_ray_polygon_intersection(ray: &Ray, polygon: &Polygon) -> (bool, Vector, f32) {
     // println!("{:?}\n\n\n",polygon);
     // first, if the ray is parallel to the plane the polygon lies in, they do not intersect

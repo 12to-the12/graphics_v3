@@ -2,14 +2,13 @@ use crate::camera::{Camera, Lens, Sensor};
 // use crate::coordinate_space::Polar;
 use crate::primitives::{sample_mesh, unit_cube, vector, vertex, Mesh, Polygon, Vertex};
 // use crate::primitives::Object;
-use crate::load_object_file::load_obj;
 use crate::lighting::{sun_light, Light};
+use crate::load_object_file::load_obj;
 use crate::transformations::{
     build_scale_transform, build_x_rotation_transform, build_y_rotation_transform,
     build_z_rotation_transform, Transform,
 };
 use image::{ImageFormat, Rgb, RgbImage};
-
 
 /// I am not sure what the responsibilities of this construction should be
 /// should it be concerned with intermediate rendering data?
@@ -32,20 +31,21 @@ pub struct Scene {
     // pub time: Time, // timestamp to render at
     // pub settings: Settings,
     // geometry: <T,Mesh>,
-    pub background: Rgb<u8>
+    pub background: Rgb<u8>,
+    pub tick: usize,
 }
 
 pub fn simple_scene() -> Scene {
     let lens = Lens {
         aperture: 50.0,
-        focal_length: 30.0,
+        focal_length: 50.0,
         focus_distance: 2.0,
     };
     let sensor = Sensor {
         width: 36.0,
         // height: 24.0,
-        horizontal_res: 160,
-        vertical_res: 120,
+        horizontal_res: 400,
+        vertical_res: 400,
     };
     let camera = Camera {
         position: vertex(0.0, 0.0, 0.0),
@@ -55,23 +55,31 @@ pub fn simple_scene() -> Scene {
         near_clipping_plane: 1e-1,
         far_clipping_plane: 1e6,
     };
-    let light = sun_light(vertex(0.0, 0.0, 0.0), 1.0);
+    let light = sun_light(vertex(0.0, 0.0, 0.0),vector(-1., 0., 0.), 1.0);
     let lights = vec![light];
+    let mut meshes = Vec::new();
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
     // let mesh = sample_mesh(vector(0.0, 0.0, -3.0));
-    let mut mesh = load_obj("models/teapot.obj".to_string());
-    mesh.position = vector(0.0, 0.0, -10.0);
+    let mut mesh = load_obj("models/sphere.obj".to_string());
+    mesh.position = vector(-3.0, 0.0, -10.0);
+    meshes.push(mesh);
 
-    let background = Rgb([0,0,0]);
-    // println!("polygons: {:?}",mesh.polygons);
-    let meshes = vec![mesh];
+    let mut mesh = load_obj("models/sphere.obj".to_string());
+    mesh.position = vector(0.0, 0.0, -10.0);
+    meshes.push(mesh);
+
+    let mut mesh = load_obj("models/sphere.obj".to_string());
+    mesh.position = vector(3.0, 0.0, -10.0);
+    meshes.push(mesh);
+
+    let background = Rgb([0, 0, 0]);
     let scene = Scene {
         camera,
         lights,
         meshes,
-        background
-        // unified_mesh: Vec::new(),
-        // unified_vertices: Vec::new(),
+        background,
+        tick: 0, // unified_mesh: Vec::new(),
+                 // unified_vertices: Vec::new(),
     };
     return scene;
 }

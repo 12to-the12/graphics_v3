@@ -48,20 +48,23 @@ pub fn check_debug() {
     println!("Debugging disabled");
 }
 
+// builds a scene and renders it over and over
 fn main_loop() {
     let mut scene;
-    let mut counter: f32 = 0.0;
+    let mut counter: usize = 0;
     loop {
         println!("");
         scene = simple_scene();
+        scene.tick = counter;
 
-        let render = geometry_pipeline(scene, counter);
+        let render = geometry_pipeline(scene);
         save_image(render);
         sleep(REST);
-        counter += 1.0;
-        counter %= 360.0;
+        counter += 1;
+        // counter %= 360.0;
     }
 }
+// REST is ms per frame
 // const REST: u64 = 1000 / 1 as u64; // ms/frame @ 1 fps
 // const REST: u64 = 1000 / 8 as u64; // ms/frame @ 8 fps
 const REST: u64 = 1000 / 12 as u64; // const REST: u64 = 1000/12 as u64;// ms/frame @ 12 fps

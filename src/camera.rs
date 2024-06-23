@@ -1,6 +1,5 @@
 // use crate::coordinate_space::Orientation;
 use crate::primitives::{vertex, Vertex};
-use std::f32::consts::PI as π;
 
 #[derive(Clone)]
 pub struct Camera {

@@ -13,10 +13,12 @@ pub fn load_obj(path: String) -> Mesh {
             // println!("discarding comment")
         }
         // adds a vertex
-        else if line.starts_with("v") {
+        else if line.starts_with("v ") {
+            // println!("{}", line);
+
             let mut numbers = line
                 .trim()
-                .strip_prefix("v")
+                .strip_prefix("v ")
                 .unwrap()
                 .split_ascii_whitespace();
             let x: f32 = numbers.next().unwrap().parse().unwrap();
@@ -25,14 +27,17 @@ pub fn load_obj(path: String) -> Mesh {
             vertices.push(vertex(x, y, z));
         }
         // adds a face
-        else if line.starts_with("f") {
+        else if line.starts_with("f ") {
+            // println!("{}", line);
+
             let numbers = line
                 .trim()
-                .strip_prefix("f")
+                .strip_prefix("f ")
                 .unwrap()
                 .split_ascii_whitespace();
             let mut polygon: Vec<usize> = Vec::new();
             for number in numbers {
+                let number: &str = number.split("/").next().unwrap();
                 let mut number: usize = number.parse().unwrap();
                 number -= 1; // because obj starts at 1 which is stupid
                 polygon.push(number)
