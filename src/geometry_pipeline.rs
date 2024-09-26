@@ -1,12 +1,12 @@
-use std::vec;
-use crate::camera::Camera;
 use crate::application::application;
+use crate::camera::Camera;
 use crate::primitives::{triangle, vector, Point, Polygon, Triangle, Vector, Vertex};
+use std::vec;
 // use crate::primitives::LineCollection;
 use crate::scene::Scene;
 // use crate::primitives::PolygonCollection;
 use crate::line_plotting::plot_triangle;
-use crate::pixel_shader::{shade_pixels, solid_shader, lit_shader, color_shader};
+use crate::pixel_shader::{color_shader, lit_shader, shade_pixels, solid_shader};
 use crate::rasterization::rasterize_triangle;
 use crate::transformations::{
     build_projection_transform, build_scale_transform, build_translation_transform,
@@ -119,11 +119,11 @@ fn solid(canvas: &mut RgbImage, scene: Scene) {
 /// the material associated with that geometry
 /// the associated images maps and the corresponding coordinates
 fn rasterize(canvas: &mut RgbImage, mut scene: Scene) {
-    let mut vertex_shade = Stopwatch::start_new();
+    let mut raster_time = Stopwatch::start_new();
 
     vertex_shader(&mut scene); // projections
-    vertex_shade.stop();
-    println!("vertex_shade: {:?}", vertex_shade.elapsed());
+    raster_time.stop();
+    println!("raster_time: {:?}", raster_time.elapsed());
 
     solid(canvas, scene);
 }
@@ -137,7 +137,7 @@ fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
 
         mesh.apply_transformations();
     }
-    shade_pixels(canvas, &scene, solid_shader); // lit_shader solid_shader color_shader
+    shade_pixels(canvas, &scene, lit_shader); // lit_shader solid_shader solid_shader
 }
 
 /// this serves as an abstraction away from rasterization, so that ray tracing can be dropped into the pipeline
@@ -145,8 +145,8 @@ fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
 /// I am unsure of the best way to pass it information
 ///
 fn render(canvas: &mut RgbImage, scene: Scene) {
-    rasterize(canvas, scene);
-    // ray_trace(canvas, scene);
+    // rasterize(canvas, scene);
+    ray_trace(canvas, scene);
 }
 
 /// Application

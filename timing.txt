@@ -44,3 +44,5 @@ real: 0:16.04 CPUs kernel: 8.66 CPUs user: 150.02
 real: 0:14.61 CPUs kernel: 7.95 CPUs user: 141.56
 
 real: 0:14.83 CPUs kernel: 8.09 CPUs user: 141.88
+
+real: 0:12.62 CPUs kernel: 6.95 CPUs user: 118.53

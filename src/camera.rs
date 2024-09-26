@@ -23,7 +23,7 @@ pub struct Lens {
 
 /// models a camera sensor
 /// notably used to accurately model the frequency response
-/// I would like to implememnt a number of predefined lenses in addition to offering a generic
+/// I would like to implement a number of predefined lenses in addition to offering a generic
 #[derive(Clone)]
 pub struct Sensor {
     pub width: f32, // the width of the sensor in millimeters

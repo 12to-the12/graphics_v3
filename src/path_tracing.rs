@@ -8,7 +8,7 @@ pub fn ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> bool {
     let mut probe = Stopwatch::start_new();
     let (b, I, dist) = probe_ray_polygon_intersection(ray, polygon);
     probe.stop();
-    println!("  probe: {:?}", probe.elapsed());
+    // println!("  probe: {:?}", probe.elapsed());
     b
 }
 
@@ -34,7 +34,7 @@ pub fn probe_ray_polygon_intersection(ray: &Ray, polygon: &Polygon) -> (bool, Ve
         return (false, vector(0., 0., 0.), 0.);
     }
 
-    let (I,dist) = result.unwrap();
+    let (I, dist) = result.unwrap();
 
     // # print(f'I:{I}')
     // if np.all(I == 0):
@@ -132,7 +132,7 @@ fn project_vector(a: &Vector, b: &Vector) -> Vector {
     a.times(a.dot(&b) / a.dot(&a))
 }
 
-fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Option<(Vector,f32)> {
+fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Option<(Vector, f32)> {
     let origin = vector(0., 0., 0.);
     let ray = &ray.direction;
     // ray_origin = np.array([0, 0, 0])
@@ -188,7 +188,7 @@ fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Option<(Vector,f32)> 
         // return origin;
     }
     // # print ('distance:',k)
-    return Some((I,k));
+    return Some((I, k));
     // return I  # returns the intersection point
 }
 

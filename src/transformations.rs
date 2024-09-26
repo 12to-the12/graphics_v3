@@ -48,6 +48,7 @@ pub fn build_translation_transform(translation: Vector) -> Transform {
     ]);
     Transform { matrix }
 }
+
 pub fn build_scale_transform(scale: Vector) -> Transform {
     let x = scale.x;
     let y = scale.y;
@@ -60,6 +61,7 @@ pub fn build_scale_transform(scale: Vector) -> Transform {
     ]);
     Transform { matrix }
 }
+
 /// still trying to figure this one out
 pub fn build_projection_transform(camera: &Camera) -> Transform {
     let hfov = camera.horizontal_field_of_view();
@@ -75,20 +77,24 @@ pub fn build_projection_transform(camera: &Camera) -> Transform {
     ]);
     Transform { matrix }
 }
+
+// 2024-06-23 I switched which sin was negative because of what wikipedia used
 pub fn build_x_rotation_transform(θ: f32) -> Transform {
     let matrix = arr2(&[
         [1.0, 0.0, 0.0, 0.0],
-        [0.0, cos(θ), sin(θ), 0.0],
-        [0.0, -sin(θ), cos(θ), 0.0],
+        [0.0, cos(θ), -sin(θ), 0.0],
+        [0.0, sin(θ), cos(θ), 0.0],
         [0.0, 0.0, 0.0, 1.0],
     ]);
     Transform { matrix }
 }
+
+// 2024-06-23 I switched which sin was negative because of what wikipedia used
 pub fn build_y_rotation_transform(θ: f32) -> Transform {
     let matrix = arr2(&[
-        [cos(θ), 0.0, -sin(θ), 0.0],
+        [cos(θ), 0.0, sin(θ), 0.0],
         [0.0, 1.0, 0.0, 0.0],
-        [sin(θ), 0.0, cos(θ), 0.0],
+        [-sin(θ), 0.0, cos(θ), 0.0],
         [0.0, 0.0, 0.0, 1.0],
     ]);
     Transform { matrix }
@@ -99,6 +105,39 @@ pub fn build_z_rotation_transform(θ: f32) -> Transform {
         [sin(θ), cos(θ), 0.0, 0.0],
         [0.0, 0.0, 1.0, 0.0],
         [0.0, 0.0, 0.0, 1.0],
+    ]);
+    Transform { matrix }
+}
+
+// quaternions! See my notes
+// assumes radians
+pub fn build_arbitrary_rotation_transform(θ: f32, mut axis: Vector) -> Transform {
+    axis.norm();
+    let q0 = cos(θ / 2.);
+    let factor = sin(θ / 2.);
+    let q1 = axis.x * factor;
+    let q2 = axis.y * factor;
+    let q3 = axis.z * factor;
+    let matrix = arr2(&[
+        [
+            sq(q0) + sq(q1) - sq(q2) - sq(q3),
+            2. * q1 * q2 - 2. * q0 * q3,
+            2. * q1 * q3 + 2. * q0 * q2,
+            0.,
+        ],
+        [
+            2. * q1 * q2 + 2. * q0 * q3,
+            sq(q0) - sq(q1) + sq(q2) - sq(q3),
+            2. * q2 * q3 - 2. * q0 * q1,
+            0.,
+        ],
+        [
+            2. * q1 * q3 - 2. * q0 * q2,
+            2. * q2 * q3 + 2. * q0 * q1,
+            sq(q0) - sq(q1) - sq(q2) + sq(q3),
+            0.,
+        ],
+        [0., 0., 0., 1.],
     ]);
     Transform { matrix }
 }
@@ -121,6 +160,12 @@ fn cos(θ: f32) -> f32 {
 
 fn sin(θ: f32) -> f32 {
     θ.sin()
+}
+
+/// squares the number
+fn sq(a: f32) -> f32 {
+    // 2 << a
+    f32::powi(a, 2)
 }
 
 fn zero_tiny(x: &f32) -> f32 {
@@ -256,7 +301,7 @@ mod tests {
         assert_eq!(arr1(&[-2.0, 1.0, 3.0, 1.0]), vertex);
     }
     #[test]
-    fn verify_rotation_implementation() {
+    fn verify_z_rotation_implementation() {
         let transform = build_z_rotation_transform(90f32.to_radians());
         let myvertex = arr1(&[1.0, 2.0, 3.0, 1.0]);
         let vertex_list = vec![vertex_from_array(myvertex)];
@@ -264,6 +309,21 @@ mod tests {
         let myvertex = arr1(&myvertex.as_array());
         let myvertex = myvertex.map(round_6);
         assert_eq!(arr1(&[-2.0, 1.0, 3.0]), myvertex);
+    }
+    #[test]
+    fn verify_quaternions() {
+        let vector = vector(1., 0., 0.);
+        let angle = 90f32.to_radians();
+
+        let transform = build_arbitrary_rotation_transform(angle, vector);
+
+        let vertex = arr1(&[0., 1., 0., 1.]);
+        let vertex_list = vec![vertex_from_array(vertex)];
+        let vertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
+        let myvertex_p = arr1(&vertex.as_array());
+        let myvertex_p = myvertex_p.map(round_6);
+        println!("{:?}", myvertex_p);
+        assert_eq!(arr1(&[0., 0., 1.]), myvertex_p);
     }
 
     #[test]
@@ -287,7 +347,7 @@ mod tests {
             far_clipping_plane: 1e6,
         };
         let transform = build_projection_transform(&camera);
-        println!("{:?}",camera.horizontal_field_of_view());
+        println!("{:?}", camera.horizontal_field_of_view());
         println!("{:?}", transform);
         let myvertex = arr1(&[10.0, 10.0, 5.0, 1.0]);
         let vertex_list = vec![vertex_from_array(myvertex)];

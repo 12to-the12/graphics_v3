@@ -44,8 +44,8 @@ pub fn simple_scene() -> Scene {
     let sensor = Sensor {
         width: 36.0,
         // height: 24.0,
-        horizontal_res: 400,
-        vertical_res: 400,
+        horizontal_res: 100,
+        vertical_res: 100,
     };
     let camera = Camera {
         position: vertex(0.0, 0.0, 0.0),
@@ -55,7 +55,7 @@ pub fn simple_scene() -> Scene {
         near_clipping_plane: 1e-1,
         far_clipping_plane: 1e6,
     };
-    let light = sun_light(vertex(0.0, 0.0, 0.0),vector(-1., 0., 0.), 1.0);
+    let light = sun_light(vertex(0.0, 0.0, 0.0), vector(-1., 0., 0.), 1.0);
     let lights = vec![light];
     let mut meshes = Vec::new();
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));

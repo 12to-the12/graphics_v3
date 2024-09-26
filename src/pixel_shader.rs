@@ -13,7 +13,6 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
     scene: &Scene,
     closure: F,
 ) {
-
     let mut shading = Stopwatch::start_new();
     // println!("{}", scene.camera.sensor.horizontal_res);
     let (width, height) = canvas.dimensions();
@@ -28,20 +27,19 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
         }
     }
     shading.stop();
-    println!("  shading: {:?}", shading.elapsed());
-    
+    // println!("  shading: {:?}", shading.elapsed());
 }
 
 pub fn color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let (hres, vres) = scene.camera.sensor.res();
     let x = x as f32 / (hres as f32);
     let y = y as f32 / (vres as f32);
-    let r1 = y*255.;
+    let r1 = y * 255.;
     let g1 = 0.;
     let b1 = 0.;
 
     let r2 = 0.;
-    let g2 = y*255.;
+    let g2 = y * 255.;
     let b2 = 200.;
     if x < 0.3 {
         return Rgb([r1 as u8, g1 as u8, b1 as u8]);
@@ -50,10 +48,10 @@ pub fn color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
         return Rgb([r2 as u8, g2 as u8, b2 as u8]);
     }
     if y < 0.5 {
-        let r3 = ((r1+r2)/2.) as u8;
-        let g3 = ((g1+g2)/2.) as u8;
-        let b3 = ((b1+b2)/2.) as u8;
-        return Rgb([r3,g3,b3]);
+        let r3 = ((r1 + r2) / 2.) as u8;
+        let g3 = ((g1 + g2) / 2.) as u8;
+        let b3 = ((b1 + b2) / 2.) as u8;
+        return Rgb([r3, g3, b3]);
     }
 
     return Rgb([r1 as u8, g1 as u8, b1 as u8]);
@@ -72,7 +70,7 @@ pub fn solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             if ray_polygon_intersection_test(&ray, &polygon) {
                 // hit = true;
                 // break 'mesh;
-                return Rgb([255,255,255]);
+                return Rgb([255, 255, 255]);
             }
             // } else {
             //     return Rgb([0, 0, 0]);
@@ -80,7 +78,7 @@ pub fn solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             // return ray_polygon_intersection_test(&ray, &polygon);
         }
     }
-    return Rgb([0,0,0]);
+    return Rgb([0, 0, 0]);
     // if hit {
     //     return Rgb([255, 255, 255]);
     // } else {
@@ -155,7 +153,8 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
         let b = b as u8;
         return Rgb([r, g, b]);
     } else {
-        return Rgb([0, 0, 0]);
+        // return Rgb([0, 0, 0]);
+        return scene.background;
         // return scene.background;
     } // Rgb([x, y, y])
 }

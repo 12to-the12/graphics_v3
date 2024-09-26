@@ -48,5 +48,5 @@ fn _sort_points(triangle: &Triangle) -> Vec<&Point> {
     if p2.y > p1.y {
         points.swap(0, 1)
     }
-    return points
+    return points;
 }

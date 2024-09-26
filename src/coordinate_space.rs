@@ -10,6 +10,4 @@ pub struct Polar {
 
 /// allows for objects to be defined in spaces that differ from global
 /// in the end, everything is compiled to global anyways
-struct CoordinateSystem {
-
-}
+struct CoordinateSystem {}
