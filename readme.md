@@ -116,10 +116,3 @@ the renderer outputs the result as a png in the project root, that was simpler t
 - [ ] full physically based light propagation
 - [ ] spatial acceleration structures
 
-```mermaid
-graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
-```
