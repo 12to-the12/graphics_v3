@@ -108,7 +108,18 @@ the renderer outputs the result as a png in the project root, that was simpler t
 - [x] matrix based tranformations
 - [x] .obj import
 - [x] Lambert's law falloff
-- [x] Spectra based light propagation
+- [x] Spectra based light values
 - [x] concurrency
-- [ ] full physically based lighting model
+- [ ] BSDF for roughness/specular and dielectric/metallic materials
+- [ ] texture mapping
+- [ ] Phong shading
+- [ ] full physically based light propagation
 - [ ] spatial acceleration structures
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
