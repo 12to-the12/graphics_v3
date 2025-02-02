@@ -20,11 +20,13 @@ I bit the bullet and learned how to actually program as I started High School th
 I have fond memories of fighting IDLE on my Rasbperry Pi staring up at the TV I was using as a monitor on the floor.
 
 That Spring term, at 15 I got a real computer for the first time, and for some reason I decided to use a web based IDE? Trinket was terrible and made me use Python 2, but I was able to write the first version of this project, foreshorting a cube and animating it in space.
+
 ![foreshortening](readme_media/foreshortening.png)
 
 Learning modelling software in the Spring of 2019 only intensified this desire, now I was regularly working with computer generated imagery, but was still as a complete loss as to how it all worked.
 
 It's all kind of unclear what happened when, but sometime between that first version and Spring 2022 when I started using version control, ray tracing became my goal. I implemented ray sphere intersection, texture mapping, Lambert's law weakening, and recursive ray propagation. That iteration ended with the realization I needed a more robust codebase to implement the features I wanted to, I didn't know what I was doing was called linear algebra at that point, and I was trying to do light propagation in RGB, without any understanding of what that meant.
+
 ![texture mapping](readme_media/texture_mapping.png)
 
 
@@ -53,6 +55,7 @@ As soon as ray tracing became my goal, I need to learn how to trace rays! Sphere
 
 ## rotational composition and transformation matrices
 When I started this journey with just a wireframe rendered using pygame, I was unaware that rotations could not be summed together linearly. I was encoding rotations using polar coordinates, as well as projected points in space using equally spaced angles rather than a viewing frustrum. These techniques caused a lot of issues, and necessitated I learn the fundamentals of linear algebra.
+
 ![cube in space](readme_media/bleak_renderer.png)
 
 A lot of reading later and I had my answers.
@@ -63,7 +66,9 @@ This was massive, and really interesting to me.
 I also learned about the difference between object space, world space, camera space, and raster space; and why you want to encode values using different coordinate spaces. Using matrix composition, transforming location vectors between these is as simple as applying a transform matrix.
 
 ## light and color
+
 ![xkcd Color Models](readme_media/xkcd_color.png)
+
 The first time I tried implementing specular highlights I failed miserably. Turns out light and color are complicated. I was familiar with the BSDF from Blender, but I didn't know exactly how to implement it.
 
 This project motivated me to learn about the ridiculous intricacy of color, I'd recommend [this](https://www.youtube.com/watch?v=gnUYoQ1pwes) amazing explanation about how human vision interprets electromagnetic radiation, how we can represent it using vector spaces, and how we can record and display it using technology.
