@@ -2,19 +2,19 @@
                                     // use std::time::Duration;
 mod application;
 mod camera;
-mod orientation;
 mod geometry_pipeline;
 mod lighting;
 mod line_plotting;
 mod load_object_file;
+mod luminous_efficiency;
+mod orientation;
 mod path_tracing;
 mod pixel_shader;
 mod primitives;
 mod rasterization;
+mod rendering_equation;
 mod scene;
 mod transformations;
-mod rendering_equation;
-mod luminous_efficiency;
 
 extern crate stopwatch;
 
@@ -25,17 +25,15 @@ use stopwatch::Stopwatch;
 use crate::geometry_pipeline::geometry_pipeline;
 use crate::scene::simple_scene;
 
-fn sleep(ms: u64) {
-    thread::sleep(Duration::from_millis(ms as u64));
+fn sleep(ms: Duration) {
+    thread::sleep(ms);
 }
 
 #[inline]
 pub fn save_image(canvas: ImageBuffer<Rgb<u8>, Vec<u8>>) -> () {
-
     canvas
         .save_with_format("rust-output.png", ImageFormat::Png)
         .unwrap();
-
 }
 
 pub fn check_debug() {
@@ -58,6 +56,11 @@ fn main_loop() {
         // sleep(REST);
         frame.stop();
         println!("frame: {:?}", frame.elapsed());
+        if REST > frame.elapsed() {
+            let wait = REST - frame.elapsed(); // accounts for time already elapsed
+            sleep(wait);
+        }
+
         counter += 1;
         // counter %= 360.0;
     }
@@ -71,10 +74,10 @@ fn single(i: usize) {
 }
 // REST is ms per frame
 // const REST: u64 = 1000 / 1 as u64; // ms/frame @ 1 fps
-const REST: u64 = 1000 / 8 as u64; // ms/frame @ 8 fps
-                                   // const REST: u64 = 1000 / 12 as u64; // const REST: u64 = 1000/12 as u64;// ms/frame @ 12 fps
-                                   // const REST: u64 = 1000 / 24 as u64; // const REST: u64 = 1000/24 as u64;// ms/frame @ 24 fps
-                                   // const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000/60 as u64;// ms/frame @ 60 fps
+const REST: Duration = Duration::from_millis(1000 / 8 as u64); // ms/frame @ 8 fps
+                                                               // const REST: u64 = 1000 / 12 as u64; // const REST: u64 = 1000/12 as u64;// ms/frame @ 12 fps
+                                                               // const REST: u64 = 1000 / 24 as u64; // const REST: u64 = 1000/24 as u64;// ms/frame @ 24 fps
+                                                               // const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000/60 as u64;// ms/frame @ 60 fps
 
 fn main() {
     check_debug();

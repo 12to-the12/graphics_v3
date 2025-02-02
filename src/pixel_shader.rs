@@ -17,12 +17,13 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
     let mut shading = Stopwatch::start_new();
     // println!("{}", scene.camera.sensor.horizontal_res);
     // let (width, height) = canvas.dimensions();
-    let width = y_end-y_start;
-    let height = x_end-x_start;
+    let width = y_end - y_start;
+    let height = x_end - x_start;
     for y in y_start..y_end {
         for x in x_start..x_end {
             let color = closure(x, y, scene);
-            mini_canvas.put_pixel(x-x_start as u32, y-y_start as u32, color); // for personal canvas
+            mini_canvas.put_pixel(x - x_start as u32, y - y_start as u32, color);
+            // for personal canvas
             // canvas.put_pixel(x as u32, y as u32, color);
             // canvas
             // .save_with_format("rust-output.bmp", ImageFormat::Bmp)
@@ -119,6 +120,11 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
                 closest = dist;
                 hit = true;
                 surface_normal = polygon.get_normal();
+                if surface_normal.dot(&ray.direction) > 0. {
+                    println!("polygon is facing away! This shouldn't register as an intersection!");
+                    panic!();
+                }
+
             }
             // } else {
             //     return Rgb([0, 0, 0]);

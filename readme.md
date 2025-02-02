@@ -29,3 +29,14 @@ make
 ```
 
 the renderer outputs the result as a png in the project root, that was simpler than trying to interface with a windowing system.
+
+
+# Roadmap
+- [x] ray/polygon intersection
+- [x] matrix based tranformations
+- [x] .obj import
+- [x] Lambert's law falloff
+- [x] Spectra based light propagation
+- [x] concurrency
+- [ ] full physically based lighting model
+- [ ] spatial acceleration structures

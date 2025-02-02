@@ -3,7 +3,7 @@ use crate::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
 use crate::primitives::{vector, vertex, Mesh};
 // use crate::primitives::Object;
-use crate::lighting::{point_light, black_spectra, PointLight, Spectra};
+use crate::lighting::{black_spectra, point_light, PointLight, Spectra};
 use crate::load_object_file::load_obj;
 use image::Rgb;
 use ndarray::Array;
@@ -46,7 +46,7 @@ pub fn simple_scene() -> Scene {
         vertical_res: 320,
     };
     let camera = Camera {
-        position: vertex(0.0, 0.0, 0.0),
+        position: vertex(0.0, 0.0, 15.0),
         // orientation: Polar
         lens,
         sensor,
@@ -54,30 +54,30 @@ pub fn simple_scene() -> Scene {
         far_clipping_plane: 1e6,
         shutter_speed: 1.,
     };
-    let mut red_spectra: Spectra = black_spectra(); 
+    let mut red_spectra: Spectra = black_spectra();
     red_spectra.spectra[32] = 1.; // 700nm, red
 
     // let light = sun_light(vertex(0.0, 0.0, 0.0), vector(-1., 0., 0.), red_spectra.clone());
     let light = point_light(vertex(-100.0, 0.0, -100.0), RIGHT, red_spectra);
 
-    let mut muted_spectra = black_spectra(); 
+    let mut muted_spectra = black_spectra();
     muted_spectra.spectra[32] = 0.5; // 700nm, red
     let lightb = point_light(vertex(100.0, -100.0, -100.), RIGHT, muted_spectra);
     let lights = vec![light];
     let mut meshes = Vec::new();
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
     // let mesh = sample_mesh(vector(0.0, 0.0, -3.0));
-    // let mut mesh = load_obj("models/sphere.obj".to_string());
-    // mesh.position = vector(-3.0, 0.0, -10.0);
-    // meshes.push(mesh);
+    let mut mesh = load_obj("models/cube.obj".to_string());
+    mesh.position = vector(-3.0, 0.0, -10.0);
+    meshes.push(mesh);
 
     let mut mesh = load_obj("models/sphere.obj".to_string());
     mesh.position = vector(0.0, 0.0, -10.0);
     meshes.push(mesh);
 
-    // let mut mesh = load_obj("models/sphere.obj".to_string());
-    // mesh.position = vector(3.0, 0.0, -10.0);
-    // meshes.push(mesh);
+    let mut mesh = load_obj("models/sphere.obj".to_string());
+    mesh.position = vector(3.0, 0.0, -10.0);
+    meshes.push(mesh);
 
     let background = Rgb([0, 0, 0]);
     let scene = Scene {
