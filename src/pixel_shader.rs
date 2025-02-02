@@ -1,28 +1,46 @@
 use crate::path_tracing::{probe_ray_polygon_intersection, ray_polygon_intersection_test};
 use crate::primitives::{polygon, ray, vector, Ray, Vector};
+use crate::rendering_equation::weakening_function;
 use crate::scene::Scene;
 use image::{Rgb, RgbImage};
 use stopwatch::Stopwatch;
-use crate::rendering_equation::weakening_function;
 
 pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
-    canvas: &mut RgbImage,
+    mini_canvas: &mut RgbImage,
     scene: &Scene,
     closure: F,
+    x_start: u32,
+    x_end: u32,
+    y_start: u32,
+    y_end: u32,
 ) {
     let mut shading = Stopwatch::start_new();
     // println!("{}", scene.camera.sensor.horizontal_res);
-    let (width, height) = canvas.dimensions();
-    for y in 0..height {
-        for x in 0..width {
+    // let (width, height) = canvas.dimensions();
+    let width = y_end-y_start;
+    let height = x_end-x_start;
+    for y in y_start..y_end {
+        for x in x_start..x_end {
             let color = closure(x, y, scene);
-            canvas.put_pixel(x as u32, y as u32, color);
+            mini_canvas.put_pixel(x-x_start as u32, y-y_start as u32, color); // for personal canvas
+            // canvas.put_pixel(x as u32, y as u32, color);
             // canvas
             // .save_with_format("rust-output.bmp", ImageFormat::Bmp)
             // .unwrap();
             // println!("px");
         }
     }
+
+    // for y in 0..height {
+    //     for x in 0..width {
+    //         let color = closure(x, y, scene);
+    //         canvas.put_pixel(x as u32, y as u32, color);
+    //         // canvas
+    //         // .save_with_format("rust-output.bmp", ImageFormat::Bmp)
+    //         // .unwrap();
+    //         // println!("px");
+    //     }
+    // }
     shading.stop();
     // println!("  shading: {:?}", shading.elapsed());
 }
@@ -122,7 +140,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             // our job here is to find the amount of energy transmitted to the pixel from the light
 
             let to_light = intersection_point.clone().to(light.position.as_vector());
-            
+
             let distance_to_surface: f32 = closest;
             let distance_to_light: f32 = to_light.magnitude();
 
@@ -140,21 +158,17 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             brightness -= 90.;
             // mag *= -1.;
 
-
             if brightness < 0. {
                 brightness = 0.;
             }
             brightness /= 90.;
             // 1 should map to 180° and 0 should be anything below 90°
             brightness *= light.radiant_flux.spectra[32]; // 1 is full
-            // brightness *= 3.;
-            
-            
+                                                          // brightness *= 3.;
+
             // let d: f32 = 1.;
             // brightness = (brightness+1.).log10()/d; // because images are encoded logarithmically
             brightness *= 255.;
-
-
 
             r += brightness;
             g += brightness;

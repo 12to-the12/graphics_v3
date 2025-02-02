@@ -42,8 +42,8 @@ pub fn simple_scene() -> Scene {
     let sensor = Sensor {
         width: 36.0,
         // height: 24.0,
-        horizontal_res: 240,
-        vertical_res: 160,
+        horizontal_res: 480,
+        vertical_res: 320,
     };
     let camera = Camera {
         position: vertex(0.0, 0.0, 0.0),

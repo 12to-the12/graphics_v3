@@ -1,3 +1,7 @@
+use std::sync::Arc;
+use std::thread::{self, JoinHandle};
+use std::time::Duration;
+
 use crate::application::application;
 use crate::camera::Camera;
 use crate::primitives::{triangle, vector};
@@ -127,8 +131,7 @@ fn rasterize(canvas: &mut RgbImage, mut scene: Scene) {
     solid(canvas, scene);
 }
 
-fn apply_transforms(scene:&mut  Scene) {
-
+fn apply_transforms(scene: &mut Scene) {
     for mesh in &mut scene.meshes {
         // for mesh in scene.meshes.iter_mut() {
         let to_world_space = build_translation_transform(mesh.position.clone());
@@ -138,12 +141,70 @@ fn apply_transforms(scene:&mut  Scene) {
 
         mesh.apply_transformations();
     }
-    
 }
 
 fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     apply_transforms(&mut scene);
-    shade_pixels(canvas, &scene, lit_shader); // lit_shader solid_shader solid_shader
+
+    shade_pixels(canvas, &scene, lit_shader, 0, scene.camera.sensor.horizontal_res, 0, scene.camera.sensor.vertical_res); // lit_shader solid_shader solid_shader
+}
+fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
+    apply_transforms(&mut scene);
+
+    let data = Arc::new(scene.clone()); // necessary for borrowing in threads
+
+    let thread_count = 32;
+    let mut threads = Stopwatch::start_new();
+    let mut handles = Vec::new();
+    let mut canvases: Vec<RgbImage> = Vec::new();
+
+    let width = scene.camera.sensor.horizontal_res / thread_count;
+    let height = scene.camera.sensor.vertical_res;
+
+    for i in 0..thread_count {
+        // sliced vertically
+        
+        let data_clone = Arc::clone(&data);
+
+        let mut mini_canvas: RgbImage = ImageBuffer::new(width, height);
+
+        let handle = thread::spawn(move || {
+            shade_pixels(
+                &mut mini_canvas,
+                &data_clone,
+                lit_shader,
+                i * width,
+                i * width + width,
+                0,
+                height,
+            );
+            mini_canvas
+        });
+        handles.push(handle);
+    }
+    // let painted_mini_canvas = handle.join().unwrap();
+    for handle in handles {
+        canvases.push(handle.join().unwrap());
+    }
+    for (i,mini_canvas) in canvases.iter().enumerate() {
+        for (x, y, pixel) in mini_canvas.enumerate_pixels() {
+            canvas.put_pixel(x+(i as u32)*width, y, *pixel);
+        }
+    }
+
+    threads.stop();
+    println!("threads: {:?}", threads.elapsed());
+
+    let mut reassembly = Stopwatch::start_new();
+
+    reassembly.stop();
+    println!("reassembly: {:?}", reassembly.elapsed());
+
+    // for i in 1..10 {
+    //     println!("this is number {i} from main");
+    //     thread::sleep(Duration::from_millis(1));
+
+    // }
 }
 
 /// this serves as an abstraction away from rasterization, so that ray tracing can be dropped into the pipeline
@@ -152,7 +213,7 @@ fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
 ///
 fn render(canvas: &mut RgbImage, scene: Scene) {
     // rasterize(canvas, scene);
-    ray_trace(canvas, scene);
+    threaded_ray_trace(canvas, scene);
 }
 
 /// Application
