@@ -1,12 +1,9 @@
-use crate::camera::{Camera, Lens, Sensor};
-use crate::line_plotting::plot_triangle;
 use crate::path_tracing::{probe_ray_polygon_intersection, ray_polygon_intersection_test};
-use crate::primitives::{polygon, ray, vector, vertex, Point, Polygon, Ray, Triangle, Vector};
+use crate::primitives::{polygon, ray, vector, Ray, Vector};
 use crate::scene::Scene;
-use image::{ImageFormat, Rgb, RgbImage};
-use ndarray::{arr1, arr2, Array1, Array2, Axis};
-use rand::distributions::{Distribution, Uniform}; // 0.6.5
+use image::{Rgb, RgbImage};
 use stopwatch::Stopwatch;
+use crate::rendering_equation::weakening_function;
 
 pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
     canvas: &mut RgbImage,
@@ -89,7 +86,7 @@ pub fn solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = pixel_to_ray(x, y, scene);
     let mut hit = false;
-    let mut closest = 1e6;
+    let mut closest: f32 = 1e6;
     let mut surface_normal: Vector;
     surface_normal = vector(1., 1., 1.);
     for mesh in scene.meshes.clone() {
@@ -113,40 +110,55 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     }
 
     if hit {
+        let mut direction: Vector = ray.direction.clone();
+        direction.norm();
+        let intersection_point: Vector = (closest * direction) + ray.position;
+
         let mut r = 0.;
         let mut g = 0.;
         let mut b = 0.;
 
         for light in scene.lights.clone() {
+            // our job here is to find the amount of energy transmitted to the pixel from the light
+
+            let to_light = intersection_point.clone().to(light.position.as_vector());
+            
+            let distance_to_surface: f32 = closest;
+            let distance_to_light: f32 = to_light.magnitude();
+
             // let light_angle = vector(0., -1., 0.);
             // let θ = light_angle.dot(&surface_normal).acos().cos().to_degrees();
-            let θ = light.direction.dot(&surface_normal);
-
+            let irradiance: f32 = weakening_function(&to_light, &surface_normal);
+            let θ = (irradiance).acos().to_degrees();
+            // println!("{:?}",θ);
             // if θ < -1. || θ > 1. {
             //     println!("{θ}");
 
             // }
 
-            let mut mag = θ; // [0 -> 180]
-            mag *= -1.;
-            if mag < 0. {
-                return Rgb([0, 0, 0]);
-            }
-            // [-1 -> 1] becomes 0 -> -1, where -1 is strong
-            if mag > 0.9 {
-                return Rgb([255, 0, 0]);
-            }
+            let mut brightness = θ; // [0 -> 180]
+            brightness -= 90.;
+            // mag *= -1.;
 
-            if mag < 0.1 {
-                return Rgb([0, 0, 100]);
+
+            if brightness < 0. {
+                brightness = 0.;
             }
+            brightness /= 90.;
+            // 1 should map to 180° and 0 should be anything below 90°
+            brightness *= light.radiant_flux.spectra[32]; // 1 is full
+            // brightness *= 3.;
+            
+            
+            // let d: f32 = 1.;
+            // brightness = (brightness+1.).log10()/d; // because images are encoded logarithmically
+            brightness *= 255.;
 
-            // mag /= 90.; // [0 -> 1]
 
-            mag *= 255.;
-            r += mag;
-            g += mag;
-            b += mag;
+
+            r += brightness;
+            g += brightness;
+            b += brightness;
         }
         let r = r as u8;
         let g = g as u8;

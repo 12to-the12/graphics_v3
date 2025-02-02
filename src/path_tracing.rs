@@ -1,7 +1,4 @@
-use std::vec;
-
 use crate::primitives::{vector, Polygon, Ray, Vector};
-use image::{Rgb, RgbImage};
 use stopwatch::Stopwatch;
 
 pub fn ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> bool {

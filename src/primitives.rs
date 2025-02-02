@@ -2,10 +2,9 @@
 use image::{Rgb, RgbImage};
 use ndarray::Array1;
 
-use crate::{coordinate_space::Orientation, line_plotting::plot_line};
+use crate::line_plotting::plot_line;
 
-use crate::coordinate_space::Polar;
-use crate::transformations::{build_translation_transform, compile_transforms, Transform};
+use crate::transformations::{compile_transforms, Transform};
 
 /// point in 3D space
 #[derive(Clone, Debug, PartialEq)]
@@ -14,6 +13,12 @@ pub struct Vertex {
     pub y: f32,
     pub z: f32,
 }
+
+pub const ORIGIN: Vertex = Vertex {
+    x: 0.,
+    y: 0.,
+    z: 0.,
+};
 
 impl Vertex {
     pub fn to_point(&self) -> Point {
@@ -48,6 +53,28 @@ impl Vertex {
     }
 }
 
+impl std::ops::Mul<Vertex> for f32 {
+    type Output = Vertex;
+    fn mul(self, rhs: Vertex) -> Vertex {
+        Vertex {
+            x: rhs.x * self,
+            y: rhs.y * self,
+            z: rhs.z * self,
+        }
+    }
+}
+
+impl std::ops::Add<Vertex> for Vertex {
+    type Output = Vertex;
+    fn add(self, rhs: Vertex) -> Vertex {
+        Vertex {
+            x: rhs.x + self.x,
+            y: rhs.y + self.y,
+            z: rhs.z + self.z,
+        }
+    }
+}
+
 pub fn vertex(x: f32, y: f32, z: f32) -> Vertex {
     return Vertex { x, y, z };
 }
@@ -61,7 +88,7 @@ pub fn vertex_from_array(arr: Array1<f32>) -> Vertex {
     };
 }
 /// direction and magnitude in 3D space
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Vector {
     pub x: f32,
     pub y: f32,
@@ -72,6 +99,40 @@ pub struct Vector {
 //     x**2
 //     x.pow(2)
 // }
+impl std::ops::Mul<Vector> for f32 {
+    type Output = Vector;
+    fn mul(self, rhs: Vector) -> Vector {
+        Vector {
+            x: rhs.x * self,
+            y: rhs.y * self,
+            z: rhs.z * self,
+        }
+    }
+}
+
+impl std::ops::Add<Vector> for Vector {
+    type Output = Vector;
+    fn add(self, rhs: Vector) -> Vector {
+        Vector {
+            x: rhs.x + self.x,
+            y: rhs.y + self.y,
+            z: rhs.z + self.z,
+        }
+    }
+}
+
+impl std::ops::Neg for Vector {
+    type Output = Vector;
+    fn neg(self) -> Vector {
+        Vector {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        }
+    }
+}
+
+
 impl Vector {
     /// magnitude of the vector
     pub fn magnitude(&self) -> f32 {
@@ -110,6 +171,9 @@ impl Vector {
             return true;
         }
         false
+    }
+    pub fn to(&self, head: Vector) -> Vector {
+        head.minus(self)
     }
 }
 
@@ -324,5 +388,20 @@ pub fn ray(position: Vector, direction: Vector) -> Ray {
     Ray {
         position,
         direction,
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use crate::primitives::vector;
+
+
+    /// useful table: https://www.nikonians.org/reviews/fov-tables
+    #[test]
+    fn test_negative_vectors() {
+        let myvec = vector(1.,2.,3.);
+        let anothervec = -myvec;
+        assert_eq!(anothervec,vector(-1.,-2.,-3.));
     }
 }

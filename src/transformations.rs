@@ -1,10 +1,8 @@
-use std::ops::Mul;
-
 use crate::{
     camera::Camera,
-    primitives::{vector, vertex, vertex_from_array, Angle, Vector, Vertex},
+    primitives::{vector, vertex_from_array, Vector, Vertex},
 };
-use ndarray::{arr1, arr2, Array1, Array2, Axis};
+use ndarray::{arr1, arr2, Array2};
 
 #[derive(Clone, Debug)]
 pub struct Transform {
@@ -345,6 +343,7 @@ mod tests {
             sensor,
             near_clipping_plane: 1e-1,
             far_clipping_plane: 1e6,
+            shutter_speed: 1.,
         };
         let transform = build_projection_transform(&camera);
         println!("{:?}", camera.horizontal_field_of_view());

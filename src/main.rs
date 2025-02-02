@@ -2,7 +2,7 @@
                                     // use std::time::Duration;
 mod application;
 mod camera;
-mod coordinate_space;
+mod orientation;
 mod geometry_pipeline;
 mod lighting;
 mod line_plotting;
@@ -13,6 +13,8 @@ mod primitives;
 mod rasterization;
 mod scene;
 mod transformations;
+mod rendering_equation;
+mod luminous_efficiency;
 
 extern crate stopwatch;
 
@@ -23,21 +25,17 @@ use stopwatch::Stopwatch;
 use crate::geometry_pipeline::geometry_pipeline;
 use crate::scene::simple_scene;
 
-use crate::load_object_file::load_obj;
-
 fn sleep(ms: u64) {
     thread::sleep(Duration::from_millis(ms as u64));
 }
 
 #[inline]
 pub fn save_image(canvas: ImageBuffer<Rgb<u8>, Vec<u8>>) -> () {
-    let mut image_save = Stopwatch::start_new();
 
     canvas
         .save_with_format("rust-output.png", ImageFormat::Png)
         .unwrap();
-    image_save.stop();
-    println!("image_save: {:?}", image_save.elapsed());
+
 }
 
 pub fn check_debug() {
@@ -53,9 +51,13 @@ fn main_loop() {
     // let mut scene;
     let mut counter: usize = 0;
     loop {
+        let mut frame = Stopwatch::start_new();
+
         println!("");
         single(counter);
-        sleep(REST);
+        // sleep(REST);
+        frame.stop();
+        println!("frame: {:?}", frame.elapsed());
         counter += 1;
         // counter %= 360.0;
     }

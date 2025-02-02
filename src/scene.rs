@@ -1,14 +1,12 @@
 use crate::camera::{Camera, Lens, Sensor};
+use crate::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
-use crate::primitives::{sample_mesh, unit_cube, vector, vertex, Mesh, Polygon, Vertex};
+use crate::primitives::{vector, vertex, Mesh};
 // use crate::primitives::Object;
-use crate::lighting::{sun_light, Light};
+use crate::lighting::{point_light, black_spectra, PointLight, Spectra};
 use crate::load_object_file::load_obj;
-use crate::transformations::{
-    build_scale_transform, build_x_rotation_transform, build_y_rotation_transform,
-    build_z_rotation_transform, Transform,
-};
-use image::{ImageFormat, Rgb, RgbImage};
+use image::Rgb;
+use ndarray::Array;
 
 /// I am not sure what the responsibilities of this construction should be
 /// should it be concerned with intermediate rendering data?
@@ -23,7 +21,7 @@ use image::{ImageFormat, Rgb, RgbImage};
 #[derive(Clone)]
 pub struct Scene {
     pub camera: Camera,
-    pub lights: Vec<Light>,
+    pub lights: Vec<PointLight>,
     pub meshes: Vec<Mesh>,
     // pub unified_mesh: Vec<Polygon<'a>>,
     // pub unified_vertices: Vec<Vertex>, // pub materials: Vec<Material>,
@@ -38,14 +36,14 @@ pub struct Scene {
 pub fn simple_scene() -> Scene {
     let lens = Lens {
         aperture: 50.0,
-        focal_length: 50.0,
+        focal_length: 120.0,
         focus_distance: 2.0,
     };
     let sensor = Sensor {
         width: 36.0,
         // height: 24.0,
-        horizontal_res: 100,
-        vertical_res: 100,
+        horizontal_res: 240,
+        vertical_res: 160,
     };
     let camera = Camera {
         position: vertex(0.0, 0.0, 0.0),
@@ -54,23 +52,32 @@ pub fn simple_scene() -> Scene {
         sensor,
         near_clipping_plane: 1e-1,
         far_clipping_plane: 1e6,
+        shutter_speed: 1.,
     };
-    let light = sun_light(vertex(0.0, 0.0, 0.0), vector(-1., 0., 0.), 1.0);
+    let mut red_spectra: Spectra = black_spectra(); 
+    red_spectra.spectra[32] = 1.; // 700nm, red
+
+    // let light = sun_light(vertex(0.0, 0.0, 0.0), vector(-1., 0., 0.), red_spectra.clone());
+    let light = point_light(vertex(-100.0, 0.0, -100.0), RIGHT, red_spectra);
+
+    let mut muted_spectra = black_spectra(); 
+    muted_spectra.spectra[32] = 0.5; // 700nm, red
+    let lightb = point_light(vertex(100.0, -100.0, -100.), RIGHT, muted_spectra);
     let lights = vec![light];
     let mut meshes = Vec::new();
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
     // let mesh = sample_mesh(vector(0.0, 0.0, -3.0));
-    let mut mesh = load_obj("models/sphere.obj".to_string());
-    mesh.position = vector(-3.0, 0.0, -10.0);
-    meshes.push(mesh);
+    // let mut mesh = load_obj("models/sphere.obj".to_string());
+    // mesh.position = vector(-3.0, 0.0, -10.0);
+    // meshes.push(mesh);
 
     let mut mesh = load_obj("models/sphere.obj".to_string());
     mesh.position = vector(0.0, 0.0, -10.0);
     meshes.push(mesh);
 
-    let mut mesh = load_obj("models/sphere.obj".to_string());
-    mesh.position = vector(3.0, 0.0, -10.0);
-    meshes.push(mesh);
+    // let mut mesh = load_obj("models/sphere.obj".to_string());
+    // mesh.position = vector(3.0, 0.0, -10.0);
+    // meshes.push(mesh);
 
     let background = Rgb([0, 0, 0]);
     let scene = Scene {

@@ -1,7 +1,6 @@
 use crate::application::application;
 use crate::camera::Camera;
-use crate::primitives::{triangle, vector, Point, Polygon, Triangle, Vector, Vertex};
-use std::vec;
+use crate::primitives::{triangle, vector};
 // use crate::primitives::LineCollection;
 use crate::scene::Scene;
 // use crate::primitives::PolygonCollection;
@@ -128,15 +127,22 @@ fn rasterize(canvas: &mut RgbImage, mut scene: Scene) {
     solid(canvas, scene);
 }
 
-fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
+fn apply_transforms(scene:&mut  Scene) {
+
     for mesh in &mut scene.meshes {
         // for mesh in scene.meshes.iter_mut() {
-        let transform = build_translation_transform(mesh.position.clone());
-        mesh.add_transform(transform);
-        mesh.add_transform(build_camera_space_transform(&scene.camera));
+        let to_world_space = build_translation_transform(mesh.position.clone());
+        mesh.add_transform(to_world_space);
+        let to_camera_space = build_camera_space_transform(&scene.camera);
+        mesh.add_transform(to_camera_space);
 
         mesh.apply_transformations();
     }
+    
+}
+
+fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
+    apply_transforms(&mut scene);
     shade_pixels(canvas, &scene, lit_shader); // lit_shader solid_shader solid_shader
 }
 
@@ -165,9 +171,7 @@ pub fn geometry_pipeline(mut scene: Scene) -> RgbImage {
     let vertical_res = scene.camera.sensor.vertical_res;
     let mut canvas: RgbImage = ImageBuffer::new(horizontal_res, vertical_res);
 
-    let mut render_time = Stopwatch::start_new();
     render(&mut canvas, scene);
-    render_time.stop();
-    println!("render: {:?}", render_time.elapsed());
+
     canvas
 }

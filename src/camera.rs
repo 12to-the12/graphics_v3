@@ -1,5 +1,5 @@
 // use crate::coordinate_space::Orientation;
-use crate::primitives::{vertex, Vertex};
+use crate::primitives::{vertex, Vertex,ORIGIN};
 
 #[derive(Clone)]
 pub struct Camera {
@@ -9,6 +9,28 @@ pub struct Camera {
     pub sensor: Sensor,
     pub near_clipping_plane: f32,
     pub far_clipping_plane: f32,
+    pub shutter_speed: f32, // shutterspeed in seconds
+}
+// impl Default for Camera {
+//     fn default() -> Camera {
+//         Camera {
+//             position: ORIGIN,
+//             lens: LENS,
+//             sensor: SENSOR,
+//             near_clipping_plane: 1e-1,
+//             far_clipping_plane: 1e6,
+//             shutter_speed: 1.,
+//         }
+//     }
+// }
+
+impl Camera {
+    pub fn horizontal_field_of_view(&self) -> f32 {
+        return ((self.sensor.width / (2.0 * self.lens.focal_length)).atan() * 2.0).to_degrees();
+    }
+    pub fn vertical_field_of_view(&self) -> f32 {
+        return ((self.sensor.height() / (2.0 * self.lens.focal_length)).atan() * 2.0).to_degrees();
+    }
 }
 
 /// models a camera lens
@@ -43,16 +65,28 @@ impl Sensor {
     pub fn res(&self) -> (u32, u32) {
         (self.horizontal_res, self.vertical_res)
     }
-}
-impl Camera {
-    pub fn horizontal_field_of_view(&self) -> f32 {
-        return ((self.sensor.width / (2.0 * self.lens.focal_length)).atan() * 2.0).to_degrees();
+    pub fn sensor_area(&self) -> f32 { // the area of the sensor in square millimeters
+         self.width * self.height()
     }
-    pub fn vertical_field_of_view(&self) -> f32 {
-        return ((self.sensor.height() / (2.0 * self.lens.focal_length)).atan() * 2.0).to_degrees();
+    pub fn pixel_area(&self) -> f32  { // the area of a pixel in square millimeters
+        let pixel_count = self.horizontal_res * self.vertical_res;
+        self.sensor_area() / pixel_count as f32
     }
 }
 
+
+
+const LENS: Lens = Lens {
+    aperture: 12.0,
+    focal_length: 50.0,
+    focus_distance: 20.0,
+};
+const SENSOR: Sensor = Sensor {
+    width: 36.0,
+    // height: 24.0,
+    horizontal_res: 1500,
+    vertical_res: 1000,
+};
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -60,23 +94,14 @@ mod tests {
     /// useful table: https://www.nikonians.org/reviews/fov-tables
     #[test]
     fn field_of_view() {
-        let lens = Lens {
-            aperture: 12.0,
-            focal_length: 50.0,
-            focus_distance: 20.0,
-        };
-        let sensor = Sensor {
-            width: 36.0,
-            // height: 24.0,
-            horizontal_res: 1500,
-            vertical_res: 1000,
-        };
+ 
         let mut camera = Camera {
             position: vertex(0.0, 0.0, 0.0),
-            lens: lens,
-            sensor: sensor,
+            lens: LENS,
+            sensor: SENSOR,
             near_clipping_plane: 1e-1,
             far_clipping_plane: 1e6,
+            shutter_speed: 1.,
         };
         assert_eq!(camera.horizontal_field_of_view().round(), 40.0); // 39.59775
         assert_eq!(camera.vertical_field_of_view().round(), 27.0); //
@@ -90,5 +115,11 @@ mod tests {
 
         assert_eq!(camera.horizontal_field_of_view().round(), 90.0); //
         assert_eq!(camera.vertical_field_of_view().round(), 67.0); //
+    }
+    #[test]
+    fn pixel_size() {
+        assert_eq!(SENSOR.sensor_area(), 864.0);
+        assert_eq!(SENSOR.pixel_area(), 0.000576);
+
     }
 }
