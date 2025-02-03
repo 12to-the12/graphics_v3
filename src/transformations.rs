@@ -1,6 +1,6 @@
 use crate::{
     camera::Camera,
-    primitives::{vector, vertex_from_array, Vector, Vertex},
+    primitives::{vertex_from_array, Vector, Vertex},
 };
 use ndarray::{arr1, arr2, Array2};
 
@@ -64,7 +64,7 @@ pub fn build_scale_transform(scale: Vector) -> Transform {
 pub fn build_projection_transform(camera: &Camera) -> Transform {
     let hfov = camera.horizontal_field_of_view();
     let hfactor = hfov / 90.0; // for every meter away
-    let vfactor = hfactor / camera.sensor.aspect_ratio(); // for every meter away
+    let _vfactor = hfactor / camera.sensor.aspect_ratio(); // for every meter away
 
     let matrix = arr2(&[
         //*x + *y + *z + *1
@@ -195,11 +195,9 @@ pub fn compile_transforms(transforms: &Vec<Transform>) -> Transform {
 mod tests {
     use crate::camera::{Camera, Lens, Sensor};
 
-    use std::ops::Mul;
 
-    use ndarray::linalg::Dot;
 
-    use crate::{primitives::vertex, scene::simple_scene};
+    use crate::primitives::{vector, vertex};
 
     use super::*;
 
@@ -343,7 +341,7 @@ mod tests {
             sensor,
             near_clipping_plane: 1e-1,
             far_clipping_plane: 1e6,
-            shutter_speed: 1.,
+            exposure_time: 1.,
         };
         let transform = build_projection_transform(&camera);
         println!("{:?}", camera.horizontal_field_of_view());

@@ -6,7 +6,6 @@ use crate::primitives::{vector, vertex, Mesh};
 use crate::lighting::{black_spectra, point_light, PointLight, Spectra};
 use crate::load_object_file::load_obj;
 use image::Rgb;
-use ndarray::Array;
 
 /// I am not sure what the responsibilities of this construction should be
 /// should it be concerned with intermediate rendering data?
@@ -52,7 +51,7 @@ pub fn simple_scene() -> Scene {
         sensor,
         near_clipping_plane: 1e-1,
         far_clipping_plane: 1e6,
-        shutter_speed: 1.,
+        exposure_time: 1.,
     };
     let mut red_spectra: Spectra = black_spectra();
     red_spectra.spectra[32] = 1.; // 700nm, red
@@ -62,7 +61,7 @@ pub fn simple_scene() -> Scene {
 
     let mut muted_spectra = black_spectra();
     muted_spectra.spectra[32] = 0.5; // 700nm, red
-    let lightb = point_light(vertex(100.0, -100.0, -100.), RIGHT, muted_spectra);
+    let _lightb = point_light(vertex(100.0, -100.0, -100.), RIGHT, muted_spectra);
     let lights = vec![light];
     let mut meshes = Vec::new();
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));

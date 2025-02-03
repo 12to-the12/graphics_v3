@@ -1,6 +1,7 @@
 use crate::primitives::{vector, Polygon, Ray, Vector};
 use stopwatch::Stopwatch;
 
+#[allow(non_snake_case)]
 pub fn ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> bool {
     let mut probe = Stopwatch::start_new();
     let (b, I, dist) = probe_ray_polygon_intersection(ray, polygon);
@@ -10,6 +11,7 @@ pub fn ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> bool {
 }
 
 /// returns whether it intersects, the ray, and the distance
+#[allow(non_snake_case)]
 pub fn probe_ray_polygon_intersection(ray: &Ray, polygon: &Polygon) -> (bool, Vector, f32) {
     // println!("{:?}\n\n\n",polygon);
     // first, if the ray is parallel to the plane the polygon lies in, they do not intersect

@@ -98,7 +98,7 @@ git clone https://github.com/12to-the12/graphics_v3.git
 
 cd into the folder and and run the project with
 ```
-make
+make run
 ```
 
 the renderer outputs the result as a png in the project root, that was simpler than trying to interface with a windowing system.

@@ -17,8 +17,8 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
     let mut shading = Stopwatch::start_new();
     // println!("{}", scene.camera.sensor.horizontal_res);
     // let (width, height) = canvas.dimensions();
-    let width = y_end - y_start;
-    let height = x_end - x_start;
+    let _width = y_end - y_start;
+    let _height = x_end - x_start;
     for y in y_start..y_end {
         for x in x_start..x_end {
             let color = closure(x, y, scene);
@@ -46,7 +46,7 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
     // println!("  shading: {:?}", shading.elapsed());
 }
 
-pub fn color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
+pub fn _color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let (hres, vres) = scene.camera.sensor.res();
     let x = x as f32 / (hres as f32);
     let y = y as f32 / (vres as f32);
@@ -76,8 +76,8 @@ pub fn color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 pub fn solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = pixel_to_ray(x, y, scene);
     // let mut hit = false;
-    'mesh: for mesh in scene.meshes.iter() {
-        'poly: for poly in &mesh.polygons {
+    '_mesh: for mesh in scene.meshes.iter() {
+        '_poly: for poly in &mesh.polygons {
             // println!("{:?}\n\n\n", mesh.output_vertices);
             let a = mesh.output_vertices[poly[0]].clone();
             let b = mesh.output_vertices[poly[1]].clone();
@@ -115,7 +115,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             let b = mesh.output_vertices[poly[1]].clone();
             let c = mesh.output_vertices[poly[2]].clone();
             let polygon = polygon(a, b, c);
-            let (b, I, dist) = probe_ray_polygon_intersection(&ray, &polygon);
+            let (b, _i, dist) = probe_ray_polygon_intersection(&ray, &polygon);
             if b && dist < closest {
                 closest = dist;
                 hit = true;
@@ -147,8 +147,8 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 
             let to_light = intersection_point.clone().to(light.position.as_vector());
 
-            let distance_to_surface: f32 = closest;
-            let distance_to_light: f32 = to_light.magnitude();
+            let _distance_to_surface: f32 = closest;
+            let _distance_to_light: f32 = to_light.magnitude();
 
             // let light_angle = vector(0., -1., 0.);
             // let θ = light_angle.dot(&surface_normal).acos().cos().to_degrees();
