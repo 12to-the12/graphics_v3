@@ -3,7 +3,7 @@ use crate::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
 use crate::primitives::{vector, vertex, Mesh};
 // use crate::primitives::Object;
-use crate::lighting::{black_spectra, point_light, PointLight, Spectra};
+use crate::lighting::{black_spectra, const_spectra, point_light, PointLight, Spectra};
 use crate::load_object_file::load_obj;
 use image::Rgb;
 
@@ -53,15 +53,9 @@ pub fn simple_scene() -> Scene {
         far_clipping_plane: 1e6,
         exposure_time: 1.,
     };
-    let mut red_spectra: Spectra = black_spectra();
-    red_spectra.spectra[32] = 1.; // 700nm, red
 
-    // let light = sun_light(vertex(0.0, 0.0, 0.0), vector(-1., 0., 0.), red_spectra.clone());
-    let light = point_light(vertex(-100.0, 0.0, -100.0), RIGHT, red_spectra);
+    let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, const_spectra(1.));
 
-    let mut muted_spectra = black_spectra();
-    muted_spectra.spectra[32] = 0.5; // 700nm, red
-    let _lightb = point_light(vertex(100.0, -100.0, -100.), RIGHT, muted_spectra);
     let lights = vec![light];
     let mut meshes = Vec::new();
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));

@@ -11,7 +11,7 @@ use crate::transformations::{
 pub fn application(scene: &mut Scene) -> &Scene {
     let tick = scene.tick as f32;
     let meshes = &mut scene.meshes;
-    scene.lights[0].position.x += 2.*tick;
+    // scene.lights[0].position.x += 2.*tick;
 
     // scene.lights[0].direction = vector(-1., 0., 0.);
 

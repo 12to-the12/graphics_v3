@@ -24,9 +24,16 @@ pub fn diffuse_white(_x: &Vector, _ω_i: &Vector, _ω_o: &Vector, _spectra: &Spe
     return const_spectra(PI / 2.);
 }
 
-/// defines how much radiance we're receiving in every wavelength with our parameters.
+/// as if bro. Lights don't exist.
 pub fn fuck_incoming_spectral_radiance(x: &Vector, ω_i: &Vector, spectra: &Spectra) -> Spectra {
     return black_spectra();
+}
+
+/// defines how much radiance we're receiving in every wavelength with our parameters.
+/// because the current lights are all isotrophic, the function is trivium
+pub fn normal_incoming_spectral_radiance(x: &Vector, ω_i: &Vector, spectra: &Spectra) -> Spectra {
+    return spectra.clone();
+    
 }
 
 /// emission function candidate

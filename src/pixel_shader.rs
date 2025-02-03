@@ -2,7 +2,7 @@ use crate::path_tracing::{probe_ray_polygon_intersection, ray_polygon_intersecti
 use crate::primitives::{polygon, ray, vector, Ray, Vector};
 use crate::rendering_equation::{
     bright_white_emission, diffuse_white, fuck_incoming_spectral_radiance, lamberts_law,
-    no_emission, rendering_equation, void,
+    no_emission, normal_incoming_spectral_radiance, rendering_equation, void,
 };
 use crate::scene::Scene;
 use image::{Rgb, RgbImage};
@@ -157,9 +157,9 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
                 &direction,
                 &surface_normal,
                 light.radiant_flux,
-                void,
-                bright_white_emission,
-                fuck_incoming_spectral_radiance,
+                diffuse_white,
+                no_emission,
+                normal_incoming_spectral_radiance,
             );
 
             let irradiance: f32 = lamberts_law(&to_light, &surface_normal);
@@ -174,7 +174,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             brightness /= 90.;
             // 1 should map to 180° and 0 should be anything below 90°
             // brightness *= 3.;
-            
+
             brightness = radiance.from_λ(555.);
 
             brightness *= 255.;
