@@ -28,6 +28,7 @@ pub fn point_light(
     }
 }
 
+
 // associates an unspecified value with 40 different wavelengths
 // 380nm -> 780nm at 10nm intervals
 
@@ -47,6 +48,24 @@ impl std::ops::Mul<Spectra> for f32 {
     }
 }
 
+impl std::ops::Mul<Spectra> for Spectra {
+    type Output = Spectra;
+    fn mul(self, rhs: Spectra) -> Spectra {
+        return Spectra {
+            spectra: rhs.spectra * self.spectra,
+        };
+    }
+}
+
+impl std::ops::Add<Spectra> for Spectra {
+    type Output = Spectra;
+    fn add(self, rhs: Spectra) -> Spectra {
+        return Spectra {
+            spectra: rhs.spectra + self.spectra,
+        };
+    }
+}
+
 impl Spectra {
     pub fn from_λ(&self, λ: f32) -> f32 {
         let index: usize = (λ as usize - 380) / 10;
@@ -60,6 +79,12 @@ impl Spectra {
 pub fn black_spectra() -> Spectra {
     Spectra {
         spectra: Array::zeros(40),
+    }
+}
+
+pub fn const_spectra(value: f32) -> Spectra {
+    Spectra {
+        spectra: Array::from_elem(40,value),
     }
 }
 

@@ -1,6 +1,9 @@
 use crate::path_tracing::{probe_ray_polygon_intersection, ray_polygon_intersection_test};
 use crate::primitives::{polygon, ray, vector, Ray, Vector};
-use crate::rendering_equation::weakening_function;
+use crate::rendering_equation::{
+    bright_white_emission, diffuse_white, fuck_incoming_spectral_radiance, lamberts_law,
+    no_emission, rendering_equation, void,
+};
 use crate::scene::Scene;
 use image::{Rgb, RgbImage};
 use stopwatch::Stopwatch;
@@ -124,7 +127,6 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
                     println!("polygon is facing away! This shouldn't register as an intersection!");
                     panic!();
                 }
-
             }
             // } else {
             //     return Rgb([0, 0, 0]);
@@ -136,7 +138,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     if hit {
         let mut direction: Vector = ray.direction.clone();
         direction.norm();
-        let intersection_point: Vector = (closest * direction) + ray.position;
+        let intersection_point: Vector = (closest * direction.clone()) + ray.position;
 
         let mut r = 0.;
         let mut g = 0.;
@@ -145,35 +147,36 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
         for light in scene.lights.clone() {
             // our job here is to find the amount of energy transmitted to the pixel from the light
 
-            let to_light = intersection_point.clone().to(light.position.as_vector());
+            let to_light = &intersection_point.clone().to(light.position.as_vector());
 
-            let _distance_to_surface: f32 = closest;
-            let _distance_to_light: f32 = to_light.magnitude();
+            // let _distance_to_surface: f32 = closest;
+            // let _distance_to_light: f32 = to_light.magnitude();
+            let radiance = rendering_equation(
+                &intersection_point,
+                to_light,
+                &direction,
+                &surface_normal,
+                light.radiant_flux,
+                void,
+                bright_white_emission,
+                fuck_incoming_spectral_radiance,
+            );
 
-            // let light_angle = vector(0., -1., 0.);
-            // let θ = light_angle.dot(&surface_normal).acos().cos().to_degrees();
-            let irradiance: f32 = weakening_function(&to_light, &surface_normal);
+            let irradiance: f32 = lamberts_law(&to_light, &surface_normal);
             let θ = (irradiance).acos().to_degrees();
-            // println!("{:?}",θ);
-            // if θ < -1. || θ > 1. {
-            //     println!("{θ}");
-
-            // }
 
             let mut brightness = θ; // [0 -> 180]
             brightness -= 90.;
-            // mag *= -1.;
 
             if brightness < 0. {
                 brightness = 0.;
             }
             brightness /= 90.;
             // 1 should map to 180° and 0 should be anything below 90°
-            brightness *= light.radiant_flux.spectra[32]; // 1 is full
-                                                          // brightness *= 3.;
+            // brightness *= 3.;
+            
+            brightness = radiance.from_λ(555.);
 
-            // let d: f32 = 1.;
-            // brightness = (brightness+1.).log10()/d; // because images are encoded logarithmically
             brightness *= 255.;
 
             r += brightness;

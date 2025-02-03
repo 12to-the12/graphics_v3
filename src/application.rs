@@ -1,15 +1,17 @@
-use crate::primitives::vector;
+use crate::lighting::point_light;
+use crate::primitives::{vector, vertex};
 use crate::scene::Scene;
 use crate::transformations::{
     build_arbitrary_rotation_transform, build_scale_transform, build_translation_transform,
     build_x_rotation_transform, build_y_rotation_transform, build_z_rotation_transform,
 };
 
-/// all of the stuff that should happen to make the scene,
-/// beyond what's in the scene description
+/// all of the stuff that should happen to run the scene,
+/// note: this is recomputed every frame. Not a major performance bottleneck
 pub fn application(scene: &mut Scene) -> &Scene {
     let tick = scene.tick as f32;
     let meshes = &mut scene.meshes;
+    scene.lights[0].position.x += 2.*tick;
 
     // scene.lights[0].direction = vector(-1., 0., 0.);
 

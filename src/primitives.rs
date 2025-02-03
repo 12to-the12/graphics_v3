@@ -1,3 +1,4 @@
+
 // use image::{ImageBuffer, Rgb, RgbImage};
 use image::{Rgb, RgbImage};
 use ndarray::Array1;
@@ -7,7 +8,7 @@ use crate::line_plotting::plot_line;
 use crate::transformations::{compile_transforms, Transform};
 
 /// point in 3D space
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Copy)]
 pub struct Vertex {
     pub x: f32,
     pub y: f32,
