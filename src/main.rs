@@ -2,6 +2,8 @@
                                     // use std::time::Duration;
 mod application;
 mod camera;
+mod cie_color_matching_functions;
+mod colorspace_conversion;
 mod geometry_pipeline;
 mod lighting;
 mod line_plotting;
@@ -18,7 +20,8 @@ mod transformations;
 
 extern crate stopwatch;
 
-use image::{ImageBuffer, ImageFormat, Rgb};
+use colorspace_conversion::{coloring_book, draw_colors_in_xyz};
+use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
 use std::{thread, time::Duration};
 use stopwatch::Stopwatch;
 
@@ -77,11 +80,17 @@ fn single(i: usize) {
 const REST: Duration = Duration::from_millis(1000 / 8 as u64); // ms/frame @ 8 fps
                                                                // const REST: u64 = 1000 / 12 as u64; // const REST: u64 = 1000/12 as u64;// ms/frame @ 12 fps
                                                                // const REST: u64 = 1000 / 24 as u64; // const REST: u64 = 1000/24 as u64;// ms/frame @ 24 fps
-                                                               // const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000 / 60 as u64; // const REST: u64 = 1000/60 as u64;// ms/frame @ 60 fps
-
+fn draw_colors() {
+    let horizontal_res = 1_000;
+    let vertical_res = horizontal_res;
+    let mut canvas: RgbImage = ImageBuffer::new(horizontal_res, vertical_res);
+    coloring_book(&mut canvas);
+    // draw_colors_in_xyz(&mut canvas);
+    save_image(canvas);
+}
 fn main() {
     check_debug();
-    // load_obj("models/cube.obj".to_string());
-    main_loop()
+    // main_loop()
     // single(0)
+    draw_colors()
 }

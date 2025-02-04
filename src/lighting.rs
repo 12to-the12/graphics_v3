@@ -30,11 +30,11 @@ pub fn point_light(
 
 
 // associates an unspecified value with 40 different wavelengths
-// 380nm -> 780nm at 10nm intervals
+// 380nm -> 780nm non inclusive at 10nm intervals
 
 // this can be used to track radiance, radiant flux, "brightness", whatever
 // this is a very memory intensive thing to track, so optimization will be key
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub struct Spectra {
     pub spectra: Array1<f32>,
 }
@@ -75,6 +75,10 @@ impl Spectra {
         let index: usize = (λ as usize - 380) / 10;
         self.spectra[index]=value;
     }
+    /// the band of wavelengths that a single sample covers
+    pub fn get_sample_width(&self)->f32{
+        return 10.
+    }
 }
 pub fn black_spectra() -> Spectra {
     Spectra {
@@ -98,6 +102,28 @@ const h: f32 = 6.62607015e-34;
 
 // speed of light in a vacuum
 const c: f32 = 299_792_458.;
+
+// Wien's displacement constant
+const b: f32 = 2.897771955e-3;
+
+
+/// get the peak wavelength of a blackbody in nanometers
+/// 
+pub fn peak_blackbody(temp:f32)->f32{
+    let peak_in_meters = b/temp;
+    let peak_in_nm = peak_in_meters*1e9;
+    peak_in_nm
+}
+
+
+pub fn norm_black_body(temp: f32)->Spectra{
+    
+    let λ = peak_blackbody(temp);
+    let value_at_peak = plancks_law(&λ, &temp);
+    let factor = 1./value_at_peak;
+    let normalized: Spectra =  factor*black_body(temp);
+    normalized
+}
 
 // blackbody radiation spectra at a given temperature in Kelvin
 // the spectra is in terms of watts/meter**2/steradian, radiance

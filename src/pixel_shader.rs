@@ -3,6 +3,7 @@ use crate::primitives::{polygon, ray, vector, Ray, Vector};
 use crate::rendering_equation::{
     bright_white_emission, diffuse_white, fuck_incoming_spectral_radiance, lamberts_law,
     no_emission, normal_incoming_spectral_radiance, rendering_equation, void,
+    white_emission_equation, white_matte_equation,
 };
 use crate::scene::Scene;
 use image::{Rgb, RgbImage};
@@ -149,18 +150,35 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 
             let to_light = &intersection_point.clone().to(light.position.as_vector());
 
-            // let _distance_to_surface: f32 = closest;
+            let distance_to_surface: f32 = closest;
             // let _distance_to_light: f32 = to_light.magnitude();
-            let radiance = rendering_equation(
+
+            // let radiance = rendering_equation(
+            //     &intersection_point,
+            //     to_light,
+            //     &direction,
+            //     &surface_normal,
+            //     light.radiant_flux,
+            //     diffuse_white,
+            //     no_emission,
+            //     normal_incoming_spectral_radiance,
+            // );
+
+            let radiance = white_matte_equation(
                 &intersection_point,
                 to_light,
                 &direction,
                 &surface_normal,
                 light.radiant_flux,
-                diffuse_white,
-                no_emission,
-                normal_incoming_spectral_radiance,
             );
+
+            // let radiance = white_emission_equation(
+            //     &intersection_point,
+            //     to_light,
+            //     &direction,
+            //     &surface_normal,
+            //     light.radiant_flux,
+            // );
 
             let irradiance: f32 = lamberts_law(&to_light, &surface_normal);
             let θ = (irradiance).acos().to_degrees();

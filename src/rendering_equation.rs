@@ -20,6 +20,7 @@ pub fn void(_x: &Vector, _ω_i: &Vector, _ω_o: &Vector, _spectra: &Spectra) -> 
 /// BRDF
 /// returns a radiance value as a Spectra
 /// correctness needs to be checked
+/// *not* multipled by the provided Spectra, that's there for when the function differs over the spectrum, this function is isotrophic
 pub fn diffuse_white(_x: &Vector, _ω_i: &Vector, _ω_o: &Vector, _spectra: &Spectra) -> Spectra {
     return const_spectra(PI / 2.);
 }
@@ -33,7 +34,6 @@ pub fn fuck_incoming_spectral_radiance(x: &Vector, ω_i: &Vector, spectra: &Spec
 /// because the current lights are all isotrophic, the function is trivium
 pub fn normal_incoming_spectral_radiance(x: &Vector, ω_i: &Vector, spectra: &Spectra) -> Spectra {
     return spectra.clone();
-    
 }
 
 /// emission function candidate
@@ -72,13 +72,56 @@ pub fn rendering_equation<
     return outgoing_radiance;
 }
 
+pub fn white_matte_equation(
+    x: &Vector,       // position vector of equation
+    ω_i: &Vector,     // vector to light
+    ω_o: &Vector,     // light exit path
+    normal: &Vector,  // surface normal
+    spectra: Spectra, // the radiant flux of the lightsource encoded as a spectrum
+) -> Spectra {
+    return rendering_equation(
+        x,
+        ω_i,
+        ω_o,
+        normal,
+        spectra,
+        diffuse_white,
+        no_emission,
+        normal_incoming_spectral_radiance,
+    );
+}
+
+
+pub fn white_emission_equation(
+    x: &Vector,       // position vector of equation
+    ω_i: &Vector,     // vector to light
+    ω_o: &Vector,     // light exit path
+    normal: &Vector,  // surface normal
+    spectra: Spectra, // the radiant flux of the lightsource encoded as a spectrum
+) -> Spectra {
+    return rendering_equation(
+        x,
+        ω_i,
+        ω_o,
+        normal,
+        spectra,
+        void,
+        bright_white_emission,
+        fuck_incoming_spectral_radiance,
+    );
+}
+
 #[cfg(test)]
 mod tests {
+    use std::f32::consts::PI;
+
     use crate::{
-        lighting::{black_body, black_spectra, Spectra},
+        lighting::{black_body, black_spectra, const_spectra, Spectra},
         primitives::vector,
         rendering_equation::lamberts_law,
     };
+
+    use super::diffuse_white;
 
     #[test]
     fn test_lamberts_law() {
@@ -93,5 +136,10 @@ mod tests {
         assert_eq!(lamberts_law(&a, &a), 1.);
     }
 
-    fn test_weakening_function() {}
+    
+    fn test_diffuse_white() {
+        let O = vector(0., 0., 0.);
+        let spectra: Spectra = diffuse_white(&O, &O, &O, &const_spectra(1.));
+        assert_eq!(spectra.from_λ(550.), PI / 2.);
+    }
 }

@@ -9,6 +9,13 @@ pub fn ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> bool {
     // println!("  probe: {:?}", probe.elapsed());
     b
 }
+// #[allow(non_snake_case)]
+// pub fn ray_sphere_intersection(ray: &Ray, sphere: &Sphere) -> Option<(Vector)>{
+
+
+// }
+
+
 
 /// returns whether it intersects, the ray, and the distance
 #[allow(non_snake_case)]
