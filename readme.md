@@ -108,8 +108,9 @@ the renderer outputs the result as a png in the project root, that was simpler t
 - [x] matrix based tranformations
 - [x] .obj import
 - [x] Lambert's law falloff
-- [x] Spectra based light values
+- [x] Spectra based light computation
 - [x] concurrency
+- [x] blackbody functions
 - [ ] BSDF for roughness/specular and dielectric/metallic materials
 - [ ] texture mapping
 - [ ] Phong shading

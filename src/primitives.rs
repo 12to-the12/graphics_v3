@@ -135,6 +135,7 @@ impl std::ops::Neg for Vector {
 
 
 impl Vector {
+    
     /// magnitude of the vector
     pub fn magnitude(&self) -> f32 {
         (self.x.powf(2.0) + self.y.powf(2.0) + self.z.powf(2.0)).sqrt()

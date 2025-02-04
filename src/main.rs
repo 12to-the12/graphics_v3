@@ -90,8 +90,8 @@ fn draw_colors() {
 }
 fn main() {
     check_debug();
-    // main_loop()
+    println!("{:?}", black_body_sRGB(1.));
+    main_loop();
     // single(0)
-    draw_colors();
-    println!("{:?}", black_body_sRGB(1000.));
+    // draw_colors();
 }

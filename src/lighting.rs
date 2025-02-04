@@ -1,6 +1,6 @@
 use std::f32::consts::{E, PI};
 const π: f32 = PI;
-use crate::{orientation::Orientation, primitives::Vertex};
+use crate::{luminous_efficiency::luminous_efficacy, orientation::Orientation, primitives::Vertex};
 extern crate ndarray;
 use ndarray::prelude::*;
 
@@ -78,6 +78,12 @@ impl Spectra {
     /// the band of wavelengths that a single sample covers
     pub fn get_sample_width(&self)->f32{
         return 10.
+    }
+    pub fn luminance(&self)->f32{
+        return luminous_efficacy(self.clone());
+    }
+    pub fn total(&self)->f32{
+        return self.spectra.sum();
     }
 }
 pub fn black_spectra() -> Spectra {

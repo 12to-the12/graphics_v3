@@ -14,7 +14,7 @@ pub fn draw_colors_in_xyz(canvas: &mut RgbImage) {
             let x: f32 = (i as f32) / (canvas.width() as f32);
             let y: f32 = (canvas.height() - j - 1) as f32 / canvas.height() as f32;
 
-            canvas.put_pixel(i, j, xyY_to_sRGB(x, y));
+            canvas.put_pixel(i, j,  sRGB_to_display(xyY_to_sRGB(vector(x,y,0.))));
         }
     }
 
@@ -33,7 +33,7 @@ pub fn black_body_xyY(temp: f32) -> Vector {
     xyY
 }
 
-pub fn black_body_sRGB(temp: f32) -> Rgb<u8> {
+pub fn black_body_sRGB(temp: f32) -> Vector {
     spectra_to_sRGB(&norm_black_body(temp))
 }
 pub fn coloring_book(canvas: &mut RgbImage) {
@@ -44,7 +44,7 @@ pub fn coloring_book(canvas: &mut RgbImage) {
             let x: f32 = (i as f32) / (canvas.width() as f32);
             let y: f32 = (canvas.height() - j - 1) as f32 / canvas.height() as f32;
 
-            canvas.put_pixel(i, j, xyY_to_sRGB(x, y));
+            canvas.put_pixel(i, j, sRGB_to_display(xyY_to_sRGB(vector(x, y,1.))));
         }
     }
     for λ in 380..780 {
@@ -107,11 +107,19 @@ pub fn coloring_book(canvas: &mut RgbImage) {
 
 // conversions
 
-pub fn spectra_to_sRGB(spectra: &Spectra) -> Rgb<u8> {
+pub fn spectra_to_sRGB(spectra: &Spectra) -> Vector {
     let XYZ = spectra_to_CIEXYZ(spectra);
     let xyY = CIEXYZ_to_xyY(XYZ);
-    let sRGB = xyY_to_sRGB(xyY.x, xyY.y);
+    let sRGB = xyY_to_sRGB(xyY);
     sRGB
+}
+
+pub fn spectra_to_display(spectra: &Spectra) -> Rgb<u8> {
+    let XYZ = spectra_to_CIEXYZ(spectra);
+    let xyY = CIEXYZ_to_xyY(XYZ);
+    let sRGB = xyY_to_sRGB(xyY);
+    let display = sRGB_to_display(sRGB);
+    display
 }
 
 pub fn spectra_to_CIEXYZ(spectra: &Spectra) -> Vector {
@@ -131,16 +139,38 @@ pub fn CIEXYZ_to_xyY(XYZ: Vector) -> Vector {
 }
 
 /// I think? it might supposed to be CIEXYZ?
-pub fn xyY_to_sRGB(x: f32, y: f32) -> Rgb<u8> {
+/// NOTE: this is not u8 encoded! it's possibly negative!
+pub fn xyY_to_sRGB(xyY: Vector) -> Vector {
+
+    // yeah, yeah, bad vector implementation I know
+    let x: f32 = xyY.x;
+    let y: f32 = xyY.y;
+    let Y: f32 = xyY.z;
     let z = 1. - x - y;
 
-    let sR_linear = 3.2404542 * x - 1.5371385 * y - 0.4985314 * z;
-    let sG_linear = -0.9692660 * x + 1.8760108 * y + 0.0415560 * z;
-    let sB_linear = 0.0556434 * x - 0.2040259 * y + 1.0572252 * z;
+    let mut sR_linear = 3.2404542 * x - 1.5371385 * y - 0.4985314 * z;
+    let mut sG_linear = -0.9692660 * x + 1.8760108 * y + 0.0415560 * z;
+    let mut sB_linear = 0.0556434 * x - 0.2040259 * y + 1.0572252 * z;
+
+    // I pray this is the correct way to do things
+    sR_linear *= Y;
+    sG_linear *= Y;
+    sB_linear *= Y;
 
     let sR = sRGB_apply_gamma(sR_linear);
     let sG = sRGB_apply_gamma(sG_linear);
     let sB = sRGB_apply_gamma(sB_linear);
+    vector(sR,sG,sB)
+}
+
+
+
+/// constrains sRGB to only positive, displayable values
+pub fn sRGB_to_display(sRGB: Vector) -> Rgb<u8>{
+    let sR = sRGB.x;
+    let sG = sRGB.y;
+    let sB = sRGB.z;
+    
     if sR < 0. || sG < 0. || sB < 0. {
         // if sR > 1. || sG > 1. || sB > 1. || sR < 0. || sG < 0. || sB < 0. {
 
@@ -148,9 +178,9 @@ pub fn xyY_to_sRGB(x: f32, y: f32) -> Rgb<u8> {
         let sR = pixel_ready(sR / 5.);
         let sG = pixel_ready(sG / 5.);
         let sB = pixel_ready(sB / 5.);
-        return Rgb([sR, sG, sB]);
+        // return Rgb([sR, sG, sB]);
 
-        // return Rgb([0, 0, 0]);
+        return Rgb([0, 0, 0]);
     }
     // println!("{x} {y}");
     let sR = pixel_ready(sR);
@@ -159,6 +189,13 @@ pub fn xyY_to_sRGB(x: f32, y: f32) -> Rgb<u8> {
 
     return Rgb([sR, sG, sB]);
 }
+
+
+
+
+
+
+
 
 pub fn sRGB_apply_gamma(V: f32) -> f32 {
     if V <= 0.0031308 {
@@ -170,3 +207,4 @@ pub fn sRGB_apply_gamma(V: f32) -> f32 {
 pub fn pixel_ready(x: f32) -> u8 {
     (255. * x) as u8
 }
+

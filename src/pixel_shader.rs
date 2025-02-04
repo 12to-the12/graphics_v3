@@ -1,3 +1,4 @@
+use crate::colorspace_conversion::{spectra_to_display, spectra_to_sRGB};
 use crate::lighting::{black_spectra, Spectra};
 use crate::path_tracing::{probe_ray_polygon_intersection, ray_polygon_intersection_test};
 use crate::primitives::{polygon, ray, vector, Ray, Vector};
@@ -145,7 +146,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
         let mut r = 0.;
         let mut g = 0.;
         let mut b = 0.;
-        let output: Spectra = black_spectra();
+        let mut output: Spectra = black_spectra();
         for light in scene.lights.clone() {
             // our job here is to find the amount of energy transmitted to the pixel from the light
 
@@ -194,19 +195,26 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             // // 1 should map to 180° and 0 should be anything below 90°
             // // brightness *= 3.;
 
-            let mut brightness = radiance.from_λ(555.);
+            // let mut brightness = radiance.from_λ(555.);
+            // let mut brightness = spectra_to_sRGB(&radiance);
+            // brightness *= 255.;
 
-            brightness *= 255.;
+            // r += brightness;
+            // g += brightness;
+            // b += brightness;
 
-            r += brightness;
-            g += brightness;
-            b += brightness;
-
+            // println!("{:?}\n\n", radiance.luminance());
+            if radiance.total() > 0. {
+                // println!("{:?}", radiance.total());
+                // println!("{:?}", spectra_to_sRGB(&radiance));
+                output = output + radiance;
+            }
         }
-        let r = r as u8;
-        let g = g as u8;
-        let b = b as u8;
-        return Rgb([r, g, b]);
+        return spectra_to_display(&output);
+        // let r = r as u8;
+        // let g = g as u8;
+        // let b = b as u8;
+        // return Rgb([r, g, b]);
     } else {
         // return Rgb([0, 0, 0]);
         return scene.background;
