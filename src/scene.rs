@@ -3,7 +3,7 @@ use crate::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
 use crate::primitives::{vector, vertex, Mesh};
 // use crate::primitives::Object;
-use crate::lighting::{black_body, black_spectra, const_spectra, norm_black_body, point_light, PointLight, Spectra};
+use crate::lighting::{black_body, black_spectra, const_spectra, monochroma_spectra, norm_black_body, point_light, PointLight, Spectra};
 use crate::load_object_file::load_obj;
 use image::Rgb;
 
@@ -53,11 +53,13 @@ pub fn simple_scene() -> Scene {
         far_clipping_plane: 1e6,
         exposure_time: 1.,
     };
-    let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, norm_black_body(6000.));
+    // let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, norm_black_body(6000.));
+    // let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, 1000*const_spectra(380.));
+    let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, monochroma_spectra(550.,5e-1));
 
-    let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, norm_black_body(2000.));
+    // let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, norm_black_body(2000.));
     // println!("{:?}",light.radiant_flux.from_λ(700.));
-    let lights = vec![light,lightb];
+    let lights = vec![lightb];
     let mut meshes = Vec::new();
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
     // let mesh = sample_mesh(vector(0.0, 0.0, -3.0));
