@@ -53,13 +53,13 @@ pub fn simple_scene() -> Scene {
         far_clipping_plane: 1e6,
         exposure_time: 1.,
     };
-    // let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, norm_black_body(6000.));
+    let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, norm_black_body(6000.));
     // let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, 1000*const_spectra(380.));
-    let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, monochroma_spectra(550.,5e-1));
+    // let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, monochroma_spectra(460.,5e-1));
 
-    // let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, norm_black_body(2000.));
+    let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, norm_black_body(2000.));
     // println!("{:?}",light.radiant_flux.from_λ(700.));
-    let lights = vec![lightb];
+    let lights = vec![light, lightb];
     let mut meshes = Vec::new();
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
     // let mesh = sample_mesh(vector(0.0, 0.0, -3.0));

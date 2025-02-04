@@ -20,8 +20,9 @@ mod transformations;
 
 extern crate stopwatch;
 
-use colorspace_conversion::{black_body_sRGB, coloring_book, draw_colors_in_xyz};
+use colorspace_conversion::{black_body_sRGB, coloring_book, draw_colors_in_xyz, sRGB_to_display, spectra_to_CIEXYZ, spectra_to_sRGB, CIEXYZ_to_xyY};
 use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
+use lighting::monochroma_spectra;
 use std::{thread, time::Duration};
 use stopwatch::Stopwatch;
 
@@ -86,12 +87,19 @@ fn draw_colors() {
     let mut canvas: RgbImage = ImageBuffer::new(horizontal_res, vertical_res);
     coloring_book(&mut canvas);
     // draw_colors_in_xyz(&mut canvas);
-    save_image(canvas);
+    canvas
+        .save_with_format("color_gamut.png", ImageFormat::Png)
+        .unwrap();
 }
 fn main() {
     check_debug();
-    println!("{:?}", black_body_sRGB(1.));
+    println!("{:?}", (spectra_to_sRGB(&monochroma_spectra(500., 1.))));
+    println!("{:?}", (spectra_to_CIEXYZ(&monochroma_spectra(500., 1.))));
+    println!("{:?}", CIEXYZ_to_xyY(spectra_to_CIEXYZ(&monochroma_spectra(500., 1.))));
+
+
+    draw_colors();
+
     main_loop();
     // single(0)
-    // draw_colors();
 }

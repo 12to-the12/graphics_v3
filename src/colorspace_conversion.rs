@@ -47,6 +47,8 @@ pub fn coloring_book(canvas: &mut RgbImage) {
             canvas.put_pixel(i, j, sRGB_to_display(xyY_to_sRGB(vector(x, y, 1.))));
         }
     }
+
+    
     for λ in 380..780 {
         let spectra = monochroma_spectra(λ as f32, 1.);
         let xyY = CIEXYZ_to_xyY(spectra_to_CIEXYZ(&spectra));
@@ -158,7 +160,7 @@ pub fn xyY_to_sRGB(xyY: Vector) -> Vector {
 
     // NOTE: THIS DEVIATES FROM AN ACCURATE COLOR MODEL
     // I think this will desaturate?
-    let factor = 2.5;
+    let factor = 1.2;
     let sR_linear = (sR_linear + (factor - 1.)) / factor;
     let sG_linear = (sG_linear + (factor - 1.)) / factor;
     let sB_linear = (sB_linear + (factor - 1.)) / factor;
@@ -183,12 +185,12 @@ pub fn sRGB_to_display(sRGB: Vector) -> Rgb<u8> {
         // if sR > 1. || sG > 1. || sB > 1. || sR < 0. || sG < 0. || sB < 0. {
 
         // if sR > 1. || sG > 1. || sB > 1. {
-        let sR = pixel_ready(sR / 5.);
-        let sG = pixel_ready(sG / 5.);
-        let sB = pixel_ready(sB / 5.);
+        // let sR = pixel_ready(sR / 5.);
+        // let sG = pixel_ready(sG / 5.);
+        // let sB = pixel_ready(sB / 5.);
         // return Rgb([sR, sG, sB]);
 
-        return Rgb([0, 0, 0]);
+        return Rgb([255, 0, 255]);
     }
     // println!("{x} {y}");
     let sR = pixel_ready(sR);
