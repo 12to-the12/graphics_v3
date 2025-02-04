@@ -1,3 +1,4 @@
+use crate::lighting::{black_spectra, Spectra};
 use crate::path_tracing::{probe_ray_polygon_intersection, ray_polygon_intersection_test};
 use crate::primitives::{polygon, ray, vector, Ray, Vector};
 use crate::rendering_equation::{
@@ -144,7 +145,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
         let mut r = 0.;
         let mut g = 0.;
         let mut b = 0.;
-
+        let output: Spectra = black_spectra();
         for light in scene.lights.clone() {
             // our job here is to find the amount of energy transmitted to the pixel from the light
 
@@ -181,25 +182,26 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             // );
 
             let irradiance: f32 = lamberts_law(&to_light, &surface_normal);
-            let θ = (irradiance).acos().to_degrees();
+            // let θ = (irradiance).acos().to_degrees();
 
-            let mut brightness = θ; // [0 -> 180]
-            brightness -= 90.;
+            // let mut brightness = θ; // [0 -> 180]
+            // brightness -= 90.;
 
-            if brightness < 0. {
-                brightness = 0.;
-            }
-            brightness /= 90.;
-            // 1 should map to 180° and 0 should be anything below 90°
-            // brightness *= 3.;
+            // if brightness < 0. {
+            //     brightness = 0.;
+            // }
+            // brightness /= 90.;
+            // // 1 should map to 180° and 0 should be anything below 90°
+            // // brightness *= 3.;
 
-            brightness = radiance.from_λ(555.);
+            let mut brightness = radiance.from_λ(555.);
 
             brightness *= 255.;
 
             r += brightness;
             g += brightness;
             b += brightness;
+
         }
         let r = r as u8;
         let g = g as u8;

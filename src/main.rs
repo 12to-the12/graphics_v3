@@ -20,7 +20,7 @@ mod transformations;
 
 extern crate stopwatch;
 
-use colorspace_conversion::{coloring_book, draw_colors_in_xyz};
+use colorspace_conversion::{black_body_sRGB, coloring_book, draw_colors_in_xyz};
 use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
 use std::{thread, time::Duration};
 use stopwatch::Stopwatch;
@@ -92,5 +92,6 @@ fn main() {
     check_debug();
     // main_loop()
     // single(0)
-    draw_colors()
+    draw_colors();
+    println!("{:?}", black_body_sRGB(1000.));
 }

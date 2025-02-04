@@ -92,6 +92,13 @@ pub fn const_spectra(value: f32) -> Spectra {
     }
 }
 
+pub fn monochroma_spectra(λ: f32,value: f32) -> Spectra {
+    let mut spectra = black_spectra();
+
+    spectra.set_from_λ(λ, value);
+    spectra
+}
+
 // Boltzmann constant
 // joules/kelvin
 const k_B: f32 = 1.380649e-23;
@@ -118,9 +125,10 @@ pub fn peak_blackbody(temp:f32)->f32{
 
 pub fn norm_black_body(temp: f32)->Spectra{
     
-    let λ = peak_blackbody(temp);
-    let value_at_peak = plancks_law(&λ, &temp);
-    let factor = 1./value_at_peak;
+    // let λ = peak_blackbody(temp);
+    // let value_at_peak = plancks_law(&λ, &temp);
+    let total_power = black_body(temp).spectra.sum();
+    let factor = 1./total_power;
     let normalized: Spectra =  factor*black_body(temp);
     normalized
 }
