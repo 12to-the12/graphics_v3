@@ -1,9 +1,7 @@
-use crate::lighting::point_light;
-use crate::primitives::{vector, vertex};
+use crate::geometry::primitives::vector;
 use crate::scene::Scene;
-use crate::transformations::{
-    build_arbitrary_rotation_transform, build_scale_transform, build_translation_transform,
-    build_x_rotation_transform, build_y_rotation_transform, build_z_rotation_transform,
+use crate::geometry::transformations::{
+    build_arbitrary_rotation_transform, build_y_rotation_transform, build_z_rotation_transform,
 };
 
 /// all of the stuff that should happen to run the scene,

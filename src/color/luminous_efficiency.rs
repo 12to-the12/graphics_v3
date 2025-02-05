@@ -52,7 +52,7 @@ mod tests {
 
     use crate::{
         lighting::{black_body, black_spectra, Spectra},
-        luminous_efficiency::{luminous_efficacy, photopic_conversion},
+        color::luminous_efficiency::{luminous_efficacy, photopic_conversion},
     };
 
     // use super::PHOTOPIC_CONVERSION;

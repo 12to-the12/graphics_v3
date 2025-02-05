@@ -2,7 +2,7 @@ use std::f32::consts::PI;
 
 use crate::{
     lighting::{black_spectra, const_spectra, Spectra},
-    primitives::Vector,
+    geometry::primitives::Vector,
 };
 
 pub fn lamberts_law(ω_i: &Vector, normal: &Vector) -> f32 {
@@ -117,9 +117,9 @@ mod tests {
     use std::f32::consts::PI;
 
     use crate::{
-        lighting::{black_body, black_spectra, const_spectra, Spectra},
-        primitives::vector,
-        rendering_equation::lamberts_law,
+        lighting::{const_spectra, Spectra},
+        geometry::primitives::vector,
+        ray_tracing::rendering_equation::lamberts_law,
     };
 
     use super::diffuse_white;

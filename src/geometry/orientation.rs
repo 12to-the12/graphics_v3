@@ -1,4 +1,4 @@
-use crate::primitives::{Vector};
+use crate::geometry::primitives::{Vector};
 
 #[derive(Clone, Debug)]
 pub struct Orientation {

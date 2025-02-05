@@ -1,6 +1,6 @@
 use crate::{
     camera::Camera,
-    primitives::{vertex_from_array, Vector, Vertex},
+    geometry::primitives::{vertex_from_array, Vector, Vertex},
 };
 use ndarray::{arr1, arr2, Array2};
 
@@ -197,7 +197,7 @@ mod tests {
 
 
 
-    use crate::primitives::{vector, vertex};
+    use crate::geometry::primitives::{vector, vertex};
 
     use super::*;
 
@@ -335,7 +335,7 @@ mod tests {
             vertical_res: 300,
         };
         let camera = Camera {
-            position: vertex(0.0, 0.0, 0.0),
+            position: vector(0.0, 0.0, 0.0),
             // orientation: Polar
             lens,
             sensor,

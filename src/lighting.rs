@@ -1,6 +1,8 @@
 use std::f32::consts::{E, PI};
 const π: f32 = PI;
-use crate::{luminous_efficiency::luminous_efficacy, orientation::Orientation, primitives::Vertex};
+use crate::{
+    color::luminous_efficiency::luminous_efficacy, geometry::orientation::Orientation, geometry::primitives::Vertex,
+};
 extern crate ndarray;
 use ndarray::prelude::*;
 
@@ -28,13 +30,12 @@ pub fn point_light(
     }
 }
 
-
 // associates an unspecified value with 40 different wavelengths
 // 380nm -> 780nm non inclusive at 10nm intervals
 
 // this can be used to track radiance, radiant flux, "brightness", whatever
 // this is a very memory intensive thing to track, so optimization will be key
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub struct Spectra {
     pub spectra: Array1<f32>,
 }
@@ -71,18 +72,18 @@ impl Spectra {
         let index: usize = (λ as usize - 380) / 10;
         return self.spectra[index];
     }
-    pub fn set_from_λ(&mut self, λ: f32,value:f32) {
+    pub fn set_from_λ(&mut self, λ: f32, value: f32) {
         let index: usize = (λ as usize - 380) / 10;
-        self.spectra[index]=value;
+        self.spectra[index] = value;
     }
     /// the band of wavelengths that a single sample covers
-    pub fn get_sample_width(&self)->f32{
-        return 10.
+    pub fn get_sample_width(&self) -> f32 {
+        return 10.;
     }
-    pub fn luminance(&self)->f32{
+    pub fn luminance(&self) -> f32 {
         return luminous_efficacy(self.clone());
     }
-    pub fn total(&self)->f32{
+    pub fn total(&self) -> f32 {
         return self.spectra.sum();
     }
 }
@@ -94,11 +95,11 @@ pub fn black_spectra() -> Spectra {
 
 pub fn const_spectra(value: f32) -> Spectra {
     Spectra {
-        spectra: Array::from_elem(40,value),
+        spectra: Array::from_elem(40, value),
     }
 }
 
-pub fn monochroma_spectra(λ: f32,value: f32) -> Spectra {
+pub fn monochroma_spectra(λ: f32, value: f32) -> Spectra {
     let mut spectra = black_spectra();
 
     spectra.set_from_λ(λ, value);
@@ -119,23 +120,20 @@ const c: f32 = 299_792_458.;
 // Wien's displacement constant
 const b: f32 = 2.897771955e-3;
 
-
 /// get the peak wavelength of a blackbody in nanometers
-/// 
-pub fn peak_blackbody(temp:f32)->f32{
-    let peak_in_meters = b/temp;
-    let peak_in_nm = peak_in_meters*1e9;
+///
+pub fn peak_blackbody(temp: f32) -> f32 {
+    let peak_in_meters = b / temp;
+    let peak_in_nm = peak_in_meters * 1e9;
     peak_in_nm
 }
 
-
-pub fn norm_black_body(temp: f32)->Spectra{
-    
+pub fn norm_black_body(temp: f32) -> Spectra {
     // let λ = peak_blackbody(temp);
     // let value_at_peak = plancks_law(&λ, &temp);
     let total_power = black_body(temp).spectra.sum();
-    let factor = 1./total_power;
-    let normalized: Spectra =  factor*black_body(temp);
+    let factor = 1. / total_power;
+    let normalized: Spectra = factor * black_body(temp);
     normalized
 }
 

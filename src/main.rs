@@ -2,25 +2,27 @@
                                     // use std::time::Duration;
 mod application;
 mod camera;
-mod cie_color_matching_functions;
-mod colorspace_conversion;
+mod color;
+// cie_color_matching_functions;
+// mod colorspace_conversion;
 mod geometry_pipeline;
 mod lighting;
-mod line_plotting;
 mod load_object_file;
-mod luminous_efficiency;
-mod orientation;
-mod path_tracing;
-mod pixel_shader;
-mod primitives;
-mod rasterization;
-mod rendering_equation;
+
 mod scene;
-mod transformations;
+
+mod ray_tracing;
+mod geometry;
+mod rasterization;
+
+
+
+
 
 extern crate stopwatch;
 
-use colorspace_conversion::{black_body_sRGB, coloring_book, draw_colors_in_xyz, sRGB_to_display, spectra_to_CIEXYZ, spectra_to_sRGB, CIEXYZ_to_xyY};
+use color::colorspace_conversion::{spectra_to_CIEXYZ, spectra_to_sRGB, CIEXYZ_to_xyY};
+use color::draw_chromaticity_diagram::coloring_book;
 use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
 use lighting::monochroma_spectra;
 use std::{thread, time::Duration};

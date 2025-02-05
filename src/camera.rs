@@ -1,11 +1,10 @@
-use std::f32::consts::PI;
-
+#![allow(nonstandard_style)]
 // use crate::coordinate_space::Orientation;
-use crate::primitives::{vertex, Vertex, ORIGIN};
+use crate::geometry::primitives::{Vector, Vertex,vector};
 
 #[derive(Clone)]
 pub struct Camera {
-    pub position: Vertex,
+    pub position: Vector,
     // orientation: Orientation, // some object that implements get_orientation?
     pub lens: Lens,
     pub sensor: Sensor,
@@ -15,7 +14,7 @@ pub struct Camera {
     pub exposure_time: f32,
 }
 
-pub fn camera(position: Vertex, lens: Lens, sensor: Sensor) -> Camera {
+pub fn camera(position: Vector, lens: Lens, sensor: Sensor) -> Camera {
     Camera {
         position,
         lens,
@@ -129,27 +128,38 @@ impl Sensor {
     }
 }
 
-const LENS: Lens = Lens {
+pub const LENS: Lens = Lens {
     aperture: 12.0,
     focal_length: 50.0,
     focus_distance: 20.0,
 };
 
-const SENSOR: Sensor = Sensor {
+pub const SENSOR: Sensor = Sensor {
     width: 36.0,
     // height: 24.0,
     horizontal_res: 1500,
     vertical_res: 1000,
 };
+
+pub const CAMERA: Camera = Camera {
+    position: Vector{x:0.,y:0.,z:0.},
+    lens: LENS,
+    sensor: SENSOR,
+    near_clipping_plane: 1e-1,
+    far_clipping_plane: 1e6,
+    exposure_time: 1.,
+};
+
 #[cfg(test)]
 mod tests {
     use std::f32::consts::PI;
+
 
     use super::*;
     #[test]
     fn lens_solid_angle() {
         // a camera with infinitesimal focal length
-        let cam = camera(vertex(0.0, 0.0, 0.0), lens(1e-6), sensor(1., 10, 10));
+        let cam = camera(vector(0.0, 0.0, 0.0), lens(1e-6), sensor(1., 10, 10));
         // subtends a hemisphere
         assert_eq!(cam.frustrum_solid_angle(), 2. * PI);
 
@@ -165,14 +175,7 @@ mod tests {
     /// useful table: https://www.nikonians.org/reviews/fov-tables
     #[test]
     fn field_of_view() {
-        let mut camera = Camera {
-            position: vertex(0.0, 0.0, 0.0),
-            lens: LENS,
-            sensor: SENSOR,
-            near_clipping_plane: 1e-1,
-            far_clipping_plane: 1e6,
-            exposure_time: 1.,
-        };
+        let mut camera = CAMERA;
         assert_eq!(camera.horizontal_field_of_view().round(), 40.0); // 39.59775
         assert_eq!(camera.vertical_field_of_view().round(), 27.0); //
 

@@ -1,4 +1,4 @@
-use crate::primitives::{vector, Polygon, Ray, Vector};
+use crate::geometry::primitives::{vector, Polygon, Ray, Vector};
 use stopwatch::Stopwatch;
 
 #[allow(non_snake_case)]
@@ -200,10 +200,7 @@ fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Option<(Vector, f32)>
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        primitives::{polygon, vertex},
-        scene::simple_scene,
-    };
+    use crate::geometry::primitives::{polygon, vertex};
 
     use super::*;
 
@@ -218,3 +215,4 @@ mod tests {
         assert_eq!(1, 1); //
     }
 }
+

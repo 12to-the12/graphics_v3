@@ -1,8 +1,8 @@
-use crate::colorspace_conversion::{spectra_to_display, spectra_to_sRGB};
+use crate::color::colorspace_conversion::{spectra_to_display, spectra_to_sRGB};
 use crate::lighting::{black_spectra, Spectra};
-use crate::path_tracing::{probe_ray_polygon_intersection, ray_polygon_intersection_test};
-use crate::primitives::{polygon, ray, vector, Ray, Vector};
-use crate::rendering_equation::{
+use crate::ray_tracing::path_tracing::{probe_ray_polygon_intersection, ray_polygon_intersection_test};
+use crate::geometry::primitives::{polygon, ray, vector, Ray, Vector};
+use crate::ray_tracing::rendering_equation::{
     bright_white_emission, diffuse_white, fuck_incoming_spectral_radiance, lamberts_law,
     no_emission, normal_incoming_spectral_radiance, rendering_equation, void,
     white_emission_equation, white_matte_equation,

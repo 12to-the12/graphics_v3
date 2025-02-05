@@ -1,12 +1,21 @@
+use std::iter::Enumerate;
+
 use crate::camera::{Camera, Lens, Sensor};
-use crate::orientation::RIGHT;
+use crate::camera::CAMERA;
+use crate::geometry::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
-use crate::primitives::{vector, vertex, Mesh};
+use crate::geometry::primitives::{vector, vertex, Mesh};
 // use crate::primitives::Object;
-use crate::lighting::{black_body, black_spectra, const_spectra, monochroma_spectra, norm_black_body, point_light, PointLight, Spectra};
+use crate::lighting::{norm_black_body, point_light, PointLight};
 use crate::load_object_file::load_obj;
 use image::Rgb;
 
+#[derive(Clone)]
+pub enum rendermode {
+    RayTrace,
+    ThreadedRayTrace,
+    Rasterize,
+}
 /// I am not sure what the responsibilities of this construction should be
 /// should it be concerned with intermediate rendering data?
 /// like transformed coordinates?
@@ -30,6 +39,7 @@ pub struct Scene {
     // geometry: <T,Mesh>,
     pub background: Rgb<u8>,
     pub tick: usize,
+    pub rendermode:rendermode,
 }
 
 pub fn simple_scene() -> Scene {
@@ -45,19 +55,17 @@ pub fn simple_scene() -> Scene {
         vertical_res: 320,
     };
     let camera = Camera {
-        position: vertex(0.0, 0.0, 15.0),
+        position: vector(0.0, 0.0, 15.0),
         // orientation: Polar
         lens,
         sensor,
-        near_clipping_plane: 1e-1,
-        far_clipping_plane: 1e6,
-        exposure_time: 1.,
+        ..CAMERA
     };
-    let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, norm_black_body(6000.));
+    let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, norm_black_body(2000.));
     // let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, 1000*const_spectra(380.));
     // let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, monochroma_spectra(460.,5e-1));
 
-    let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, norm_black_body(2000.));
+    let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, norm_black_body(1000.));
     // println!("{:?}",light.radiant_flux.from_λ(700.));
     let lights = vec![light, lightb];
     let mut meshes = Vec::new();
@@ -81,8 +89,8 @@ pub fn simple_scene() -> Scene {
         lights,
         meshes,
         background,
-        tick: 0, // unified_mesh: Vec::new(),
-                 // unified_vertices: Vec::new(),
+        tick: 0,
+        rendermode: rendermode::RayTrace,
     };
     return scene;
 }

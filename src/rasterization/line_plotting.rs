@@ -1,6 +1,6 @@
 use image::{Rgb, RgbImage};
 
-use crate::primitives::{Point, Triangle};
+use crate::geometry::primitives::{Point, Triangle};
 
 fn plot_line_low(canvas: &mut RgbImage, p0: &Point, p1: &Point, color: Rgb<u8>) {
     let dx = p1.x - p0.x; // difference in x

@@ -3,17 +3,17 @@ use std::thread::{self};
 
 use crate::application::application;
 use crate::camera::Camera;
-use crate::primitives::{triangle, vector};
+use crate::geometry::primitives::{triangle, vector};
 // use crate::primitives::LineCollection;
-use crate::scene::Scene;
+use crate::scene::{self, rendermode, Scene};
 // use crate::primitives::PolygonCollection;
-use crate::line_plotting::plot_triangle;
-use crate::pixel_shader::{lit_shader, shade_pixels};
-use crate::rasterization::rasterize_triangle;
-use crate::transformations::{
+use crate::geometry::transformations::{
     build_projection_transform, build_scale_transform, build_translation_transform,
     compile_transforms, Transform,
 };
+use crate::rasterization::line_plotting::plot_triangle;
+use crate::rasterization::rasterization::rasterize_triangle;
+use crate::ray_tracing::pixel_shader::{lit_shader, shade_pixels};
 use image::{ImageBuffer, Rgb, RgbImage};
 use stopwatch::Stopwatch;
 
@@ -120,7 +120,7 @@ fn solid(canvas: &mut RgbImage, scene: Scene) {
 /// the geometry id
 /// the material associated with that geometry
 /// the associated images maps and the corresponding coordinates
-fn _rasterize(canvas: &mut RgbImage, mut scene: Scene) {
+fn rasterize(canvas: &mut RgbImage, mut scene: Scene) {
     let mut raster_time = Stopwatch::start_new();
 
     vertex_shader(&mut scene); // projections
@@ -145,7 +145,15 @@ fn apply_transforms(scene: &mut Scene) {
 fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     apply_transforms(&mut scene);
 
-    shade_pixels(canvas, &scene, lit_shader, 0, scene.camera.sensor.horizontal_res, 0, scene.camera.sensor.vertical_res); // lit_shader solid_shader solid_shader
+    shade_pixels(
+        canvas,
+        &scene,
+        lit_shader,
+        0,
+        scene.camera.sensor.horizontal_res,
+        0,
+        scene.camera.sensor.vertical_res,
+    ); // lit_shader solid_shader solid_shader
 }
 fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     apply_transforms(&mut scene);
@@ -162,7 +170,7 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
 
     for i in 0..thread_count {
         // sliced vertically
-        
+
         let data_clone = Arc::clone(&data);
 
         let mut mini_canvas: RgbImage = ImageBuffer::new(width, height);
@@ -185,9 +193,9 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     for handle in handles {
         canvases.push(handle.join().unwrap());
     }
-    for (i,mini_canvas) in canvases.iter().enumerate() {
+    for (i, mini_canvas) in canvases.iter().enumerate() {
         for (x, y, pixel) in mini_canvas.enumerate_pixels() {
-            canvas.put_pixel(x+(i as u32)*width, y, *pixel);
+            canvas.put_pixel(x + (i as u32) * width, y, *pixel);
         }
     }
 
@@ -211,8 +219,14 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
 /// I am unsure of the best way to pass it information
 ///
 fn render(canvas: &mut RgbImage, scene: Scene) {
-    // rasterize(canvas, scene);
-    threaded_ray_trace(canvas, scene);
+    match &scene.rendermode {
+        rendermode::ThreadedRayTrace => threaded_ray_trace(canvas, scene),
+        
+        rendermode::RayTrace => ray_trace(canvas, scene),
+        
+        rendermode::Rasterize => rasterize(canvas, scene),
+        
+    }
 }
 
 /// Application

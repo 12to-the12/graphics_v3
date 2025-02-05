@@ -3,9 +3,9 @@
 use image::{Rgb, RgbImage};
 use ndarray::Array1;
 
-use crate::line_plotting::plot_line;
+use crate::rasterization::line_plotting::plot_line;
 
-use crate::transformations::{compile_transforms, Transform};
+use crate::geometry::transformations::{compile_transforms, Transform};
 
 /// point in 3D space
 #[derive(Clone, Debug, PartialEq, Copy)]
@@ -89,6 +89,7 @@ pub fn vertex_from_array(arr: Array1<f32>) -> Vertex {
     };
 }
 /// direction and magnitude in 3D space
+/// THIS IS EXPLICITLY A SPATIAL REPRESENTATION. DO NOT USE THIS FOR NON CARTESIAN DATA
 #[derive(Clone, Debug, PartialEq)]
 pub struct Vector {
     pub x: f32,
@@ -176,6 +177,12 @@ impl Vector {
     }
     pub fn to(&self, head: Vector) -> Vector {
         head.minus(self)
+    }
+    pub fn inv(&self) -> Vector {
+        let x = self.x * -1.0;
+        let y = self.y * -1.0;
+        let z = self.z * -1.0;
+        Vector { x, y, z }
     }
 }
 
@@ -396,7 +403,7 @@ pub fn ray(position: Vector, direction: Vector) -> Ray {
 
 #[cfg(test)]
 mod tests {
-    use crate::primitives::vector;
+    use crate::geometry::primitives::vector;
 
 
     /// useful table: https://www.nikonians.org/reviews/fov-tables
