@@ -1,5 +1,6 @@
+#![ allow(non_upper_case_globals)]
 use std::f32::consts::{E, PI};
-const π: f32 = PI;
+const _π: f32 = PI;
 use crate::{
     color::luminous_efficiency::luminous_efficacy, geometry::orientation::Orientation, geometry::primitives::Vertex,
 };
@@ -9,12 +10,12 @@ use ndarray::prelude::*;
 #[derive(Clone)]
 pub struct PointLight {
     pub position: Vertex,
-    pub orientation: Orientation,
+    pub _orientation: Orientation,
     pub radiant_flux: Spectra, // power
 }
 impl PointLight {
-    pub fn radiant_intensity(&self) -> Spectra {
-        return 1. / (4. * π) * self.radiant_flux.clone();
+    pub fn _radiant_intensity(&self) -> Spectra {
+        return 1. / (4. * _π) * self.radiant_flux.clone();
     }
 }
 
@@ -25,7 +26,7 @@ pub fn point_light(
 ) -> PointLight {
     PointLight {
         position,
-        orientation,
+        _orientation: orientation,
         radiant_flux,
     }
 }
@@ -118,12 +119,12 @@ const h: f32 = 6.62607015e-34;
 const c: f32 = 299_792_458.;
 
 // Wien's displacement constant
-const b: f32 = 2.897771955e-3;
+const _b: f32 = 2.897771955e-3;
 
 /// get the peak wavelength of a blackbody in nanometers
 ///
-pub fn peak_blackbody(temp: f32) -> f32 {
-    let peak_in_meters = b / temp;
+pub fn _peak_blackbody(temp: f32) -> f32 {
+    let peak_in_meters = _b / temp;
     let peak_in_nm = peak_in_meters * 1e9;
     peak_in_nm
 }

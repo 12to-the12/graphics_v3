@@ -1,3 +1,4 @@
+#![ allow(nonstandard_style)]
 use image::Rgb;
 
 use crate::{
@@ -7,7 +8,7 @@ use crate::{
     lighting::{norm_black_body, Spectra},
 };
 
-pub fn black_body_xyY(temp: f32) -> (f32,f32,f32) {
+pub fn _black_body_xyY(temp: f32) -> (f32,f32,f32) {
     // println!("peak wavelength: {}", peak_blackbody(temp));
     let spectra = norm_black_body(temp);
     let XYZ = spectra_to_CIEXYZ(&spectra);
@@ -15,7 +16,7 @@ pub fn black_body_xyY(temp: f32) -> (f32,f32,f32) {
     xyY
 }
 
-pub fn black_body_sRGB(temp: f32) -> (f32,f32,f32) {
+pub fn _black_body_sRGB(temp: f32) -> (f32,f32,f32) {
     spectra_to_sRGB(&norm_black_body(temp))
 }
 

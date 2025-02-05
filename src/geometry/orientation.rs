@@ -1,9 +1,9 @@
-use crate::geometry::primitives::{Vector};
+use crate::geometry::primitives::Vector;
 
 #[derive(Clone, Debug)]
 pub struct Orientation {
-    top: Vector,
-    front: Vector,
+    _top: Vector,
+    _front: Vector,
 }
 
 
@@ -18,28 +18,28 @@ pub const J: Vector = Vector {
     y: 0.,
     z: 0.,
 };
-pub const K: Vector = Vector {
+pub const _K: Vector = Vector {
     x: 1.,
     y: 0.,
     z: 0.,
 };
-pub const NI: Vector = Vector {
+pub const _NI: Vector = Vector {
     x: -1.,
     y: 0.,
     z: 0.,
 };
-pub const NJ: Vector = Vector {
+pub const _NJ: Vector = Vector {
     x: -1.,
     y: 0.,
     z: 0.,
 };
-pub const NK: Vector = Vector {
+pub const _NK: Vector = Vector {
     x: -1.,
     y: 0.,
     z: 0.,
 };
 
 // oriented
-pub const RIGHT: Orientation = Orientation { top: J, front: I };
-pub const UP: Orientation = Orientation { top: NK, front: J };
-pub const FORWARDS: Orientation = Orientation { top: J, front: K };
+pub const RIGHT: Orientation = Orientation { _top: J, _front: I };
+pub const _UP: Orientation = Orientation { _top: _NK, _front: J };
+pub const _FORWARDS: Orientation = Orientation { _top: J, _front: _K };

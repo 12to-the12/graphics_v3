@@ -63,7 +63,7 @@ pub fn plot_line(canvas: &mut RgbImage, p0: &Point, p1: &Point, color: Rgb<u8>) 
     }
 }
 
-pub fn plot_line_naive(canvas: &mut RgbImage, p0: &Point, p1: &Point, color: Rgb<u8>) {
+pub fn _plot_line_naive(canvas: &mut RgbImage, p0: &Point, p1: &Point, color: Rgb<u8>) {
     // naive implementation
     let start_x = p0.x as f32;
     let start_y = p0.y as f32;

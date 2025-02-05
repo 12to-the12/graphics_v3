@@ -2,9 +2,9 @@ use crate::geometry::primitives::{vector, Polygon, Ray, Vector};
 use stopwatch::Stopwatch;
 
 #[allow(non_snake_case)]
-pub fn ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> bool {
+pub fn _ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> bool {
     let mut probe = Stopwatch::start_new();
-    let (b, I, dist) = probe_ray_polygon_intersection(ray, polygon);
+    let (b, _I, _dist) = probe_ray_polygon_intersection(ray, polygon);
     probe.stop();
     // println!("  probe: {:?}", probe.elapsed());
     b
@@ -12,10 +12,7 @@ pub fn ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> bool {
 // #[allow(non_snake_case)]
 // pub fn ray_sphere_intersection(ray: &Ray, sphere: &Sphere) -> Option<(Vector)>{
 
-
 // }
-
-
 
 /// returns whether it intersects, the ray, and the distance
 #[allow(non_snake_case)]
@@ -138,8 +135,8 @@ fn project_vector(a: &Vector, b: &Vector) -> Vector {
     a.times(a.dot(&b) / a.dot(&a))
 }
 
+#[allow(non_snake_case)]
 fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Option<(Vector, f32)> {
-    let origin = vector(0., 0., 0.);
     let ray = &ray.direction;
     // ray_origin = np.array([0, 0, 0])
     let ray_origin = vector(0., 0., 0.);
@@ -200,9 +197,6 @@ fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Option<(Vector, f32)>
 
 #[cfg(test)]
 mod tests {
-    use crate::geometry::primitives::{polygon, vertex};
-
-    use super::*;
 
     /// useful table: https://www.nikonians.org/reviews/fov-tables
     #[test]
@@ -215,4 +209,3 @@ mod tests {
         assert_eq!(1, 1); //
     }
 }
-

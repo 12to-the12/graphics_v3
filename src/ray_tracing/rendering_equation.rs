@@ -1,8 +1,8 @@
 use std::f32::consts::PI;
 
 use crate::{
-    lighting::{black_spectra, const_spectra, Spectra},
     geometry::primitives::Vector,
+    lighting::{black_spectra, const_spectra, Spectra},
 };
 
 pub fn lamberts_law(ω_i: &Vector, normal: &Vector) -> f32 {
@@ -13,7 +13,7 @@ pub fn lamberts_law(ω_i: &Vector, normal: &Vector) -> f32 {
 
 /// BRDF
 /// returns a radiance value
-pub fn void(_x: &Vector, _ω_i: &Vector, _ω_o: &Vector, _spectra: &Spectra) -> Spectra {
+pub fn _void(_x: &Vector, _ω_i: &Vector, _ω_o: &Vector, _spectra: &Spectra) -> Spectra {
     return black_spectra();
 }
 
@@ -26,13 +26,15 @@ pub fn diffuse_white(_x: &Vector, _ω_i: &Vector, _ω_o: &Vector, _spectra: &Spe
 }
 
 /// as if bro. Lights don't exist.
-pub fn fuck_incoming_spectral_radiance(x: &Vector, ω_i: &Vector, spectra: &Spectra) -> Spectra {
+pub fn _fuck_incoming_spectral_radiance(_x: &Vector, _: &Vector, _spectra: &Spectra) -> Spectra {
     return black_spectra();
 }
 
 /// defines how much radiance we're receiving in every wavelength with our parameters.
 /// because the current lights are all isotrophic, the function is trivium
-pub fn normal_incoming_spectral_radiance(x: &Vector, ω_i: &Vector, spectra: &Spectra) -> Spectra {
+pub fn normal_incoming_spectral_radiance(
+    _x: &Vector, _ω_i: &Vector, spectra: &Spectra
+) -> Spectra {
     return spectra.clone();
 }
 
@@ -42,16 +44,17 @@ pub fn no_emission(_x: &Vector, _ω_0: &Vector) -> Spectra {
 }
 
 /// emission function candidate
-pub fn bright_white_emission(_x: &Vector, _ω_0: &Vector) -> Spectra {
+pub fn _bright_white_emission(_x: &Vector, _ω_0: &Vector) -> Spectra {
     return const_spectra(1.);
 }
 
 /// the rendering equation! Currently implemented as a single instance scene wise, that will change
 /// note that I'm handling all wavelengths through a single function call
+// #[allow(non_camel_case_types)]
 pub fn rendering_equation<
     BRDF: Fn(&Vector, &Vector, &Vector, &Spectra) -> Spectra,
     EMISSION: Fn(&Vector, &Vector) -> Spectra,
-    INCOMING_RADIANCE: Fn(&Vector, &Vector, &Spectra) -> Spectra,
+    IncomingRadiance: Fn(&Vector, &Vector, &Spectra) -> Spectra,
 >(
     x: &Vector,       // position vector of equation
     ω_i: &Vector,     // vector to light
@@ -60,7 +63,7 @@ pub fn rendering_equation<
     spectra: Spectra, // the radiant flux of the lightsource encoded as a spectrum
     brdf: BRDF,       // the BSDF function itself
     emission: EMISSION,
-    incoming_radiance: INCOMING_RADIANCE,
+    incoming_radiance: IncomingRadiance,
 ) -> Spectra {
     let emitted_radiance = emission(x, ω_o);
     let scattering = brdf(&x, &ω_i, &ω_o, &spectra);
@@ -92,8 +95,7 @@ pub fn white_matte_equation(
     );
 }
 
-
-pub fn white_emission_equation(
+pub fn _white_emission_equation(
     x: &Vector,       // position vector of equation
     ω_i: &Vector,     // vector to light
     ω_o: &Vector,     // light exit path
@@ -106,9 +108,9 @@ pub fn white_emission_equation(
         ω_o,
         normal,
         spectra,
-        void,
-        bright_white_emission,
-        fuck_incoming_spectral_radiance,
+        _void,
+        _bright_white_emission,
+        _fuck_incoming_spectral_radiance,
     );
 }
 
@@ -117,8 +119,8 @@ mod tests {
     use std::f32::consts::PI;
 
     use crate::{
+        geometry::primitives::{vector, _ORIGIN},
         lighting::{const_spectra, Spectra},
-        geometry::primitives::vector,
         ray_tracing::rendering_equation::lamberts_law,
     };
 
@@ -137,10 +139,9 @@ mod tests {
         assert_eq!(lamberts_law(&a, &a), 1.);
     }
 
-    
+    #[test]
     fn test_diffuse_white() {
-        let O = vector(0., 0., 0.);
-        let spectra: Spectra = diffuse_white(&O, &O, &O, &const_spectra(1.));
+        let spectra: Spectra = diffuse_white(&_ORIGIN, &_ORIGIN, &_ORIGIN, &const_spectra(1.));
         assert_eq!(spectra.from_λ(550.), PI / 2.);
     }
 }

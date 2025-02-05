@@ -1,5 +1,3 @@
-use std::iter::Enumerate;
-
 use crate::camera::{Camera, Lens, Sensor};
 use crate::camera::CAMERA;
 use crate::geometry::orientation::RIGHT;
@@ -11,10 +9,10 @@ use crate::load_object_file::load_obj;
 use image::Rgb;
 
 #[derive(Clone)]
-pub enum rendermode {
-    RayTrace,
+pub enum Rendermode {
+    _RayTrace,
     ThreadedRayTrace,
-    Rasterize,
+    _Rasterize,
 }
 /// I am not sure what the responsibilities of this construction should be
 /// should it be concerned with intermediate rendering data?
@@ -39,14 +37,14 @@ pub struct Scene {
     // geometry: <T,Mesh>,
     pub background: Rgb<u8>,
     pub tick: usize,
-    pub rendermode:rendermode,
+    pub rendermode:Rendermode,
 }
 
 pub fn simple_scene() -> Scene {
     let lens = Lens {
-        aperture: 50.0,
+        _aperture: 50.0,
         focal_length: 120.0,
-        focus_distance: 2.0,
+        _focus_distance: 2.0,
     };
     let sensor = Sensor {
         width: 36.0,
@@ -90,7 +88,7 @@ pub fn simple_scene() -> Scene {
         meshes,
         background,
         tick: 0,
-        rendermode: rendermode::RayTrace,
+        rendermode: Rendermode::ThreadedRayTrace,
     };
     return scene;
 }

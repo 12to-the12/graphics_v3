@@ -7,7 +7,7 @@ use crate::lighting::Spectra;
 
 // photopic conversion (lm/w)
 // 380-770
-const PHOTOPIC_CONVERSION: [f32; 40] = [
+const _PHOTOPIC_CONVERSION: [f32; 40] = [
     0.027, 0.082, 0.270, 0.826, 2.732, 7.923, 15.709, 25.954, 40.980, 62.139, 94.951, 142.078,
     220.609, 343.549, 484.930, 588.746, 651.582, 679.551, 679.585, 650.216, 594.210, 517.031,
     430.973, 343.549, 260.223, 180.995, 119.525, 73.081, 41.663, 21.856, 11.611, 5.607, 2.802,
@@ -26,10 +26,10 @@ const LUMINOUS_EFFICACY: [f32; 40] = [
 
 // neither of these are valid, they need to average or something, not sum
 // lm/w
-pub fn photopic_conversion(spectra: Spectra) -> f32 {
+pub fn _photopic_conversion(spectra: Spectra) -> f32 {
     // println!("{:?}", &spectra.spectra);
 
-    let watts = Array::from_vec(PHOTOPIC_CONVERSION.to_vec());
+    let watts = Array::from_vec(_PHOTOPIC_CONVERSION.to_vec());
     let lumens_spectra = watts * spectra.spectra; // watts* (lumens/watt)
     let lumens = Array::sum(&lumens_spectra);
     return lumens;
@@ -48,11 +48,10 @@ pub fn luminous_efficacy(spectra: Spectra) -> f32 {
 
 #[cfg(test)]
 mod tests {
-    use std::f32::consts::PI;
 
     use crate::{
-        lighting::{black_body, black_spectra, Spectra},
-        color::luminous_efficiency::{luminous_efficacy, photopic_conversion},
+        lighting::{black_spectra, Spectra},
+        color::luminous_efficiency::_photopic_conversion,
     };
 
     // use super::PHOTOPIC_CONVERSION;
@@ -60,25 +59,25 @@ mod tests {
     #[test]
     fn test_luminous_efficacy_of_darkness() {
         let spectra: Spectra = black_spectra();
-        let efficacy: f32 = photopic_conversion(spectra);
+        let efficacy: f32 = _photopic_conversion(spectra);
         assert_eq!(efficacy, 0.);
     }
     #[test]
     fn test_luminous_efficacy_of_a_single_wavelength() {
         let mut radiant_flux: Spectra = black_spectra();
         radiant_flux.set_from_λ(550., 1.);
-        let lumens: f32 = photopic_conversion(radiant_flux);
+        let lumens: f32 = _photopic_conversion(radiant_flux);
         assert_eq!(lumens, 679.551);
 
         let mut radiant_flux: Spectra = black_spectra();
         radiant_flux.set_from_λ(560., 1.);
-        let lumens: f32 = photopic_conversion(radiant_flux);
+        let lumens: f32 = _photopic_conversion(radiant_flux);
         assert_eq!(lumens, 679.585);
 
         let mut radiant_flux: Spectra = black_spectra();
         radiant_flux.set_from_λ(560., 1.);
         radiant_flux.set_from_λ(550., 1.);
-        let lumens: f32 = photopic_conversion(radiant_flux);
+        let lumens: f32 = _photopic_conversion(radiant_flux);
         assert_eq!(lumens, 1359.136);
 
 

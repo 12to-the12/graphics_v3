@@ -77,7 +77,7 @@ pub fn build_projection_transform(camera: &Camera) -> Transform {
 }
 
 // 2024-06-23 I switched which sin was negative because of what wikipedia used
-pub fn build_x_rotation_transform(θ: f32) -> Transform {
+pub fn _build_x_rotation_transform(θ: f32) -> Transform {
     let matrix = arr2(&[
         [1.0, 0.0, 0.0, 0.0],
         [0.0, cos(θ), -sin(θ), 0.0],
@@ -166,14 +166,14 @@ fn sq(a: f32) -> f32 {
     f32::powi(a, 2)
 }
 
-fn zero_tiny(x: &f32) -> f32 {
+fn _zero_tiny(x: &f32) -> f32 {
     if x.abs() < 1e-7 {
         return 0.0;
     }
     *x
 }
 
-fn round_6(x: &f32) -> f32 {
+fn _round_6(x: &f32) -> f32 {
     // *x * 1e7 / 1e7
     let factor = 1e5;
     let x = *x;
@@ -274,7 +274,7 @@ mod tests {
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
         let myvertex = arr1(&myvertex.as_array());
-        let myvertex = myvertex.map(round_6);
+        let myvertex = myvertex.map(_round_6);
         assert_eq!(arr1(&[3.0, -4.0, 6.6]), myvertex);
     }
 
@@ -292,8 +292,8 @@ mod tests {
         let mut vertex = arr1(&[1.0, 2.0, 3.0, 1.0]);
         vertex = transform.dot(&vertex);
         // vertex = vertex.map(|x| *x * 10.0 / 10.0); // because of rounding errors
-        vertex = vertex.map(round_6); // because of rounding errors
-        vertex = vertex.map(zero_tiny); // because of other errors
+        vertex = vertex.map(_round_6); // because of rounding errors
+        vertex = vertex.map(_zero_tiny); // because of other errors
         assert_eq!(arr1(&[-2.0, 1.0, 3.0, 1.0]), vertex);
     }
     #[test]
@@ -303,7 +303,7 @@ mod tests {
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
         let myvertex = arr1(&myvertex.as_array());
-        let myvertex = myvertex.map(round_6);
+        let myvertex = myvertex.map(_round_6);
         assert_eq!(arr1(&[-2.0, 1.0, 3.0]), myvertex);
     }
     #[test]
@@ -317,7 +317,7 @@ mod tests {
         let vertex_list = vec![vertex_from_array(vertex)];
         let vertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
         let myvertex_p = arr1(&vertex.as_array());
-        let myvertex_p = myvertex_p.map(round_6);
+        let myvertex_p = myvertex_p.map(_round_6);
         println!("{:?}", myvertex_p);
         assert_eq!(arr1(&[0., 0., 1.]), myvertex_p);
     }
@@ -325,9 +325,9 @@ mod tests {
     #[test]
     fn verify_projection_implementation() {
         let lens = Lens {
-            aperture: 30.0,
+            _aperture: 30.0,
             focal_length: 18.0,
-            focus_distance: 2.0,
+            _focus_distance: 2.0,
         };
         let sensor = Sensor {
             width: 36.0,
@@ -339,9 +339,9 @@ mod tests {
             // orientation: Polar
             lens,
             sensor,
-            near_clipping_plane: 1e-1,
-            far_clipping_plane: 1e6,
-            exposure_time: 1.,
+            _near_clipping_plane: 1e-1,
+            _far_clipping_plane: 1e6,
+            _exposure_time: 1.,
         };
         let transform = build_projection_transform(&camera);
         println!("{:?}", camera.horizontal_field_of_view());
@@ -351,7 +351,7 @@ mod tests {
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
         println!("{:?}", myvertex);
         let myvertex = arr1(&myvertex.as_array());
-        let myvertex = myvertex.map(round_6);
+        let myvertex = myvertex.map(_round_6);
         assert_eq!(arr1(&[2.0, 2.0, 1.0]), myvertex);
 
         let myvertex = arr1(&[015.0, 0.0, 3.0, 1.0]);
@@ -359,7 +359,7 @@ mod tests {
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
         println!("{:?}", myvertex);
         let myvertex = arr1(&myvertex.as_array());
-        let myvertex = myvertex.map(round_6);
+        let myvertex = myvertex.map(_round_6);
         assert_eq!(arr1(&[05.0, 0.0, 1.0]), myvertex);
 
         let myvertex = arr1(&[10.0, 10.0, 1.0, 1.0]);
@@ -367,7 +367,7 @@ mod tests {
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
         println!("{:?}", myvertex);
         let myvertex = arr1(&myvertex.as_array());
-        let myvertex = myvertex.map(round_6);
+        let myvertex = myvertex.map(_round_6);
         assert_eq!(arr1(&[10.0, 10.0, 1.0]), myvertex);
     }
 }

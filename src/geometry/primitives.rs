@@ -1,4 +1,3 @@
-
 // use image::{ImageBuffer, Rgb, RgbImage};
 use image::{Rgb, RgbImage};
 use ndarray::Array1;
@@ -15,7 +14,7 @@ pub struct Vertex {
     pub z: f32,
 }
 
-pub const ORIGIN: Vertex = Vertex {
+pub const _ORIGIN: Vector = Vector {
     x: 0.,
     y: 0.,
     z: 0.,
@@ -134,9 +133,7 @@ impl std::ops::Neg for Vector {
     }
 }
 
-
 impl Vector {
-    
     /// magnitude of the vector
     pub fn magnitude(&self) -> f32 {
         (self.x.powf(2.0) + self.y.powf(2.0) + self.z.powf(2.0)).sqrt()
@@ -202,7 +199,7 @@ pub struct Polygon {
 }
 
 impl Polygon {
-    pub fn draw(&self, canvas: &mut RgbImage, color: Rgb<u8>) {
+    pub fn _draw(&self, canvas: &mut RgbImage, color: Rgb<u8>) {
         // note: replace the color type before using
         let a: &Point = &self.a.to_point();
         let b: &Point = &self.b.to_point();
@@ -234,7 +231,7 @@ pub fn polygon(a: Vertex, b: Vertex, c: Vertex) -> Polygon {
 //     Polygon { a, b, c }
 // }
 
-pub struct Line3D {
+pub struct _Line3D {
     pub a: Vertex,
     pub b: Vertex,
 }
@@ -264,7 +261,7 @@ impl Mesh {
     pub fn add_transform(&mut self, transform: Transform) -> () {
         self.transform_log.push(transform);
     }
-    pub fn get_transforms(&self) -> &Vec<Transform> {
+    pub fn _get_transforms(&self) -> &Vec<Transform> {
         return &self.transform_log;
     }
 }
@@ -277,7 +274,7 @@ pub fn mesh(position: Vector, vertices: Vec<Vertex>, polygons: Vec<Vec<usize>>) 
         transform_log: Vec::new(),
     }
 }
-pub fn unit_cube(position: Vector) -> Mesh {
+pub fn _unit_cube(position: Vector) -> Mesh {
     let a: Vertex = vertex(-1.0, -1.0, -1.0); //0  left down far from above
     let b: Vertex = vertex(1.0, -1.0, -1.0); //1 right down far from above
     let c: Vertex = vertex(-1.0, 1.0, -1.0); //2  left   up far from above
@@ -311,7 +308,7 @@ pub fn unit_cube(position: Vector) -> Mesh {
     return mesh;
 }
 
-pub fn sample_mesh(position: Vector) -> Mesh {
+pub fn _sample_mesh(position: Vector) -> Mesh {
     let a: Vertex = vertex(0., 0., 0.); //0  left down bottom from above
     let b: Vertex = vertex(1., 0., 0.); //1 right down bottom from above
     let c: Vertex = vertex(0., 0.5, 0.); //2  left   up bottom from above
@@ -330,7 +327,7 @@ pub fn sample_mesh(position: Vector) -> Mesh {
 }
 
 /// 2D line
-pub struct Line {
+pub struct _Line {
     pub a: Point,
     pub b: Point,
 }
@@ -342,7 +339,7 @@ pub struct Point {
     pub y: i32,
 }
 
-pub struct BoundingBox2D {
+pub struct _BoundingBox2D {
     pub min: Point,
     pub max: Point,
 }
@@ -356,14 +353,14 @@ pub struct Triangle {
 
 impl Triangle {
     // fn points(&self) ->
-    pub fn get_bounding_box(&self) -> BoundingBox2D {
+    pub fn _get_bounding_box(&self) -> _BoundingBox2D {
         let x = *vec![self.a.x, self.b.x, self.c.x].iter().min().unwrap();
         let y = *vec![self.a.y, self.b.y, self.c.y].iter().min().unwrap();
         let min = Point { x, y };
         let x = *vec![self.a.x, self.b.x, self.c.x].iter().max().unwrap();
         let y = *vec![self.a.y, self.b.y, self.c.y].iter().max().unwrap();
         let max = Point { x, y };
-        BoundingBox2D { min, max }
+        _BoundingBox2D { min, max }
     }
 }
 pub fn triangle(a: &Vertex, b: &Vertex, c: &Vertex) -> Triangle {
@@ -384,9 +381,6 @@ pub fn triangle(a: &Vertex, b: &Vertex, c: &Vertex) -> Triangle {
 }
 
 #[derive(Clone, Debug)]
-pub struct Angle(f32); // simple shit
-
-#[derive(Clone, Debug)]
 pub struct Ray {
     pub position: Vector,
     pub direction: Vector,
@@ -400,17 +394,15 @@ pub fn ray(position: Vector, direction: Vector) -> Ray {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use crate::geometry::primitives::vector;
 
-
     /// useful table: https://www.nikonians.org/reviews/fov-tables
     #[test]
     fn test_negative_vectors() {
-        let myvec = vector(1.,2.,3.);
+        let myvec = vector(1., 2., 3.);
         let anothervec = -myvec;
-        assert_eq!(anothervec,vector(-1.,-2.,-3.));
+        assert_eq!(anothervec, vector(-1., -2., -3.));
     }
 }

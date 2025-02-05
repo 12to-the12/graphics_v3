@@ -1,12 +1,11 @@
-use crate::color::colorspace_conversion::{spectra_to_display, spectra_to_sRGB};
-use crate::lighting::{black_spectra, Spectra};
-use crate::ray_tracing::path_tracing::{probe_ray_polygon_intersection, ray_polygon_intersection_test};
+use crate::color::colorspace_conversion::spectra_to_display;
 use crate::geometry::primitives::{polygon, ray, vector, Ray, Vector};
-use crate::ray_tracing::rendering_equation::{
-    bright_white_emission, diffuse_white, fuck_incoming_spectral_radiance, lamberts_law,
-    no_emission, normal_incoming_spectral_radiance, rendering_equation, void,
-    white_emission_equation, white_matte_equation,
+use crate::lighting::{black_spectra, Spectra};
+use crate::ray_tracing::path_tracing::{
+    _ray_polygon_intersection_test, probe_ray_polygon_intersection,
 };
+use crate::ray_tracing::rendering_equation::white_matte_equation;
+
 use crate::scene::Scene;
 use image::{Rgb, RgbImage};
 use stopwatch::Stopwatch;
@@ -79,7 +78,7 @@ pub fn _color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     return Rgb([r1 as u8, g1 as u8, b1 as u8]);
 }
 
-pub fn solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
+pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = pixel_to_ray(x, y, scene);
     // let mut hit = false;
     '_mesh: for mesh in scene.meshes.iter() {
@@ -89,7 +88,7 @@ pub fn solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             let b = mesh.output_vertices[poly[1]].clone();
             let c = mesh.output_vertices[poly[2]].clone();
             let polygon = polygon(a, b, c);
-            if ray_polygon_intersection_test(&ray, &polygon) {
+            if _ray_polygon_intersection_test(&ray, &polygon) {
                 // hit = true;
                 // break 'mesh;
                 return Rgb([255, 255, 255]);
@@ -143,16 +142,13 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
         direction.norm();
         let intersection_point: Vector = (closest * direction.clone()) + ray.position;
 
-        let mut r = 0.;
-        let mut g = 0.;
-        let mut b = 0.;
         let mut output: Spectra = black_spectra();
         for light in scene.lights.clone() {
             // our job here is to find the amount of energy transmitted to the pixel from the light
 
             let to_light = &intersection_point.clone().to(light.position.as_vector());
 
-            let distance_to_surface: f32 = closest;
+            let _distance_to_surface: f32 = closest;
             // let _distance_to_light: f32 = to_light.magnitude();
 
             // let radiance = rendering_equation(
@@ -182,7 +178,6 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             //     light.radiant_flux,
             // );
 
-            let irradiance: f32 = lamberts_law(&to_light, &surface_normal);
             // let θ = (irradiance).acos().to_degrees();
 
             // let mut brightness = θ; // [0 -> 180]

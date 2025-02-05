@@ -1,13 +1,14 @@
+#![allow(nonstandard_style)]
 use image::{Rgb, RgbImage};
 
 use crate::{
     color::colorspace_conversion::{
-        sRGB_to_display, spectra_to_CIEXYZ, spectra_to_sRGB, xyY_to_sRGB, CIEXYZ_to_xyY,
+        sRGB_to_display, spectra_to_CIEXYZ, xyY_to_sRGB, CIEXYZ_to_xyY,
     },
     lighting::{black_body, monochroma_spectra},
 };
 
-pub fn draw_colors_in_xyz(canvas: &mut RgbImage) {
+pub fn _draw_colors_in_xyz(canvas: &mut RgbImage) {
     for i in 0..canvas.width() {
         for j in 0..canvas.height() {
             let x: f32 = (i as f32) / (canvas.width() as f32);
@@ -25,8 +26,6 @@ pub fn draw_colors_in_xyz(canvas: &mut RgbImage) {
 }
 
 pub fn coloring_book(canvas: &mut RgbImage) {
-    // let color = Rgb([255,0,0]);
-
     for i in 0..canvas.width() {
         for j in 0..canvas.height() {
             let x: f32 = (i as f32) / (canvas.width() as f32);
@@ -39,10 +38,6 @@ pub fn coloring_book(canvas: &mut RgbImage) {
     for λ in 380..780 {
         let spectra = monochroma_spectra(λ as f32, 1.);
         let xyY = CIEXYZ_to_xyY(spectra_to_CIEXYZ(&spectra));
-        let sRGB = spectra_to_sRGB(&spectra);
-        // println!("{:?}", sRGB);
-
-        // println!("{:?}", sRGB);
         canvas.put_pixel(
             (xyY.0 * (canvas.width() as f32)) as u32,
             (canvas.height() as f32 - xyY.1 * (canvas.height() as f32)) as u32,
@@ -65,31 +60,14 @@ pub fn coloring_book(canvas: &mut RgbImage) {
         }
     }
 
-    // let div = 10;
-    // for i in 1..(div) {
-    //     for j in 0..canvas.height() {
-    //         canvas.put_pixel(canvas.width()/div*i, j, Rgb([255, 255, 255]));
-    //         canvas.put_pixel(j, canvas.height()/div*i, Rgb([255, 255, 255]));
-    //     }
-    // }
-
     for temp in 1_000..100_000 {
         let spectra = black_body(temp as f32);
         let xyY = CIEXYZ_to_xyY(spectra_to_CIEXYZ(&spectra));
-        let sRGB = spectra_to_sRGB(&spectra);
-        // println!("{:?}", sRGB);
 
-        // println!("{:?}", sRGB);
         canvas.put_pixel(
             (xyY.0 * (canvas.width() as f32)) as u32,
             (canvas.height() as f32 - xyY.1 * (canvas.height() as f32)) as u32,
             Rgb([255, 255, 255]),
         );
     }
-
-    // for i in 0..canvas.width() {
-    //     for j in 0..canvas.height() {
-    //         canvas.put_pixel(i, j, sRGB);
-    //     }
-    // }
 }

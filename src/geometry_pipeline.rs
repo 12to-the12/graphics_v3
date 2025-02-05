@@ -5,7 +5,7 @@ use crate::application::application;
 use crate::camera::Camera;
 use crate::geometry::primitives::{triangle, vector};
 // use crate::primitives::LineCollection;
-use crate::scene::{self, rendermode, Scene};
+use crate::scene::{Rendermode, Scene};
 // use crate::primitives::PolygonCollection;
 use crate::geometry::transformations::{
     build_projection_transform, build_scale_transform, build_translation_transform,
@@ -78,7 +78,7 @@ fn vertex_shader(scene: &mut Scene) {
     }
 }
 
-fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
+fn _wire_frame(canvas: &mut RgbImage, scene: Scene) {
     let color = Rgb([0, 255, 0]);
     for mut mesh in scene.meshes {
         mesh.apply_transformations();
@@ -220,11 +220,11 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
 ///
 fn render(canvas: &mut RgbImage, scene: Scene) {
     match &scene.rendermode {
-        rendermode::ThreadedRayTrace => threaded_ray_trace(canvas, scene),
+        Rendermode::ThreadedRayTrace => threaded_ray_trace(canvas, scene),
         
-        rendermode::RayTrace => ray_trace(canvas, scene),
+        Rendermode::_RayTrace => ray_trace(canvas, scene),
         
-        rendermode::Rasterize => rasterize(canvas, scene),
+        Rendermode::_Rasterize => rasterize(canvas, scene),
         
     }
 }
