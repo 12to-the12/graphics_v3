@@ -2,16 +2,21 @@
 use image::{Rgb, RgbImage};
 use ndarray::Array1;
 
-use crate::rasterization::line_plotting::plot_line;
+use crate::ray_tracing::rendering_equation::Material;
+
 
 use crate::geometry::transformations::{compile_transforms, Transform};
+// use crate::ray_tracing::rendering_equation::BRDF;
 
-/// point in 3D space
+/// geometry defining spatial surface
 #[derive(Clone, Debug, PartialEq, Copy)]
 pub struct Vertex {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
+    pub position: Vector,
+    pub uv_coord: (f32, f32),
+    pub shader: Material,
+    // pub x: f32,
+    // pub y: f32,
+    // pub z: f32,
 }
 
 pub const _ORIGIN: Vector = Vector {
@@ -20,76 +25,86 @@ pub const _ORIGIN: Vector = Vector {
     z: 0.,
 };
 
-impl Vertex {
-    pub fn to_point(&self) -> Point {
-        let factor: f32 = self.z;
-        return Point {
-            x: (self.x.round() / factor) as i32,
-            y: (self.y.round() / factor) as i32,
-        };
+impl Vertex     {
+    // pub fn to_point(&self) -> Point {
+    //     let factor: f32 = self.z;
+    //     return Point {
+    //         x: (self.x.round() / factor) as i32,
+    //         y: (self.y.round() / factor) as i32,
+    //     };
+    // }
+    pub fn _add(&mut self, other: &Vector) {
+        self.position.x += other.x;
+        self.position.y += other.y;
+        self.position.z += other.z;
     }
-    pub fn add(&mut self, other: &Vector) {
-        self.x += other.x;
-        self.y += other.y;
-        self.z += other.z;
-    }
-    pub fn as_array(&self) -> [f32; 3] {
-        [self.x, self.y, self.z]
+    pub fn _as_array(&self) -> [f32; 3] {
+        [self.position.x, self.position.y, self.position.z]
     }
     pub fn as_homogenous_array(&self) -> [f32; 4] {
-        [self.x, self.y, self.z, 1.0]
+        [self.position.x, self.position.y, self.position.z, 1.0]
     }
-    pub fn inv(&self) -> Vector {
-        let x = self.x * -1.0;
-        let y = self.y * -1.0;
-        let z = self.z * -1.0;
+    pub fn _inv(&self) -> Vector {
+        let x = self.position.x * -1.0;
+        let y = self.position.y * -1.0;
+        let z = self.position.z * -1.0;
         Vector { x, y, z }
     }
     pub fn as_vector(&self) -> Vector {
-        let x = self.x;
-        let y = self.y;
-        let z = self.z;
+        let x = self.position.x;
+        let y = self.position.y;
+        let z = self.position.z;
         Vector { x, y, z }
     }
 }
 
-impl std::ops::Mul<Vertex> for f32 {
-    type Output = Vertex;
-    fn mul(self, rhs: Vertex) -> Vertex {
-        Vertex {
-            x: rhs.x * self,
-            y: rhs.y * self,
-            z: rhs.z * self,
-        }
-    }
-}
+// impl std::ops::Mul<Vertex> for f32 {
+//     type Output = Vertex;
+//     fn mul(self, rhs: Vertex) -> Vertex {
+//         Vertex {
+//             x: rhs.x * self,
+//             y: rhs.y * self,
+//             z: rhs.z * self,
+//         }
+//     }
+// }
 
-impl std::ops::Add<Vertex> for Vertex {
-    type Output = Vertex;
-    fn add(self, rhs: Vertex) -> Vertex {
-        Vertex {
-            x: rhs.x + self.x,
-            y: rhs.y + self.y,
-            z: rhs.z + self.z,
-        }
-    }
-}
+// impl std::ops::Add<Vertex> for Vertex {
+//     type Output = Vertex;
+//     fn add(self, rhs: Vertex) -> Vertex {
+//         Vertex {
+//             x: rhs.x + self.x,
+//             y: rhs.y + self.y,
+//             z: rhs.z + self.z,
+//         }
+//     }
+// }
+
+const VERTEX: Vertex = Vertex{
+    position: _ORIGIN,
+    uv_coord: (0.,0.),
+    shader: Material{},
+};
 
 pub fn vertex(x: f32, y: f32, z: f32) -> Vertex {
-    return Vertex { x, y, z };
+    return Vertex { position: vector(x,y,z),
+    ..VERTEX};
 }
+
 
 pub fn vertex_from_array(arr: Array1<f32>) -> Vertex {
     let w = arr[3];
-    return Vertex {
-        x: arr[0] / w,
-        y: arr[1] / w,
-        z: arr[2] / w,
+    let position_vector = vector(arr[0] / w,  arr[1] / w,  arr[2] / w);
+    return Vertex {  
+        position: position_vector,
+        ..VERTEX
     };
 }
+
+
 /// direction and magnitude in 3D space
 /// THIS IS EXPLICITLY A SPATIAL REPRESENTATION. DO NOT USE THIS FOR NON CARTESIAN DATA
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Copy)]
 pub struct Vector {
     pub x: f32,
     pub y: f32,
@@ -199,15 +214,15 @@ pub struct Polygon {
 }
 
 impl Polygon {
-    pub fn _draw(&self, canvas: &mut RgbImage, color: Rgb<u8>) {
+    pub fn _draw(&self, _canvas: &mut RgbImage, _color: Rgb<u8>) {
         // note: replace the color type before using
-        let a: &Point = &self.a.to_point();
-        let b: &Point = &self.b.to_point();
-        let c: &Point = &self.c.to_point();
+        let _a: &Vector = &self.a.position;
+        let _b: &Vector = &self.b.position;
+        let _c: &Vector = &self.c.position;
 
-        plot_line(canvas, a, b, color);
-        plot_line(canvas, b, c, color);
-        plot_line(canvas, c, a, color);
+    //     plot_line(canvas, a, b, color);
+    //     plot_line(canvas, b, c, color);
+    //     plot_line(canvas, c, a, color);
     }
     /// ONLY WORKS FOR TRIGON
     pub fn get_normal(&self) -> Vector {
@@ -222,7 +237,7 @@ impl Polygon {
         out.norm();
         out
     }
-}
+    }
 
 pub fn polygon(a: Vertex, b: Vertex, c: Vertex) -> Polygon {
     Polygon { a, b, c }
@@ -365,16 +380,16 @@ impl Triangle {
 }
 pub fn triangle(a: &Vertex, b: &Vertex, c: &Vertex) -> Triangle {
     let a = Point {
-        x: a.x as i32,
-        y: a.y as i32,
+        x: a.position.x as i32,
+        y: a.position.y as i32,
     };
     let b = Point {
-        x: b.x as i32,
-        y: b.y as i32,
+        x: b.position.x as i32,
+        y: b.position.y as i32,
     };
     let c = Point {
-        x: c.x as i32,
-        y: c.y as i32,
+        x: c.position.x as i32,
+        y: c.position.y as i32,
     };
 
     Triangle { a, b, c }

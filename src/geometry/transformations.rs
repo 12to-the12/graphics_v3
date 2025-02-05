@@ -271,7 +271,7 @@ mod tests {
         let myvertex = arr1(&[1.0, 2.0, 3.0, 1.0]);
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
-        let myvertex = arr1(&myvertex.as_array());
+        let myvertex = arr1(&myvertex._as_array());
         let myvertex = myvertex.map(_round_6);
         assert_eq!(arr1(&[3.0, -4.0, 6.6]), myvertex);
     }
@@ -300,7 +300,7 @@ mod tests {
         let myvertex = arr1(&[1.0, 2.0, 3.0, 1.0]);
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
-        let myvertex = arr1(&myvertex.as_array());
+        let myvertex = arr1(&myvertex._as_array());
         let myvertex = myvertex.map(_round_6);
         assert_eq!(arr1(&[-2.0, 1.0, 3.0]), myvertex);
     }
@@ -314,7 +314,7 @@ mod tests {
         let vertex = arr1(&[0., 1., 0., 1.]);
         let vertex_list = vec![vertex_from_array(vertex)];
         let vertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
-        let myvertex_p = arr1(&vertex.as_array());
+        let myvertex_p = arr1(&vertex._as_array());
         let myvertex_p = myvertex_p.map(_round_6);
         println!("{:?}", myvertex_p);
         assert_eq!(arr1(&[0., 0., 1.]), myvertex_p);
@@ -348,7 +348,7 @@ mod tests {
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
         println!("{:?}", myvertex);
-        let myvertex = arr1(&myvertex.as_array());
+        let myvertex = arr1(&myvertex._as_array());
         let myvertex = myvertex.map(_round_6);
         assert_eq!(arr1(&[2.0, 2.0, 1.0]), myvertex);
 
@@ -356,7 +356,7 @@ mod tests {
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
         println!("{:?}", myvertex);
-        let myvertex = arr1(&myvertex.as_array());
+        let myvertex = arr1(&myvertex._as_array());
         let myvertex = myvertex.map(_round_6);
         assert_eq!(arr1(&[05.0, 0.0, 1.0]), myvertex);
 
@@ -364,7 +364,7 @@ mod tests {
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
         println!("{:?}", myvertex);
-        let myvertex = arr1(&myvertex.as_array());
+        let myvertex = arr1(&myvertex._as_array());
         let myvertex = myvertex.map(_round_6);
         assert_eq!(arr1(&[10.0, 10.0, 1.0]), myvertex);
     }

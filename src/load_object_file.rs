@@ -1,6 +1,6 @@
 use crate::geometry::primitives::{mesh, vector, vertex, Mesh};
 use std::fs;
-pub fn load_obj(path: String) -> Mesh {
+pub fn load_wavefront_obj(path: String) -> Mesh {
     let data = fs::read_to_string(path).expect("Unable to read file");
 
     let mut vertices = Vec::new();

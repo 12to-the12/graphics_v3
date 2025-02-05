@@ -76,7 +76,8 @@ fn single(i: usize) {
 }
 // REST is ms per frame
 // const REST: u64 = 1000 / 1 as u64; // ms/frame @ 1 fps
-const REST: Duration = Duration::from_millis(1000 / 8 as u64); // ms/frame @ 8 fps
+const FPS: f32 = 1.;
+const REST: Duration = Duration::from_millis((1000. / FPS) as u64); // ms/frame @ 8 fps
                                                                // const REST: u64 = 1000 / 12 as u64; // const REST: u64 = 1000/12 as u64;// ms/frame @ 12 fps
                                                                // const REST: u64 = 1000 / 24 as u64; // const REST: u64 = 1000/24 as u64;// ms/frame @ 24 fps
 fn draw_colors() {

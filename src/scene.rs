@@ -5,7 +5,7 @@ use crate::geometry::orientation::RIGHT;
 use crate::geometry::primitives::{vector, vertex, Mesh};
 // use crate::primitives::Object;
 use crate::lighting::{norm_black_body, point_light, PointLight};
-use crate::load_object_file::load_obj;
+use crate::load_object_file::load_wavefront_obj;
 use image::Rgb;
 
 #[derive(Clone)]
@@ -72,15 +72,15 @@ pub fn simple_scene() -> Scene {
     let mut meshes = Vec::new();
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
     // let mesh = sample_mesh(vector(0.0, 0.0, -3.0));
-    let mut mesh = load_obj("models/cube.obj".to_string());
+    let mut mesh = load_wavefront_obj("models/cube.obj".to_string());
     mesh.position = vector(-3.0, 0.0, -10.0);
     meshes.push(mesh);
 
-    let mut mesh = load_obj("models/sphere.obj".to_string());
+    let mut mesh = load_wavefront_obj("models/sphere.obj".to_string());
     mesh.position = vector(0.0, 0.0, -10.0);
     meshes.push(mesh);
 
-    let mut mesh = load_obj("models/sphere.obj".to_string());
+    let mut mesh = load_wavefront_obj("models/sphere.obj".to_string());
     mesh.position = vector(3.0, 0.0, -10.0);
     meshes.push(mesh);
 
