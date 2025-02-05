@@ -14,6 +14,8 @@ pub enum Rendermode {
     ThreadedRayTrace,
     _Rasterize,
 }
+
+
 /// I am not sure what the responsibilities of this construction should be
 /// should it be concerned with intermediate rendering data?
 /// like transformed coordinates?
@@ -38,6 +40,7 @@ pub struct Scene {
     pub background: Rgb<u8>,
     pub tick: usize,
     pub rendermode: Rendermode,
+    pub logging: u8
 }
 
 pub fn simple_scene() -> Scene {
@@ -89,6 +92,7 @@ pub fn simple_scene() -> Scene {
         background,
         tick: 0,
         rendermode: Rendermode::ThreadedRayTrace,
+        logging: 0,
     };
     return scene;
 }

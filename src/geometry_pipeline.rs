@@ -1,3 +1,4 @@
+use std::ffi::c_longlong;
 use std::sync::Arc;
 use std::thread::{self};
 
@@ -189,6 +190,13 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
         });
         handles.push(handle);
     }
+
+    threads.stop();
+    if scene.logging > 0 {
+        println!("threads: {:?}", threads.elapsed());
+    }
+    let mut reassembly = Stopwatch::start_new();
+
     // let painted_mini_canvas = handle.join().unwrap();
     for handle in handles {
         canvases.push(handle.join().unwrap());
@@ -199,13 +207,10 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
         }
     }
 
-    threads.stop();
-    println!("threads: {:?}", threads.elapsed());
-
-    let mut reassembly = Stopwatch::start_new();
-
     reassembly.stop();
-    println!("reassembly: {:?}", reassembly.elapsed());
+    if scene.logging > 0 {
+        println!("reassembly: {:?}", reassembly.elapsed());
+    }
 
     // for i in 1..10 {
     //     println!("this is number {i} from main");

@@ -20,7 +20,6 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
     y_end: u32,
 ) {
     let mut shading = Stopwatch::start_new();
-    // println!("{}", scene.camera.sensor.horizontal_res);
     // let (width, height) = canvas.dimensions();
     let _width = y_end - y_start;
     let _height = x_end - x_start;
@@ -33,7 +32,6 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
             // canvas
             // .save_with_format("rust-output.bmp", ImageFormat::Bmp)
             // .unwrap();
-            // println!("px");
         }
     }
 
@@ -48,7 +46,9 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
     //     }
     // }
     shading.stop();
-    // println!("  shading: {:?}", shading.elapsed());
+    if scene.logging > 1 {
+        println!("  shading: {:?}", shading.elapsed());
+    }
 }
 
 pub fn _color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
@@ -83,7 +83,6 @@ pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     // let mut hit = false;
     '_mesh: for mesh in scene.meshes.iter() {
         '_poly: for poly in &mesh.polygons {
-            // println!("{:?}\n\n\n", mesh.output_vertices);
             let a = mesh.output_vertices[poly[0]].clone();
             let b = mesh.output_vertices[poly[1]].clone();
             let c = mesh.output_vertices[poly[2]].clone();
@@ -115,7 +114,6 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     surface_normal = vector(1., 1., 1.);
     for mesh in scene.meshes.clone() {
         for poly in mesh.polygons {
-            // println!("{:?}\n\n\n", mesh.output_vertices);
             let a = mesh.output_vertices[poly[0]].clone();
             let b = mesh.output_vertices[poly[1]].clone();
             let c = mesh.output_vertices[poly[2]].clone();
@@ -198,12 +196,12 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             // g += brightness;
             // b += brightness;
 
-            // println!("{:?}\n\n", radiance.luminance());
             if radiance.total() > 0. {
-                // println!("{:?}", radiance.total());
-                // println!("{:?}", spectra_to_sRGB(&radiance));
                 output = output + radiance;
             }
+        }
+        if scene.logging >= 2 {
+            println!("{:?}", spectra_to_display(&output));
         }
         return spectra_to_display(&output);
         // let r = r as u8;

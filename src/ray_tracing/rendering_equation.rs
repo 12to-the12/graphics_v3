@@ -69,10 +69,8 @@ pub fn rendering_equation<
     let scattering = brdf(&x, &ω_i, &ω_o, &spectra);
     let incoming_radiance = incoming_radiance(&x, &ω_i, &spectra);
     let lamberts_law = lamberts_law(&ω_i, &normal);
-    // println!("{:?}",incoming_radiance);
     let outgoing_radiance: Spectra =
         emitted_radiance + lamberts_law * scattering * incoming_radiance;
-    // println!("{:?}",outgoing_radiance);
     return outgoing_radiance;
 }
 
