@@ -37,8 +37,7 @@ pub fn λx_response(λ: f32) -> f32 {
         return 0.;
     }
 
-
-    return X[ (λ as usize - 380)/5];
+    return X[(λ as usize - 380) / 5];
 }
 
 // contribution at given wavelength
@@ -48,7 +47,7 @@ pub fn λy_response(λ: f32) -> f32 {
     if (λ < 380.) || (λ > 830.) {
         return 0.;
     }
-    return Y[ (λ as usize - 380)/5];
+    return Y[(λ as usize - 380) / 5];
 }
 
 // contribution at given wavelength
@@ -57,7 +56,7 @@ pub fn λz_response(λ: f32) -> f32 {
     if (λ < 380.) || (λ > 830.) {
         return 0.;
     }
-    return Z[ (λ as usize - 380)/5];
+    return Z[(λ as usize - 380) / 5];
 }
 
 // #[cfg(test)]

@@ -1,5 +1,5 @@
-use crate::camera::{Camera, Lens, Sensor};
 use crate::camera::CAMERA;
+use crate::camera::{Camera, Lens, Sensor};
 use crate::geometry::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
 use crate::geometry::primitives::{vector, vertex, Mesh};
@@ -37,7 +37,7 @@ pub struct Scene {
     // geometry: <T,Mesh>,
     pub background: Rgb<u8>,
     pub tick: usize,
-    pub rendermode:Rendermode,
+    pub rendermode: Rendermode,
 }
 
 pub fn simple_scene() -> Scene {

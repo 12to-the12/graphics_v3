@@ -1,4 +1,4 @@
-#![ allow(nonstandard_style)]
+#![allow(nonstandard_style)]
 use image::Rgb;
 
 use crate::{
@@ -8,7 +8,7 @@ use crate::{
     lighting::{norm_black_body, Spectra},
 };
 
-pub fn _black_body_xyY(temp: f32) -> (f32,f32,f32) {
+pub fn _black_body_xyY(temp: f32) -> (f32, f32, f32) {
     // println!("peak wavelength: {}", peak_blackbody(temp));
     let spectra = norm_black_body(temp);
     let XYZ = spectra_to_CIEXYZ(&spectra);
@@ -16,13 +16,11 @@ pub fn _black_body_xyY(temp: f32) -> (f32,f32,f32) {
     xyY
 }
 
-pub fn _black_body_sRGB(temp: f32) -> (f32,f32,f32) {
+pub fn _black_body_sRGB(temp: f32) -> (f32, f32, f32) {
     spectra_to_sRGB(&norm_black_body(temp))
 }
 
-// conversions
-
-pub fn spectra_to_sRGB(spectra: &Spectra) -> (f32,f32,f32) {
+pub fn spectra_to_sRGB(spectra: &Spectra) -> (f32, f32, f32) {
     let XYZ = spectra_to_CIEXYZ(spectra);
     let xyY = CIEXYZ_to_xyY(XYZ);
     let sRGB = xyY_to_sRGB(xyY);
@@ -37,25 +35,25 @@ pub fn spectra_to_display(spectra: &Spectra) -> Rgb<u8> {
     display
 }
 
-pub fn spectra_to_CIEXYZ(spectra: &Spectra) -> (f32,f32,f32) {
+pub fn spectra_to_CIEXYZ(spectra: &Spectra) -> (f32, f32, f32) {
     let X = integrated_x_response(&spectra);
     let Y = integrated_y_response(&spectra);
     let Z = integrated_z_response(&spectra);
     (X, Y, Z)
 }
 
-pub fn CIEXYZ_to_xyY(XYZ: (f32,f32,f32)) -> (f32,f32,f32) {
+pub fn CIEXYZ_to_xyY(XYZ: (f32, f32, f32)) -> (f32, f32, f32) {
     let X = XYZ.0;
     let Y = XYZ.1;
     let Z = XYZ.2;
     let x = X / (X + Y + Z);
     let y = Y / (X + Y + Z);
-    return (x,y,Y);
+    return (x, y, Y);
 }
 
 /// I think? it might supposed to be CIEXYZ?
 /// NOTE: this is not u8 encoded! it's possibly negative!
-pub fn xyY_to_sRGB(xyY: (f32,f32,f32)) -> (f32,f32,f32) {
+pub fn xyY_to_sRGB(xyY: (f32, f32, f32)) -> (f32, f32, f32) {
     // yeah, yeah, bad vector implementation I know
     let x: f32 = xyY.0;
     let y: f32 = xyY.1;
@@ -86,7 +84,7 @@ pub fn xyY_to_sRGB(xyY: (f32,f32,f32)) -> (f32,f32,f32) {
 }
 
 /// constrains sRGB to only positive, displayable values
-pub fn sRGB_to_display(sRGB: (f32,f32,f32)) -> Rgb<u8> {
+pub fn sRGB_to_display(sRGB: (f32, f32, f32)) -> Rgb<u8> {
     let sR = sRGB.0;
     let sG = sRGB.1;
     let sB = sRGB.2;

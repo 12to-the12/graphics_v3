@@ -221,11 +221,10 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
 fn render(canvas: &mut RgbImage, scene: Scene) {
     match &scene.rendermode {
         Rendermode::ThreadedRayTrace => threaded_ray_trace(canvas, scene),
-        
+
         Rendermode::_RayTrace => ray_trace(canvas, scene),
-        
+
         Rendermode::_Rasterize => rasterize(canvas, scene),
-        
     }
 }
 

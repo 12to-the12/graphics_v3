@@ -35,7 +35,6 @@ pub fn _photopic_conversion(spectra: Spectra) -> f32 {
     return lumens;
 }
 
-
 // neither of these are valid, they need to average or something, not sum
 pub fn luminous_efficacy(spectra: Spectra) -> f32 {
     // println!("{:?}", &spectra.spectra);
@@ -50,8 +49,8 @@ pub fn luminous_efficacy(spectra: Spectra) -> f32 {
 mod tests {
 
     use crate::{
-        lighting::{black_spectra, Spectra},
         color::luminous_efficiency::_photopic_conversion,
+        lighting::{black_spectra, Spectra},
     };
 
     // use super::PHOTOPIC_CONVERSION;
@@ -79,8 +78,6 @@ mod tests {
         radiant_flux.set_from_λ(550., 1.);
         let lumens: f32 = _photopic_conversion(radiant_flux);
         assert_eq!(lumens, 1359.136);
-
-
     }
 
     // #[test]

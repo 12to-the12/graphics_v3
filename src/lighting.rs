@@ -1,8 +1,9 @@
-#![ allow(non_upper_case_globals)]
+#![allow(non_upper_case_globals)]
 use std::f32::consts::{E, PI};
 const _π: f32 = PI;
 use crate::{
-    color::luminous_efficiency::luminous_efficacy, geometry::orientation::Orientation, geometry::primitives::Vertex,
+    color::luminous_efficiency::luminous_efficacy, geometry::orientation::Orientation,
+    geometry::primitives::Vertex,
 };
 extern crate ndarray;
 use ndarray::prelude::*;

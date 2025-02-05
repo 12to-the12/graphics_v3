@@ -195,8 +195,6 @@ pub fn compile_transforms(transforms: &Vec<Transform>) -> Transform {
 mod tests {
     use crate::camera::{Camera, Lens, Sensor};
 
-
-
     use crate::geometry::primitives::{vector, vertex};
 
     use super::*;

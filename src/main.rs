@@ -11,13 +11,9 @@ mod load_object_file;
 
 mod scene;
 
-mod ray_tracing;
 mod geometry;
 mod rasterization;
-
-
-
-
+mod ray_tracing;
 
 extern crate stopwatch;
 
@@ -97,8 +93,10 @@ fn main() {
     check_debug();
     println!("{:?}", (spectra_to_sRGB(&monochroma_spectra(500., 1.))));
     println!("{:?}", (spectra_to_CIEXYZ(&monochroma_spectra(500., 1.))));
-    println!("{:?}", CIEXYZ_to_xyY(spectra_to_CIEXYZ(&monochroma_spectra(500., 1.))));
-
+    println!(
+        "{:?}",
+        CIEXYZ_to_xyY(spectra_to_CIEXYZ(&monochroma_spectra(500., 1.)))
+    );
 
     draw_colors();
 

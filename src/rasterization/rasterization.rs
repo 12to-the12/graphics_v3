@@ -1,5 +1,5 @@
-use crate::rasterization::line_plotting::plot_triangle;
 use crate::geometry::primitives::{Point, Triangle};
+use crate::rasterization::line_plotting::plot_triangle;
 use image::{Rgb, RgbImage};
 /// solid color rasterization
 pub fn rasterize_triangle(triangle: Triangle, canvas: &mut RgbImage) {

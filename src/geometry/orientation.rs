@@ -6,7 +6,6 @@ pub struct Orientation {
     _front: Vector,
 }
 
-
 // Basis Vectors
 pub const I: Vector = Vector {
     x: 1.,
@@ -41,5 +40,11 @@ pub const _NK: Vector = Vector {
 
 // oriented
 pub const RIGHT: Orientation = Orientation { _top: J, _front: I };
-pub const _UP: Orientation = Orientation { _top: _NK, _front: J };
-pub const _FORWARDS: Orientation = Orientation { _top: J, _front: _K };
+pub const _UP: Orientation = Orientation {
+    _top: _NK,
+    _front: J,
+};
+pub const _FORWARDS: Orientation = Orientation {
+    _top: J,
+    _front: _K,
+};

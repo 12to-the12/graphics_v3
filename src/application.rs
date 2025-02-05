@@ -1,8 +1,8 @@
 use crate::geometry::primitives::vector;
-use crate::scene::Scene;
 use crate::geometry::transformations::{
     build_arbitrary_rotation_transform, build_y_rotation_transform, build_z_rotation_transform,
 };
+use crate::scene::Scene;
 
 /// all of the stuff that should happen to run the scene,
 /// note: this is recomputed every frame. Not a major performance bottleneck
