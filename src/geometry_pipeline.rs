@@ -67,15 +67,12 @@ fn vertex_shader(scene: &mut Scene) {
     uniform_view_transforms.push(build_to_projection_transform(scene));
     uniform_view_transforms.push(build_to_display_transform(scene));
 
-    // println!("{:?}",uniform_view_transforms);
     let uniform_view_transform = compile_transforms(&uniform_view_transforms);
-    // println!("{:?}",uniform_view_transform);
     for object in &mut scene.objects {
         for mesh in &mut object.meshes {
             let transform = build_translation_transform(object.position.clone());
             mesh.add_transform(transform);
             mesh.add_transform(uniform_view_transform.clone());
-            println!("transforms: {:?}\n\n", mesh._get_transforms());
         }
     }
 }
@@ -129,7 +126,10 @@ fn rasterize(canvas: &mut RgbImage, mut scene: Scene) {
 
     vertex_shader(&mut scene); // projections
     raster_time.stop();
-    println!("raster_time: {:?}", raster_time.elapsed());
+    if scene.logging > 0 {
+            println!("raster_time: {:?}", raster_time.elapsed());
+
+    }
 
     solid(canvas, scene);
 }
@@ -138,14 +138,12 @@ fn apply_transforms(scene: &mut Scene) {
     for object in &mut scene.objects {
         for mesh in &mut object.meshes {
             // for mesh in scene.meshes.iter_mut() {
-            // println!("{:?}",object.position);
             let to_world_space = build_translation_transform(object.position.clone());
             mesh.add_transform(to_world_space);
             let to_camera_space = build_camera_space_transform(&scene.camera);
             mesh.add_transform(to_camera_space);
 
             mesh.apply_transformations();
-            // println!("transforms: {:?}\n\n", mesh._get_transforms());
         }
     }
 }
@@ -220,11 +218,7 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
         println!("reassembly: {:?}", reassembly.elapsed());
     }
 
-    // for i in 1..10 {
-    //     println!("this is number {i} from main");
-    //     thread::sleep(Duration::from_millis(1));
 
-    // }
 }
 
 /// this serves as an abstraction away from rasterization, so that ray tracing can be dropped into the pipeline

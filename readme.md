@@ -111,9 +111,10 @@ the renderer outputs the result as a png in the project root, that was simpler t
 - [x] Spectra based light computation
 - [x] concurrency
 - [x] blackbody functions
-- [ ] BSDF for roughness/specular and dielectric/metallic materials
+- [x] bounding volume hierarchy
+- [ ] recursive ray propagation
 - [ ] texture mapping
+- [ ] BSDF for roughness/specular and dielectric/metallic materials
 - [ ] Phong shading
-- [ ] full physically based light propagation
-- [ ] spatial acceleration structures
+- [ ] radiometrically rigorous lighting model
 

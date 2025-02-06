@@ -15,10 +15,8 @@ impl Transform {
             // processes vertex by vertex
             let vertex = vertex.as_homogenous_array();
             let vertex = arr1(&vertex);
-            // println!("in vertex: {:?}", vertex);
             let transform = &self.matrix;
             let out_vertex = transform.dot(&vertex); // the resulting vertex
-                                                     // println!("out vertex: {:?}\n\n", out_vertex);
             out.push(vertex_from_array(out_vertex)); // output a vertex
         }
         return out;
