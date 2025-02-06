@@ -14,7 +14,7 @@ use crate::geometry::transformations::{
 use crate::rasterization::line_plotting::plot_triangle;
 use crate::rasterization::rasterization::rasterize_triangle;
 use crate::ray_tracing::pixel_shader::{lit_shader, shade_pixels};
-use image::{ImageBuffer, Rgb, RgbImage};
+use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
 use stopwatch::Stopwatch;
 
 /// transforms from world space to camera space
@@ -95,14 +95,16 @@ fn _wire_frame(canvas: &mut RgbImage, scene: Scene) {
 }
 
 fn solid(canvas: &mut RgbImage, scene: Scene) {
-    for mut mesh in scene.meshes {
-        mesh.apply_transformations();
-        for poly in mesh.polygons {
-            let a = &mesh.output_vertices[poly[0]]; // currently vertexes;
-            let b = &mesh.output_vertices[poly[1]];
-            let c = &mesh.output_vertices[poly[2]];
+    for object in scene.objects {
+        for mut mesh in object.meshes {
+            mesh.apply_transformations();
+            for poly in mesh.polygons {
+                let a = &mesh.output_vertices[poly[0]]; // currently vertexes;
+                let b = &mesh.output_vertices[poly[1]];
+                let c = &mesh.output_vertices[poly[2]];
 
-            rasterize_triangle(triangle(a, b, c), canvas);
+                rasterize_triangle(triangle(a, b, c), canvas);
+            }
         }
     }
 }
@@ -144,7 +146,6 @@ fn apply_transforms(scene: &mut Scene) {
 
             mesh.apply_transformations();
             // println!("transforms: {:?}\n\n", mesh._get_transforms());
-
         }
     }
 }
@@ -167,14 +168,13 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
 
     let data = Arc::new(scene.clone()); // necessary for borrowing in threads
 
-    let thread_count = 32;
     let mut threads = Stopwatch::start_new();
     let mut handles = Vec::new();
     let mut canvases: Vec<RgbImage> = Vec::new();
 
-    let width = scene.camera.sensor.horizontal_res / thread_count;
+    let width = scene.camera.sensor.horizontal_res / scene.threads;
     let height = scene.camera.sensor.vertical_res;
-    for i in 0..thread_count {
+    for i in 0..scene.threads {
         // sliced vertically
 
         let data_clone = Arc::clone(&data);
@@ -210,6 +210,9 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
         for (x, y, pixel) in mini_canvas.enumerate_pixels() {
             canvas.put_pixel(x + (i as u32) * width, y, *pixel);
         }
+        // canvas.clone()
+        // .save_with_format("rust-output.png", ImageFormat::Png)
+        // .unwrap();
     }
 
     reassembly.stop();

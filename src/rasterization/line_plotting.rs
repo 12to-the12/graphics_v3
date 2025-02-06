@@ -13,6 +13,7 @@ fn plot_line_low(canvas: &mut RgbImage, p0: &Point, p1: &Point, color: Rgb<u8>) 
     }
     let mut d = (2 * dy) - dx;
     let mut y = p0.y;
+
     for x in p0.x..p1.x {
         canvas.put_pixel(x as u32, y as u32, color);
         if d > 0 {
@@ -91,22 +92,23 @@ pub fn plot_triangle(triangle: Triangle, canvas: &mut RgbImage, color: Rgb<u8>) 
     let c: &Point = &triangle.c;
 
     #[cfg(debug_assertions)]
-    assert!(a.x as u32 <= canvas.dimensions().0);
+    assert!(a.x as u32 <= canvas.width());
 
     #[cfg(debug_assertions)]
-    assert!(a.y as u32 <= canvas.dimensions().1);
+    assert!(a.y as u32 <= canvas.height());
 
     #[cfg(debug_assertions)]
-    assert!(b.x as u32 <= canvas.dimensions().0);
+    assert!(b.x as u32 <= canvas.width());
 
     #[cfg(debug_assertions)]
-    assert!(b.y as u32 <= canvas.dimensions().1);
+    assert!(b.y as u32 <= canvas.height());
 
     #[cfg(debug_assertions)]
-    assert!(c.x as u32 <= canvas.dimensions().0);
+    assert!(c.x as u32 <= canvas.width());
 
     #[cfg(debug_assertions)]
-    assert!(c.y as u32 <= canvas.dimensions().1);
+    assert!(c.y as u32 <= canvas.height());
+
 
     plot_line(canvas, a, b, color);
     plot_line(canvas, b, c, color);

@@ -42,6 +42,8 @@ pub struct Scene {
     pub tick: usize,
     pub rendermode: Rendermode,
     pub logging: u8,
+    pub spatial_acceleration_structures: bool,
+    pub threads: u32,
 }
 
 pub fn simple_scene<'b>() -> Scene {
@@ -53,23 +55,23 @@ pub fn simple_scene<'b>() -> Scene {
     let sensor = Sensor {
         width: 36.0, // 36.
         // height: 24.0,
-        horizontal_res: 420,
-        vertical_res: 360,
+        horizontal_res: 4200,
+        vertical_res: 3600,
     };
     let camera = Camera {
-        position: vector(0.0, 0.0, 0.0),
+        position: vector(0.0, 0.0, 10.0),
         // orientation: Polar
         lens,
         sensor,
         ..CAMERA
     };
-    let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, norm_black_body(2000.));
+    let light = point_light(vertex(-10.0, 10.0, -5.0), RIGHT, norm_black_body(2000.));
     // let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, 1000*const_spectra(380.));
     // let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, monochroma_spectra(460.,5e-1));
 
-    let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, norm_black_body(1000.));
+    let lightb = point_light(vertex(10.0, -10.0, -5.0), RIGHT, norm_black_body(4000.));
     // println!("{:?}",light.radiant_flux.from_λ(700.));
-    let lights = vec![light, lightb];
+    let lights = vec![light,lightb];
     let meshes = Vec::new();
     let mut objects = Vec::new();
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
@@ -112,9 +114,11 @@ pub fn simple_scene<'b>() -> Scene {
         meshes,
         background,
         tick: 0,
-        rendermode: Rendermode::ThreadedRayTrace,
+        rendermode: Rendermode::_Rasterize,
         logging: 0,
         objects,
+        spatial_acceleration_structures: true,
+        threads: 64,
     };
     return scene;
 }

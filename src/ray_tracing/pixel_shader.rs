@@ -115,7 +115,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     // here we're at once per pixel
     for object in &scene.objects {
         // this is once per object
-        if !object.ray_intercept(&ray) {
+        if scene.spatial_acceleration_structures && !object.ray_intercept(&ray) {
             continue;
         }
         // else {
