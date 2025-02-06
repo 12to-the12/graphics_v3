@@ -2,7 +2,7 @@ use crate::camera::CAMERA;
 use crate::camera::{Camera, Lens, Sensor};
 use crate::geometry::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
-use crate::geometry::primitives::{vector, vertex, Mesh};
+use crate::geometry::primitives::{vector, vertex, Mesh, sample_mesh};
 use crate::object::{Object, OBJECT};
 // use crate::primitives::Object;
 use crate::lighting::{norm_black_body, point_light, PointLight};
@@ -47,17 +47,17 @@ pub struct Scene {
 pub fn simple_scene<'b>() -> Scene {
     let lens = Lens {
         _aperture: 50.0,
-        focal_length: 120.0,
+        focal_length: 50.0, // 120.
         _focus_distance: 2.0,
     };
     let sensor = Sensor {
-        width: 36.0,
+        width: 36.0, // 36.
         // height: 24.0,
-        horizontal_res: 480,
-        vertical_res: 320,
+        horizontal_res: 420,
+        vertical_res: 360,
     };
     let camera = Camera {
-        position: vector(0.0, 0.0, 15.0),
+        position: vector(0.0, 0.0, 0.0),
         // orientation: Polar
         lens,
         sensor,
@@ -84,21 +84,22 @@ pub fn simple_scene<'b>() -> Scene {
 
     objects.push(object);
 
-    let mesh = load_wavefront_obj("models/sphere.obj".to_string());
+    let mesh = load_wavefront_obj("models/cube.obj".to_string());
     // meshes.push(mesh);
     let object = Object {
-        position: vector(0.0, 0.0, -10.0),
+        position: vector(3.0, 0.0, -10.0),
         meshes: vec![mesh],
         ..OBJECT
     };
     objects.push(object);
 
     let mesh = load_wavefront_obj("models/sphere.obj".to_string());
+    // let mesh = sample_mesh();
     // mesh.position = vector(3.0, 0.0, -10.0);
     // meshes.push(mesh);
 
     let object = Object {
-        position: vector(3.0, 0.0, -10.0),
+        position: vector(0., 0.,-10.0),
         meshes: vec![mesh],
         ..OBJECT
     };

@@ -1,3 +1,5 @@
+use std::ops::Add;
+
 // use image::{ImageBuffer, Rgb, RgbImage};
 use image::{Rgb, RgbImage};
 use ndarray::Array1;
@@ -18,7 +20,7 @@ pub struct Vertex {
     // pub z: f32,
 }
 
-pub const _ORIGIN: Vector = Vector {
+pub const ORIGIN: Vector = Vector {
     x: 0.,
     y: 0.,
     z: 0.,
@@ -80,7 +82,7 @@ impl Vertex {
 // }
 
 const VERTEX: Vertex = Vertex {
-    position: _ORIGIN,
+    position: ORIGIN,
     uv_coord: (0., 0.),
     shader: Material {},
 };
@@ -136,6 +138,17 @@ impl std::ops::Add<Vector> for Vector {
     }
 }
 
+impl std::ops::Sub<Vector> for Vector {
+    type Output = Vector;
+    fn sub(self, rhs: Vector) -> Vector {
+        Vector {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
+        }
+    }
+}
+
 impl std::ops::Neg for Vector {
     type Output = Vector;
     fn neg(self) -> Vector {
@@ -148,6 +161,11 @@ impl std::ops::Neg for Vector {
 }
 
 impl Vector {
+    pub fn translate(&mut self, offset: Vector) {
+        self.x += offset.x;
+        self.y += offset.y;
+        self.z += offset.z;
+    }
     /// magnitude of the vector
     pub fn magnitude(&self) -> f32 {
         (self.x.powf(2.0) + self.y.powf(2.0) + self.z.powf(2.0)).sqrt()
@@ -254,7 +272,7 @@ pub struct _Line3D {
 pub struct Mesh {
     // pub position: Vector,
     // pub orientation: ,
-    vertices: Vec<Vertex>, // a mesh owns it's vertex information
+    pub vertices: Vec<Vertex>, // a mesh owns it's vertex information
     // pub polygons: Vec<Polygon>, // it also owns it's polygon information
     pub polygons: Vec<Vec<usize>>,
     pub output_vertices: Vec<Vertex>,
@@ -262,12 +280,9 @@ pub struct Mesh {
 }
 impl Mesh {
     /// I need to learn matrix math for this one
-    /// for now we'll keep it to simple translations
     /// transforms are kept as a list of transforms to be done, which is much more efficient
     pub fn apply_transformations(&mut self) {
         let transform = compile_transforms(&self.transform_log);
-        // println!("{:?}", transform.matrix);
-        // println!("compiled transform:{:?}", transform);
 
         self.output_vertices = self.vertices.clone();
         self.output_vertices = transform.process(self.output_vertices.clone());
@@ -320,10 +335,10 @@ pub fn _unit_cube() -> Mesh {
     return mesh;
 }
 
-pub fn _sample_mesh(position: Vector) -> Mesh {
+pub fn sample_mesh() -> Mesh {
     let a: Vertex = vertex(0., 0., 0.); //0  left down bottom from above
     let b: Vertex = vertex(1., 0., 0.); //1 right down bottom from above
-    let c: Vertex = vertex(0., 0.5, 0.); //2  left   up bottom from above
+    let c: Vertex = vertex(0., 1., 0.); //2  left   up bottom from above
 
     let polygons = vec![
         vec![0, 1, 2], // bottom 0123

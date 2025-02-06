@@ -1,7 +1,7 @@
 use crate::color::colorspace_conversion::spectra_to_display;
 use crate::geometry::primitives::{polygon, ray, vector, Ray, Vector};
 use crate::lighting::{black_spectra, Spectra};
-use crate::ray_tracing::path_tracing::{
+use crate::ray_tracing::ray_polygon_intersection::{
     _ray_polygon_intersection_test, probe_ray_polygon_intersection,
 };
 use crate::ray_tracing::rendering_equation::white_matte_equation;
@@ -47,7 +47,7 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
     // }
     shading.stop();
     if scene.logging > 1 {
-        println!("  shading: {:?}", shading.elapsed());
+        // println!("  shading: {:?}", shading.elapsed());
     }
 }
 
@@ -112,10 +112,17 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let mut closest: f32 = 1e6;
     let mut surface_normal: Vector;
     surface_normal = vector(1., 1., 1.);
+    // here we're at once per pixel
     for object in &scene.objects {
+        // this is once per object
+        if !object.ray_intercept(&ray) {
+            continue;
+        }
+        // else {
+        //     return Rgb([255, 255, 255]);
+        // }
         for mesh in &object.meshes {
-
-
+            // once per mesh
             for poly in mesh.polygons.clone() {
                 let a = mesh.output_vertices[poly[0]].clone();
                 let b = mesh.output_vertices[poly[1]].clone();
@@ -165,7 +172,6 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             //     no_emission,
             //     normal_incoming_spectral_radiance,
             // );
-
             let radiance = white_matte_equation(
                 &intersection_point,
                 to_light,
@@ -207,7 +213,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             }
         }
         if scene.logging >= 2 {
-            println!("{:?}", spectra_to_display(&output));
+            // println!("{:?}", spectra_to_display(&output));
         }
         return spectra_to_display(&output);
         // let r = r as u8;
@@ -271,7 +277,7 @@ mod tests {
         scene.camera.sensor.vertical_res = 3;
         ray = pixel_to_ray(0, 2, &scene);
 
-        println!("direction: {:?}", ray.direction);
+        // println!("direction: {:?}", ray.direction);
 
         let mut foil = vector(-0.3333333, -0.3333333, -0.5);
         foil.norm();
@@ -283,7 +289,7 @@ mod tests {
         scene.camera.sensor.vertical_res = 1;
         ray = pixel_to_ray(0, 0, &scene);
 
-        println!("direction: {:?}", ray.direction);
+        // println!("direction: {:?}", ray.direction);
 
         let mut foil = vector(00.0, 0.0, -0.5);
         foil.norm();

@@ -147,7 +147,7 @@ mod tests {
     use std::f32::consts::PI;
 
     use crate::{
-        geometry::primitives::{vector, _ORIGIN},
+        geometry::primitives::{vector, ORIGIN},
         lighting::{const_spectra, Spectra},
         ray_tracing::rendering_equation::lamberts_law,
     };
@@ -171,7 +171,7 @@ mod tests {
     #[test]
     fn test_diffuse_white() {
         let brdf = DiffuseWhite {};
-        let spectra: Spectra = brdf.evaluate(&_ORIGIN, &_ORIGIN, &_ORIGIN, &const_spectra(1.));
+        let spectra: Spectra = brdf.evaluate(&ORIGIN, &ORIGIN, &ORIGIN, &const_spectra(1.));
         assert_eq!(spectra.from_λ(550.), PI / 2.);
     }
 }

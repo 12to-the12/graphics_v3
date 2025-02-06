@@ -136,14 +136,14 @@ fn apply_transforms(scene: &mut Scene) {
     for object in &mut scene.objects {
         for mesh in &mut object.meshes {
             // for mesh in scene.meshes.iter_mut() {
-            println!("{:?}",object.position);
+            // println!("{:?}",object.position);
             let to_world_space = build_translation_transform(object.position.clone());
             mesh.add_transform(to_world_space);
             let to_camera_space = build_camera_space_transform(&scene.camera);
             mesh.add_transform(to_camera_space);
 
             mesh.apply_transformations();
-            println!("transforms: {:?}\n\n", mesh._get_transforms());
+            // println!("transforms: {:?}\n\n", mesh._get_transforms());
 
         }
     }
@@ -174,7 +174,6 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
 
     let width = scene.camera.sensor.horizontal_res / thread_count;
     let height = scene.camera.sensor.vertical_res;
-
     for i in 0..thread_count {
         // sliced vertically
 

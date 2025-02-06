@@ -1,8 +1,9 @@
 use std::ops::IndexMut;
 
-use crate::geometry::primitives::{vector, Mesh};
+use crate::geometry::primitives::vector;
 use crate::geometry::transformations::{
-    build_arbitrary_rotation_transform, build_y_rotation_transform, build_z_rotation_transform,
+    build_arbitrary_rotation_transform, build_translation_transform, build_y_rotation_transform,
+    build_z_rotation_transform,
 };
 use crate::object::Object;
 use crate::scene::Scene;
@@ -42,11 +43,15 @@ pub fn application(scene: &mut Scene) -> &Scene {
         .index_mut(0)
         .add_transform(build_y_rotation_transform(tick.to_radians() * -3.));
 
+    // objects
+    //     .index_mut(2)
+    //     .position
+    //     .translate(vector(0.1 * scene.tick as f32, 0., 0.));
     objects
         .index_mut(2)
         .meshes
         .index_mut(0)
-        .add_transform(build_z_rotation_transform(tick.to_radians() * 1.));
+        .add_transform(build_y_rotation_transform(tick.to_radians() * 2.));
 
     // mesh.add_transform(build_x_rotation_transform(-30_f32.to_radians()));
     // mesh.add_transform(build_translation_transform(vector(0., -2., 2.)));
