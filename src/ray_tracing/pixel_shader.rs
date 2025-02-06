@@ -112,26 +112,32 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let mut closest: f32 = 1e6;
     let mut surface_normal: Vector;
     surface_normal = vector(1., 1., 1.);
-    for mesh in scene.meshes.clone() {
-        for poly in mesh.polygons {
-            let a = mesh.output_vertices[poly[0]].clone();
-            let b = mesh.output_vertices[poly[1]].clone();
-            let c = mesh.output_vertices[poly[2]].clone();
-            let polygon = polygon(a, b, c);
-            let (b, _i, dist) = probe_ray_polygon_intersection(&ray, &polygon);
-            if b && dist < closest {
-                closest = dist;
-                hit = true;
-                surface_normal = polygon.get_normal();
-                if surface_normal.dot(&ray.direction) > 0. {
-                    println!("polygon is facing away! This shouldn't register as an intersection!");
-                    panic!();
+    for object in &scene.objects {
+        for mesh in &object.meshes {
+
+
+            for poly in mesh.polygons.clone() {
+                let a = mesh.output_vertices[poly[0]].clone();
+                let b = mesh.output_vertices[poly[1]].clone();
+                let c = mesh.output_vertices[poly[2]].clone();
+                let polygon = polygon(a, b, c);
+                let (b, _i, dist) = probe_ray_polygon_intersection(&ray, &polygon);
+                if b && dist < closest {
+                    closest = dist;
+                    hit = true;
+                    surface_normal = polygon.get_normal();
+                    if surface_normal.dot(&ray.direction) > 0. {
+                        println!(
+                            "polygon is facing away! This shouldn't register as an intersection!"
+                        );
+                        panic!();
+                    }
                 }
+                // } else {
+                //     return Rgb([0, 0, 0]);
+                // }
+                // return ray_polygon_intersection_test(&ray, &polygon);
             }
-            // } else {
-            //     return Rgb([0, 0, 0]);
-            // }
-            // return ray_polygon_intersection_test(&ray, &polygon);
         }
     }
 

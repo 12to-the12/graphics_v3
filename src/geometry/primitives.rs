@@ -4,7 +4,6 @@ use ndarray::Array1;
 
 use crate::ray_tracing::rendering_equation::Material;
 
-
 use crate::geometry::transformations::{compile_transforms, Transform};
 // use crate::ray_tracing::rendering_equation::BRDF;
 
@@ -25,7 +24,7 @@ pub const _ORIGIN: Vector = Vector {
     z: 0.,
 };
 
-impl Vertex     {
+impl Vertex {
     // pub fn to_point(&self) -> Point {
     //     let factor: f32 = self.z;
     //     return Point {
@@ -80,27 +79,27 @@ impl Vertex     {
 //     }
 // }
 
-const VERTEX: Vertex = Vertex{
+const VERTEX: Vertex = Vertex {
     position: _ORIGIN,
-    uv_coord: (0.,0.),
-    shader: Material{},
+    uv_coord: (0., 0.),
+    shader: Material {},
 };
 
 pub fn vertex(x: f32, y: f32, z: f32) -> Vertex {
-    return Vertex { position: vector(x,y,z),
-    ..VERTEX};
-}
-
-
-pub fn vertex_from_array(arr: Array1<f32>) -> Vertex {
-    let w = arr[3];
-    let position_vector = vector(arr[0] / w,  arr[1] / w,  arr[2] / w);
-    return Vertex {  
-        position: position_vector,
+    return Vertex {
+        position: vector(x, y, z),
         ..VERTEX
     };
 }
 
+pub fn vertex_from_array(arr: Array1<f32>) -> Vertex {
+    let w = arr[3];
+    let position_vector = vector(arr[0] / w, arr[1] / w, arr[2] / w);
+    return Vertex {
+        position: position_vector,
+        ..VERTEX
+    };
+}
 
 /// direction and magnitude in 3D space
 /// THIS IS EXPLICITLY A SPATIAL REPRESENTATION. DO NOT USE THIS FOR NON CARTESIAN DATA
@@ -220,9 +219,9 @@ impl Polygon {
         let _b: &Vector = &self.b.position;
         let _c: &Vector = &self.c.position;
 
-    //     plot_line(canvas, a, b, color);
-    //     plot_line(canvas, b, c, color);
-    //     plot_line(canvas, c, a, color);
+        //     plot_line(canvas, a, b, color);
+        //     plot_line(canvas, b, c, color);
+        //     plot_line(canvas, c, a, color);
     }
     /// ONLY WORKS FOR TRIGON
     pub fn get_normal(&self) -> Vector {
@@ -237,7 +236,7 @@ impl Polygon {
         out.norm();
         out
     }
-    }
+}
 
 pub fn polygon(a: Vertex, b: Vertex, c: Vertex) -> Polygon {
     Polygon { a, b, c }
@@ -253,7 +252,7 @@ pub struct _Line3D {
 
 #[derive(Clone, Debug)]
 pub struct Mesh {
-    pub position: Vector,
+    // pub position: Vector,
     // pub orientation: ,
     vertices: Vec<Vertex>, // a mesh owns it's vertex information
     // pub polygons: Vec<Polygon>, // it also owns it's polygon information
@@ -280,16 +279,15 @@ impl Mesh {
         return &self.transform_log;
     }
 }
-pub fn mesh(position: Vector, vertices: Vec<Vertex>, polygons: Vec<Vec<usize>>) -> Mesh {
+pub fn mesh(vertices: Vec<Vertex>, polygons: Vec<Vec<usize>>) -> Mesh {
     Mesh {
-        position,
         vertices,
         polygons,
         output_vertices: Vec::new(),
         transform_log: Vec::new(),
     }
 }
-pub fn _unit_cube(position: Vector) -> Mesh {
+pub fn _unit_cube() -> Mesh {
     let a: Vertex = vertex(-1.0, -1.0, -1.0); //0  left down far from above
     let b: Vertex = vertex(1.0, -1.0, -1.0); //1 right down far from above
     let c: Vertex = vertex(-1.0, 1.0, -1.0); //2  left   up far from above
@@ -314,7 +312,6 @@ pub fn _unit_cube(position: Vector) -> Mesh {
         vec![5, 3, 7], // left
     ];
     let mesh = Mesh {
-        position,
         vertices: vec![a, b, c, d, e, f, g, h],
         polygons,
         output_vertices: Vec::new(),
@@ -332,7 +329,6 @@ pub fn _sample_mesh(position: Vector) -> Mesh {
         vec![0, 1, 2], // bottom 0123
     ];
     let mesh = Mesh {
-        position,
         vertices: vec![a, b, c],
         polygons,
         output_vertices: Vec::new(),

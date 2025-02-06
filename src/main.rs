@@ -8,12 +8,13 @@ mod color;
 mod geometry_pipeline;
 mod lighting;
 mod load_object_file;
-
+mod object;
 mod scene;
 
 mod geometry;
 mod rasterization;
 mod ray_tracing;
+
 
 extern crate stopwatch;
 
@@ -23,6 +24,7 @@ use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
 use lighting::monochroma_spectra;
 use std::{thread, time::Duration};
 use stopwatch::Stopwatch;
+
 
 use crate::geometry_pipeline::geometry_pipeline;
 use crate::scene::simple_scene;

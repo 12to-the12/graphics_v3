@@ -70,11 +70,13 @@ fn vertex_shader(scene: &mut Scene) {
     // println!("{:?}",uniform_view_transforms);
     let uniform_view_transform = compile_transforms(&uniform_view_transforms);
     // println!("{:?}",uniform_view_transform);
-    for mesh in &mut scene.meshes {
-        let transform = build_translation_transform(mesh.position.clone());
-        mesh.add_transform(transform);
-        mesh.add_transform(uniform_view_transform.clone());
-        // println!("transforms: {:?}\n\n", mesh.get_transforms());
+    for object in &mut scene.objects {
+        for mesh in &mut object.meshes {
+            let transform = build_translation_transform(object.position.clone());
+            mesh.add_transform(transform);
+            mesh.add_transform(uniform_view_transform.clone());
+            println!("transforms: {:?}\n\n", mesh._get_transforms());
+        }
     }
 }
 
@@ -131,14 +133,19 @@ fn rasterize(canvas: &mut RgbImage, mut scene: Scene) {
 }
 
 fn apply_transforms(scene: &mut Scene) {
-    for mesh in &mut scene.meshes {
-        // for mesh in scene.meshes.iter_mut() {
-        let to_world_space = build_translation_transform(mesh.position.clone());
-        mesh.add_transform(to_world_space);
-        let to_camera_space = build_camera_space_transform(&scene.camera);
-        mesh.add_transform(to_camera_space);
+    for object in &mut scene.objects {
+        for mesh in &mut object.meshes {
+            // for mesh in scene.meshes.iter_mut() {
+            println!("{:?}",object.position);
+            let to_world_space = build_translation_transform(object.position.clone());
+            mesh.add_transform(to_world_space);
+            let to_camera_space = build_camera_space_transform(&scene.camera);
+            mesh.add_transform(to_camera_space);
 
-        mesh.apply_transformations();
+            mesh.apply_transformations();
+            println!("transforms: {:?}\n\n", mesh._get_transforms());
+
+        }
     }
 }
 

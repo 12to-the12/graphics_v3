@@ -1,4 +1,4 @@
-use crate::geometry::primitives::{mesh, vector, vertex, Mesh};
+use crate::geometry::primitives::{mesh, vertex, Mesh};
 use std::fs;
 pub fn load_wavefront_obj(path: String) -> Mesh {
     let data = fs::read_to_string(path).expect("Unable to read file");
@@ -45,5 +45,5 @@ pub fn load_wavefront_obj(path: String) -> Mesh {
             polygons.push(polygon);
         }
     }
-    mesh(vector(0., 0., 0.), vertices, polygons)
+    mesh(vertices, polygons)
 }

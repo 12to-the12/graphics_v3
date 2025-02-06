@@ -3,6 +3,7 @@ use crate::camera::{Camera, Lens, Sensor};
 use crate::geometry::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
 use crate::geometry::primitives::{vector, vertex, Mesh};
+use crate::object::{Object, OBJECT};
 // use crate::primitives::Object;
 use crate::lighting::{norm_black_body, point_light, PointLight};
 use crate::load_object_file::load_wavefront_obj;
@@ -14,7 +15,6 @@ pub enum Rendermode {
     ThreadedRayTrace,
     _Rasterize,
 }
-
 
 /// I am not sure what the responsibilities of this construction should be
 /// should it be concerned with intermediate rendering data?
@@ -30,6 +30,7 @@ pub enum Rendermode {
 pub struct Scene {
     pub camera: Camera,
     pub lights: Vec<PointLight>,
+    pub objects: Vec<Object>,
     pub meshes: Vec<Mesh>,
     // pub unified_mesh: Vec<Polygon<'a>>,
     // pub unified_vertices: Vec<Vertex>, // pub materials: Vec<Material>,
@@ -40,10 +41,10 @@ pub struct Scene {
     pub background: Rgb<u8>,
     pub tick: usize,
     pub rendermode: Rendermode,
-    pub logging: u8
+    pub logging: u8,
 }
 
-pub fn simple_scene() -> Scene {
+pub fn simple_scene<'b>() -> Scene {
     let lens = Lens {
         _aperture: 50.0,
         focal_length: 120.0,
@@ -69,20 +70,39 @@ pub fn simple_scene() -> Scene {
     let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, norm_black_body(1000.));
     // println!("{:?}",light.radiant_flux.from_λ(700.));
     let lights = vec![light, lightb];
-    let mut meshes = Vec::new();
+    let meshes = Vec::new();
+    let mut objects = Vec::new();
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
     // let mesh = sample_mesh(vector(0.0, 0.0, -3.0));
-    let mut mesh = load_wavefront_obj("models/cube.obj".to_string());
-    mesh.position = vector(-3.0, 0.0, -10.0);
-    meshes.push(mesh);
+    let mesh = load_wavefront_obj("models/cube.obj".to_string());
+    // meshes.push(mesh);
+    let object = Object {
+        position: vector(-3.0, 0.0, -10.0),
+        meshes: vec![mesh],
+        ..OBJECT
+    };
 
-    let mut mesh = load_wavefront_obj("models/sphere.obj".to_string());
-    mesh.position = vector(0.0, 0.0, -10.0);
-    meshes.push(mesh);
+    objects.push(object);
 
-    let mut mesh = load_wavefront_obj("models/sphere.obj".to_string());
-    mesh.position = vector(3.0, 0.0, -10.0);
-    meshes.push(mesh);
+    let mesh = load_wavefront_obj("models/sphere.obj".to_string());
+    // meshes.push(mesh);
+    let object = Object {
+        position: vector(0.0, 0.0, -10.0),
+        meshes: vec![mesh],
+        ..OBJECT
+    };
+    objects.push(object);
+
+    let mesh = load_wavefront_obj("models/sphere.obj".to_string());
+    // mesh.position = vector(3.0, 0.0, -10.0);
+    // meshes.push(mesh);
+
+    let object = Object {
+        position: vector(3.0, 0.0, -10.0),
+        meshes: vec![mesh],
+        ..OBJECT
+    };
+    objects.push(object);
 
     let background = Rgb([0, 0, 0]);
     let scene = Scene {
@@ -93,6 +113,7 @@ pub fn simple_scene() -> Scene {
         tick: 0,
         rendermode: Rendermode::ThreadedRayTrace,
         logging: 0,
+        objects,
     };
     return scene;
 }
