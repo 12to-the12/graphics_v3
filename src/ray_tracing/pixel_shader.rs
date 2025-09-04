@@ -80,32 +80,52 @@ pub fn _color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 
 pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = pixel_to_ray(x, y, scene);
-    // let mut hit = false;
-    '_mesh: for mesh in scene.meshes.iter() {
-        '_poly: for poly in &mesh.polygons {
-            let a = mesh.output_vertices[poly[0]].clone();
-            let b = mesh.output_vertices[poly[1]].clone();
-            let c = mesh.output_vertices[poly[2]].clone();
-            let polygon = polygon(a, b, c);
-            if _ray_polygon_intersection_test(&ray, &polygon) {
-                // hit = true;
-                // break 'mesh;
-                return Rgb([255, 255, 255]);
+    let mut hit = false;
+    // here we're at once per pixel
+    for object in &scene.objects {
+        // this is once per object
+        if scene.spatial_acceleration_structures && !object.ray_intercept(&ray) {
+            continue;
+        }
+        for mesh in &object.meshes {
+            // once per mesh
+            for poly in mesh.polygons.clone() {
+                let a = mesh.output_vertices[poly[0]].clone();
+                let b = mesh.output_vertices[poly[1]].clone();
+                let c = mesh.output_vertices[poly[2]].clone();
+                let polygon = polygon(a, b, c);
+                let (b, _i, dist) = probe_ray_polygon_intersection(&ray, &polygon);
+                if b {
+                    hit = true;
+                    break;
+                }
             }
-            // } else {
-            //     return Rgb([0, 0, 0]);
-            // }
-            // return ray_polygon_intersection_test(&ray, &polygon);
         }
     }
-    return Rgb([0, 0, 0]);
-    // if hit {
-    //     return Rgb([255, 255, 255]);
-    // } else {
-    //     return Rgb([0, 0, 0]);
-    // } // Rgb([x, y, y])
+    if hit {
+        return Rgb([255,255,255])
+    } else {
+        return scene.background;
+    }
 }
 
+pub fn bvh_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
+    let ray = pixel_to_ray(x, y, scene);
+    let mut hit = false;
+    // here we're at once per pixel
+    for object in &scene.objects {
+        // this is once per object
+        if object.ray_intercept(&ray) {
+            hit = true;
+            break;
+        }
+    }
+    if hit {
+        return Rgb([255,255,255])
+    } else {
+        return scene.background;
+    }
+}
 pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = pixel_to_ray(x, y, scene);
     let mut hit = false;
@@ -252,8 +272,8 @@ pub fn pixel_to_ray(x: u32, y: u32, scene: &Scene) -> Ray {
         // z is negative, and if the ray placement is scaled to one from the sensor width,
         // the focal length needs to be proportional
     };
-
-    let mut ray = ray(vector(0.0, 0.0, 0.0), direction);
+    let position = scene.camera.position;
+    let mut ray = ray(position, direction);
     ray.direction.norm();
     ray
 }
