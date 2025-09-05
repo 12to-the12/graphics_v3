@@ -14,8 +14,10 @@ mod scene;
 mod geometry;
 mod rasterization;
 mod ray_tracing;
+mod material;
 
 extern crate stopwatch;
+extern crate approx;
 
 use color::colorspace_conversion::{spectra_to_CIEXYZ, spectra_to_sRGB, CIEXYZ_to_xyY};
 use color::draw_chromaticity_diagram::coloring_book;
@@ -109,7 +111,7 @@ fn draw_colors() {
 fn main() {
     check_debug();
 
-    // draw_colors();
+    draw_colors();
     // render_animation();
     main_loop();
     // single(0)

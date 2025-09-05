@@ -50,30 +50,30 @@ mod tests {
 
     use crate::{
         color::luminous_efficiency::_photopic_conversion,
-        lighting::{black_spectra, Spectra},
+        lighting::{black_spectra, Spectra,RadiometricUnit},
     };
 
     // use super::PHOTOPIC_CONVERSION;
 
     #[test]
     fn test_luminous_efficacy_of_darkness() {
-        let spectra: Spectra = black_spectra();
+        let spectra: Spectra = black_spectra(RadiometricUnit::Radiance);
         let efficacy: f32 = _photopic_conversion(spectra);
         assert_eq!(efficacy, 0.);
     }
     #[test]
     fn test_luminous_efficacy_of_a_single_wavelength() {
-        let mut radiant_flux: Spectra = black_spectra();
+        let mut radiant_flux: Spectra = black_spectra(RadiometricUnit::Radiance);
         radiant_flux.set_from_λ(550., 1.);
         let lumens: f32 = _photopic_conversion(radiant_flux);
         assert_eq!(lumens, 679.551);
 
-        let mut radiant_flux: Spectra = black_spectra();
+        let mut radiant_flux: Spectra = black_spectra(RadiometricUnit::Radiance);
         radiant_flux.set_from_λ(560., 1.);
         let lumens: f32 = _photopic_conversion(radiant_flux);
         assert_eq!(lumens, 679.585);
 
-        let mut radiant_flux: Spectra = black_spectra();
+        let mut radiant_flux: Spectra = black_spectra(RadiometricUnit::Radiance);
         radiant_flux.set_from_λ(560., 1.);
         radiant_flux.set_from_λ(550., 1.);
         let lumens: f32 = _photopic_conversion(radiant_flux);

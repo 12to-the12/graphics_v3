@@ -5,7 +5,7 @@ use crate::application::application;
 use crate::camera::Camera;
 use crate::geometry::primitives::{triangle, vector};
 // use crate::primitives::LineCollection;
-use crate::scene::{Rendermode, Scene};
+use crate::scene::{Rendermode, Scene, ShaderMode};
 // use crate::primitives::PolygonCollection;
 use crate::geometry::transformations::{
     build_projection_transform, build_scale_transform, build_translation_transform,
@@ -13,7 +13,7 @@ use crate::geometry::transformations::{
 };
 use crate::rasterization::line_plotting::plot_triangle;
 use crate::rasterization::rasterization::rasterize_triangle;
-use crate::ray_tracing::pixel_shader::{lit_shader, shade_pixels};
+use crate::ray_tracing::pixel_shader::{_solid_shader, bvh_shader, lit_shader, shade_pixels};
 use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
 use stopwatch::Stopwatch;
 
@@ -150,11 +150,13 @@ fn apply_transforms(scene: &mut Scene) {
 
 fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     apply_transforms(&mut scene);
+    let shadermode = match scene.shadermode { ShaderMode::Lit => lit_shader,ShaderMode::BVH => bvh_shader,ShaderMode::Solid => _solid_shader};
+
 
     shade_pixels(
         canvas,
         &scene,
-        lit_shader,
+        shadermode,
         0,
         scene.camera.sensor.horizontal_res,
         0,
@@ -169,6 +171,7 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     let mut threads = Stopwatch::start_new();
     let mut handles = Vec::new();
     let mut canvases: Vec<RgbImage> = Vec::new();
+    let shadermode = match scene.shadermode { ShaderMode::Lit => lit_shader,ShaderMode::BVH => bvh_shader,ShaderMode::Solid => _solid_shader};
 
     let width = scene.camera.sensor.horizontal_res / scene.threads;
     let height = scene.camera.sensor.vertical_res;
@@ -183,7 +186,7 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
             shade_pixels(
                 &mut mini_canvas,
                 &data_clone,
-                lit_shader,
+                shadermode,
                 i * width,
                 i * width + width,
                 0,

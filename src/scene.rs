@@ -3,11 +3,20 @@ use crate::camera::{Camera, Lens, Sensor};
 use crate::geometry::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
 use crate::geometry::primitives::{vector, vertex, Mesh, sample_mesh};
+use crate::material::Shader;
 use crate::object::{Object, OBJECT};
 // use crate::primitives::Object;
-use crate::lighting::{norm_black_body, point_light, PointLight};
+use crate::lighting::{norm_black_body, point_light, LightType, PointLight};
 use crate::load_object_file::load_wavefront_obj;
 use image::Rgb;
+
+#[derive(Clone)]
+pub enum ShaderMode {
+    BVH,
+    Solid,
+    Lit,
+}
+
 
 #[derive(Clone)]
 pub enum Rendermode {
@@ -29,7 +38,7 @@ pub enum Rendermode {
 #[derive(Clone)]
 pub struct Scene {
     pub camera: Camera,
-    pub lights: Vec<PointLight>,
+    pub lights: Vec<LightType>,
     pub objects: Vec<Object>,
     pub meshes: Vec<Mesh>,
     // pub unified_mesh: Vec<Polygon<'a>>,
@@ -41,6 +50,7 @@ pub struct Scene {
     pub background: Rgb<u8>,
     pub tick: usize,
     pub rendermode: Rendermode,
+    pub shadermode: ShaderMode,
     pub logging: u8,
     pub spatial_acceleration_structures: bool,
     pub threads: u32,
@@ -65,13 +75,13 @@ pub fn simple_scene<'b>() -> Scene {
         sensor,
         ..CAMERA
     };
-    let light = point_light(vertex(-10.0, 10.0, -5.0), RIGHT, norm_black_body(2000.));
+    let light = point_light(vector(-10.0, 10.0, -5.0), RIGHT, norm_black_body(2000.));
     // let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, 1000*const_spectra(380.));
     // let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, monochroma_spectra(460.,5e-1));
 
-    let lightb = point_light(vertex(10.0, -10.0, -5.0), RIGHT, norm_black_body(4000.));
+    let lightb = point_light(vector(10.0, -10.0, -5.0), RIGHT, norm_black_body(4000.));
     // println!("{:?}",light.radiant_flux.from_λ(700.));
-    let lights = vec![light,lightb];
+    let lights = vec![LightType::PointLight(light),LightType::PointLight(lightb),];
     let meshes = Vec::new();
     let mut objects = Vec::new();
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
@@ -114,7 +124,8 @@ pub fn simple_scene<'b>() -> Scene {
         meshes,
         background,
         tick: 0,
-        rendermode: Rendermode::_Rasterize,
+        rendermode: Rendermode::ThreadedRayTrace,
+        shadermode: ShaderMode::Lit,
         logging: 0,
         objects,
         spatial_acceleration_structures: true,

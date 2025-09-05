@@ -1,9 +1,10 @@
 use crate::color::colorspace_conversion::spectra_to_display;
 use crate::geometry::primitives::{polygon, ray, vector, Ray, Vector};
-use crate::lighting::{black_spectra, Spectra};
+use crate::lighting::{black_spectra, LightType, Spectra};
 use crate::ray_tracing::ray_polygon_intersection::{
     _ray_polygon_intersection_test, probe_ray_polygon_intersection,
 };
+use crate::object::Object;
 use crate::ray_tracing::rendering_equation::white_matte_equation;
 
 use crate::scene::Scene;
@@ -130,6 +131,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = pixel_to_ray(x, y, scene);
     let mut hit = false;
     let mut closest: f32 = 1e6;
+    let mut closest_object: &Object;
     let mut surface_normal: Vector;
     surface_normal = vector(1., 1., 1.);
     // here we're at once per pixel
@@ -150,6 +152,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
                 let polygon = polygon(a, b, c);
                 let (b, _i, dist) = probe_ray_polygon_intersection(&ray, &polygon);
                 if b && dist < closest {
+                    closest_object = object;
                     closest = dist;
                     hit = true;
                     surface_normal = polygon.get_normal();
@@ -173,11 +176,13 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
         direction.norm();
         let intersection_point: Vector = (closest * direction.clone()) + ray.position;
 
-        let mut output: Spectra = black_spectra();
+        let mut output: Spectra = black_spectra(crate::lighting::RadiometricUnit::Radiance);
         for light in scene.lights.clone() {
             // our job here is to find the amount of energy transmitted to the pixel from the light
-
-            let to_light = &intersection_point.clone().to(light.position.as_vector());
+            let value = match light {
+                LightType::PointLight(value) => value
+            };
+            let to_light = &intersection_point.clone().to(value.position);
 
             let _distance_to_surface: f32 = closest;
             // let _distance_to_light: f32 = to_light.magnitude();
@@ -192,12 +197,16 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             //     no_emission,
             //     normal_incoming_spectral_radiance,
             // );
+
+          
+
+            
             let radiance = white_matte_equation(
                 &intersection_point,
                 to_light,
                 &direction,
                 &surface_normal,
-                light.radiant_flux,
+                value.radiant_flux,
             );
 
             // let radiance = white_emission_equation(

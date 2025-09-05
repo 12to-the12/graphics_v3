@@ -2,7 +2,8 @@ use std::f32::consts::PI;
 
 use crate::{
     geometry::primitives::Vector,
-    lighting::{black_spectra, const_spectra, Spectra},
+    lighting::{black_spectra, const_spectra, Spectra,RadiometricUnit},
+
 };
 
 #[derive(Clone, Debug, PartialEq, Copy)]
@@ -15,7 +16,7 @@ pub fn lamberts_law(ω_i: &Vector, normal: &Vector) -> f32 {
 }
 
 pub trait BRDF {
-    fn evaluate(&self, x: &Vector, ω_i: &Vector, ω_0: &Vector, spectra: &Spectra) -> Spectra;
+    fn evaluate_BRDF(&self, x: &Vector, ω_i: &Vector, ω_0: &Vector, spectra: &Spectra) -> Spectra;
 }
 /// BRDF
 /// returns a radiance value
@@ -23,8 +24,8 @@ pub trait BRDF {
 pub(crate) struct _Void {}
 
 impl BRDF for _Void {
-    fn evaluate(&self, _x: &Vector, _ω_i: &Vector, _ω_o: &Vector, _spectra: &Spectra) -> Spectra {
-        return black_spectra();
+    fn evaluate_BRDF(&self, _x: &Vector, _ω_i: &Vector, _ω_o: &Vector, _spectra: &Spectra) -> Spectra {
+        return black_spectra(RadiometricUnit::Radiance);
     }
 }
 
@@ -35,15 +36,15 @@ impl BRDF for _Void {
 #[derive(Clone, Debug, PartialEq, Copy)]
 struct DiffuseWhite {}
 impl BRDF for DiffuseWhite {
-    fn evaluate(&self, _x: &Vector, _ω_i: &Vector, _ω_o: &Vector, _spectra: &Spectra) -> Spectra {
-        return const_spectra(PI / 2.);
+    fn evaluate_BRDF(&self, _x: &Vector, _ω_i: &Vector, _ω_o: &Vector, _spectra: &Spectra) -> Spectra {
+        return const_spectra(PI / 2.,RadiometricUnit::Radiance);
     }
 }
 
 /// as if bro. Lights don't exist.
 /// this is not a BRDF
 pub fn _no_incoming_spectral_radiance(_x: &Vector, _: &Vector, _spectra: &Spectra) -> Spectra {
-    return black_spectra();
+    return black_spectra(RadiometricUnit::Radiance);
 }
 
 /// as if bro. Lights don't exist.
@@ -57,28 +58,28 @@ struct _IsotrophicMaterial {}
 /// defines how much radiance we're receiving in every wavelength with our parameters.
 /// because the current lights are all isotrophic, the function is trivium
 impl BRDF for _IsotrophicMaterial {
-    fn evaluate(&self, _x: &Vector, _ω_i: &Vector, _ω_o: &Vector, spectra: &Spectra) -> Spectra {
+    fn evaluate_BRDF(&self, _x: &Vector, _ω_i: &Vector, _ω_o: &Vector, spectra: &Spectra) -> Spectra {
         return spectra.clone();
     }
 }
 
 pub trait EMMISIVITY {
-    fn evaluate(&self, x: &Vector, ω_o: &Vector) -> Spectra;
+    fn evaluate_BRDF(&self, x: &Vector, ω_o: &Vector) -> Spectra;
 }
 
 struct NoEmission {}
 
 impl EMMISIVITY for NoEmission {
-    fn evaluate(&self, _x: &Vector, _ω_o: &Vector) -> Spectra {
-        return black_spectra();
+    fn evaluate_BRDF(&self, _x: &Vector, _ω_o: &Vector) -> Spectra {
+        return black_spectra(RadiometricUnit::Radiance);
     }
 }
 
 struct _BrightWhiteEmission {}
 
 impl EMMISIVITY for _BrightWhiteEmission {
-    fn evaluate(&self, _x: &Vector, _ω_o: &Vector) -> Spectra {
-        return const_spectra(1.);
+    fn evaluate_BRDF(&self, _x: &Vector, _ω_o: &Vector) -> Spectra {
+        return const_spectra(1.,RadiometricUnit::Radiance);
     }
 }
 
@@ -95,8 +96,8 @@ pub fn rendering_equation<IncomingRadiance: Fn(&Vector, &Vector, &Spectra) -> Sp
     emission: impl EMMISIVITY,
     incoming_radiance: IncomingRadiance,
 ) -> Spectra {
-    let emitted_radiance = emission.evaluate(x, ω_o);
-    let scattering = brdf.evaluate(&x, &ω_i, &ω_o, &spectra);
+    let emitted_radiance = emission.evaluate_BRDF(x, ω_o);
+    let scattering = brdf.evaluate_BRDF(&x, &ω_i, &ω_o, &spectra);
     let incoming_radiance = incoming_radiance(&x, &ω_i, &spectra);
     let lamberts_law = lamberts_law(&ω_i, &normal);
     let outgoing_radiance: Spectra =
@@ -171,7 +172,7 @@ mod tests {
     #[test]
     fn test_diffuse_white() {
         let brdf = DiffuseWhite {};
-        let spectra: Spectra = brdf.evaluate(&ORIGIN, &ORIGIN, &ORIGIN, &const_spectra(1.));
+        let spectra: Spectra = brdf.evaluate_BRDF(&ORIGIN, &ORIGIN, &ORIGIN, &const_spectra(1.,crate::lighting::RadiometricUnit::Radiance));
         assert_eq!(spectra.from_λ(550.), PI / 2.);
     }
 }

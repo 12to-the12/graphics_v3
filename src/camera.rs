@@ -1,7 +1,7 @@
 #![allow(nonstandard_style)]
 // use crate::coordinate_space::Orientation;
 use crate::geometry::primitives::Vector;
-
+use approx::assert_relative_eq;
 #[derive(Clone)]
 pub struct Camera {
     pub position: Vector,
@@ -115,12 +115,12 @@ impl Sensor {
     pub fn _pixels(&self) -> u32 {
         self.horizontal_res * self.vertical_res
     }
+    /// the area of the sensor in square millimeters
     pub fn _sensor_area(&self) -> f32 {
-        // the area of the sensor in square millimeters
         self.width * self.height()
     }
+    /// the area of a pixel in square millimeters
     pub fn _pixel_area(&self) -> f32 {
-        // the area of a pixel in square millimeters
         let pixel_count = self.horizontal_res * self.vertical_res;
         self._sensor_area() / pixel_count as f32
     }
@@ -156,6 +156,8 @@ pub const CAMERA: Camera = Camera {
 mod tests {
     use std::f32::consts::PI;
 
+    use approx::relative_eq;
+
     use crate::geometry::primitives::vector;
 
     use super::*;
@@ -164,8 +166,8 @@ mod tests {
         // a camera with infinitesimal focal length
         let cam = _camera(vector(0.0, 0.0, 0.0), _lens(1e-6), _sensor(1., 10, 10));
         // subtends a hemisphere
-        assert!((cam._frustrum_solid_angle()-(2.*PI)).abs()<1e-5);
-        assert!((cam._pixel_solid_angle()-(2.*PI / 100.)).abs()<1e-5);
+        assert_relative_eq!(cam._frustrum_solid_angle(),2.*PI);
+        assert_relative_eq!(cam._pixel_solid_angle(),2.*PI / 100.);
         // assert_eq!(cam._frustrum_solid_angle(), 2. * PI);
 
         // assert_eq!(cam._pixel_solid_angle(), 2. * PI / 100.);
