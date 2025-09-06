@@ -11,7 +11,7 @@ use crate::{
 extern crate ndarray;
 use ndarray::prelude::*;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Copy, PartialEq)]
 pub enum RadiometricUnit {
     Flux,
     Intensity,  // per sr
@@ -69,12 +69,18 @@ pub fn point_light(
 
 // this can be used to track radiance, radiant flux, "brightness", whatever
 // this is a very memory intensive thing to track, so optimization will be key
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Spectra {
     pub spectra: Array1<f32>,
     pub unit: RadiometricUnit,
 }
 
+impl Spectra {
+    pub fn set_unit(mut self,unit:RadiometricUnit) -> Spectra{
+        self.unit = unit;
+        return self
+    }
+}
 impl std::ops::Mul<Spectra> for f32 {
     type Output = Spectra;
     fn mul(self, rhs: Spectra) -> Spectra {

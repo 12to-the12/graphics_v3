@@ -337,7 +337,7 @@ mod tests {
             sensor,
             _near_clipping_plane: 1e-1,
             _far_clipping_plane: 1e6,
-            _exposure_time: 1.,
+            exposure_time: 1.,
         };
         let transform = build_projection_transform(&camera);
         println!("{:?}", camera.horizontal_field_of_view());

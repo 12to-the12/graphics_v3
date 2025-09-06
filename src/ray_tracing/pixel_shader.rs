@@ -1,13 +1,13 @@
 use crate::color::colorspace_conversion::spectra_to_display;
 use crate::geometry::primitives::{polygon, ray, vector, Ray, Vector};
-use crate::lighting::{black_spectra, LightType, Spectra};
-use crate::material::Material;
+use crate::lighting::{black_spectra, Light, LightType, RadiometricUnit, Spectra};
+use crate::material::{ShaderNode,PBR};
 use crate::object::{Object, OBJECT};
 use crate::ray_tracing::ray_polygon_intersection::{
     _ray_polygon_intersection_test, probe_ray_polygon_intersection,
 };
 
-use crate::ray_tracing::rendering_equation::BRDF;
+use crate::ray_tracing::rendering_equation::{lamberts_law, BRDF};
 use crate::scene::Scene;
 use image::{Rgb, RgbImage};
 use stopwatch::Stopwatch;
@@ -107,7 +107,7 @@ pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     if hit {
         return Rgb([255, 255, 255]);
     } else {
-        return scene.background;
+        return spectra_to_display(&scene.background);
     }
 }
 
@@ -125,11 +125,20 @@ pub fn bvh_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     if hit {
         return Rgb([255, 255, 255]);
     } else {
-        return scene.background;
+        return spectra_to_display(&scene.background);
     }
 }
 pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = pixel_to_ray(x, y, scene);
+    let output: Spectra = shoot_ray(ray,scene);
+    let flux = (scene.camera.sensor._pixel_area()*output).set_unit(RadiometricUnit::Flux);
+    let joules = scene.camera.exposure_time*flux;
+    return spectra_to_display(&joules);
+
+}
+
+pub fn shoot_ray(ray: Ray, scene: &Scene) -> Spectra {
+    
     let mut hit = false;
     let mut closest: f32 = 1e6;
     let mut closest_object: &Object = &OBJECT;
@@ -207,14 +216,24 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             //     value.radiant_flux,
             // );
 
-            let closest_material: Material = closest_object.material;
-            let radiance = closest_material.rendering_equation(
+            // if the angle between the surface and light is obtuse, it's facing away
+            if to_light.dot(&surface_normal)<0.{
+                continue;
+            }
+
+            let closest_material: &ShaderNode = &closest_object.material;
+            let radiance:Spectra = match closest_material {
+                ShaderNode::Void => black_spectra(crate::lighting::RadiometricUnit::Radiance),
+                ShaderNode::PBR(pbr) => pbr.rendering_equation(
                 &intersection_point,
                 to_light,
                 &direction,
                 &surface_normal,
-                value.radiant_flux,
-            );
+                value.radiant_intensity(intersection_point)
+            ),
+                ShaderNode::Literal(spectra) => spectra.clone(),
+            };
+            // let radiance = closest_material
 
             // let θ = (irradiance).acos().to_degrees();
 
@@ -243,17 +262,18 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
         if scene.logging >= 2 {
             // println!("{:?}", spectra_to_display(&output));
         }
-        return spectra_to_display(&output);
+        return output
         // let r = r as u8;
         // let g = g as u8;
         // let b = b as u8;
         // return Rgb([r, g, b]);
     } else {
         // return Rgb([0, 0, 0]);
-        return scene.background;
+        return scene.background.clone();
         // return scene.background;
     } // Rgb([x, y, y])
 }
+
 
 /// yeah, the math was hard for me too 2023-11-20
 pub fn pixel_to_ray(x: u32, y: u32, scene: &Scene) -> Ray {

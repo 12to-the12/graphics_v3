@@ -11,7 +11,7 @@ pub struct Camera {
     pub _near_clipping_plane: f32,
     pub _far_clipping_plane: f32,
     /// shutterspeed in seconds
-    pub _exposure_time: f32,
+    pub exposure_time: f32,
 }
 
 pub fn _camera(position: Vector, lens: Lens, sensor: Sensor) -> Camera {
@@ -133,7 +133,7 @@ pub const LENS: Lens = Lens {
 };
 
 pub const SENSOR: Sensor = Sensor {
-    width: 36.0,
+    width: 36.0, // mm
     // height: 24.0,
     horizontal_res: 1500,
     vertical_res: 1000,
@@ -149,7 +149,7 @@ pub const CAMERA: Camera = Camera {
     sensor: SENSOR,
     _near_clipping_plane: 1e-1,
     _far_clipping_plane: 1e6,
-    _exposure_time: 1.,
+    exposure_time: 1_000.,
 };
 
 #[cfg(test)]

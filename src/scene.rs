@@ -5,7 +5,7 @@ use crate::geometry::orientation::RIGHT;
 use crate::geometry::primitives::{sample_mesh, vector, vertex, Mesh};
 use crate::object::{Object, OBJECT};
 // use crate::primitives::Object;
-use crate::lighting::{norm_black_body, point_light, LightType, PointLight};
+use crate::lighting::{black_spectra, norm_black_body, point_light, LightType, PointLight, Spectra};
 use crate::load_object_file::load_wavefront_obj;
 use image::Rgb;
 
@@ -45,7 +45,7 @@ pub struct Scene {
     // pub time: Time, // timestamp to render at
     // pub settings: Settings,
     // geometry: <T,Mesh>,
-    pub background: Rgb<u8>,
+    pub background: Spectra,
     pub tick: usize,
     pub rendermode: Rendermode,
     pub shadermode: ShaderMode,
@@ -61,7 +61,7 @@ pub fn simple_scene<'b>() -> Scene {
         _focus_distance: 2.0,
     };
     let sensor = Sensor {
-        width: 36.0, // 36.
+        width: 36.0, // 36 mm
         // height: 24.0,
         horizontal_res: 420,
         vertical_res: 360,
@@ -115,7 +115,8 @@ pub fn simple_scene<'b>() -> Scene {
     };
     objects.push(object);
 
-    let background = Rgb([0, 0, 0]);
+    // let background = Rgb([0, 0, 0]);
+    let background = black_spectra(crate::lighting::RadiometricUnit::Flux);
     let scene = Scene {
         camera,
         lights,

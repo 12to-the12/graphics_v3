@@ -3,8 +3,8 @@ use crate::{
         orientation::{Orientation, _UP},
         primitives::{Mesh, Ray, Vector, ORIGIN},
     },
-    material::Material,
-    ray_tracing::ray_sphere_intersection::ray_sphere_intersection,
+    material::{PBR,ShaderNode},
+    ray_tracing::ray_sphere_intersection::ray_sphere_intersection, scene::ShaderMode,
 };
 
 /// physical object in space with associated data
@@ -14,7 +14,7 @@ pub struct Object {
     pub _orientation: Orientation,
     pub _scale: f32,
     pub _children: Vec<Object>,
-    pub material: Material,
+    pub material: ShaderNode,
     pub meshes: Vec<Mesh>,
     // & links to textures associated with it
 }
@@ -44,7 +44,7 @@ pub const OBJECT: Object = Object {
     _orientation: _UP,
     _scale: 1.,
     _children: Vec::new(),
-    material: Material::new(),
+    material: ShaderNode::PBR(PBR::new()),
     meshes: Vec::new(),
 };
 
