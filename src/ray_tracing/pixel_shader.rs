@@ -1,12 +1,13 @@
 use crate::color::colorspace_conversion::spectra_to_display;
 use crate::geometry::primitives::{polygon, ray, vector, Ray, Vector};
 use crate::lighting::{black_spectra, LightType, Spectra};
+use crate::material::Material;
+use crate::object::{Object, OBJECT};
 use crate::ray_tracing::ray_polygon_intersection::{
     _ray_polygon_intersection_test, probe_ray_polygon_intersection,
 };
-use crate::object::Object;
-use crate::ray_tracing::rendering_equation::white_matte_equation;
 
+use crate::ray_tracing::rendering_equation::BRDF;
 use crate::scene::Scene;
 use image::{Rgb, RgbImage};
 use stopwatch::Stopwatch;
@@ -104,7 +105,7 @@ pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
         }
     }
     if hit {
-        return Rgb([255,255,255])
+        return Rgb([255, 255, 255]);
     } else {
         return scene.background;
     }
@@ -122,7 +123,7 @@ pub fn bvh_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
         }
     }
     if hit {
-        return Rgb([255,255,255])
+        return Rgb([255, 255, 255]);
     } else {
         return scene.background;
     }
@@ -131,7 +132,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = pixel_to_ray(x, y, scene);
     let mut hit = false;
     let mut closest: f32 = 1e6;
-    let mut closest_object: &Object;
+    let mut closest_object: &Object = &OBJECT;
     let mut surface_normal: Vector;
     surface_normal = vector(1., 1., 1.);
     // here we're at once per pixel
@@ -180,7 +181,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
         for light in scene.lights.clone() {
             // our job here is to find the amount of energy transmitted to the pixel from the light
             let value = match light {
-                LightType::PointLight(value) => value
+                LightType::PointLight(value) => value,
             };
             let to_light = &intersection_point.clone().to(value.position);
 
@@ -198,24 +199,22 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
             //     normal_incoming_spectral_radiance,
             // );
 
-          
+            // let radiance = white_matte_equation(
+            //     &intersection_point,
+            //     to_light,
+            //     &direction,
+            //     &surface_normal,
+            //     value.radiant_flux,
+            // );
 
-            
-            let radiance = white_matte_equation(
+            let closest_material: Material = closest_object.material;
+            let radiance = closest_material.rendering_equation(
                 &intersection_point,
                 to_light,
                 &direction,
                 &surface_normal,
                 value.radiant_flux,
             );
-
-            // let radiance = white_emission_equation(
-            //     &intersection_point,
-            //     to_light,
-            //     &direction,
-            //     &surface_normal,
-            //     light.radiant_flux,
-            // );
 
             // let θ = (irradiance).acos().to_degrees();
 

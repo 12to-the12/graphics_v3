@@ -2,8 +2,7 @@ use crate::camera::CAMERA;
 use crate::camera::{Camera, Lens, Sensor};
 use crate::geometry::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
-use crate::geometry::primitives::{vector, vertex, Mesh, sample_mesh};
-use crate::material::Shader;
+use crate::geometry::primitives::{sample_mesh, vector, vertex, Mesh};
 use crate::object::{Object, OBJECT};
 // use crate::primitives::Object;
 use crate::lighting::{norm_black_body, point_light, LightType, PointLight};
@@ -16,7 +15,6 @@ pub enum ShaderMode {
     Solid,
     Lit,
 }
-
 
 #[derive(Clone)]
 pub enum Rendermode {

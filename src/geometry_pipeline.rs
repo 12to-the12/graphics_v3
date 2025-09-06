@@ -127,7 +127,7 @@ fn rasterize(canvas: &mut RgbImage, mut scene: Scene) {
     vertex_shader(&mut scene); // projections
     raster_time.stop();
     if scene.logging > 0 {
-            println!("raster_time: {:?}", raster_time.elapsed());
+        println!("raster_time: {:?}", raster_time.elapsed());
 
     }
 
@@ -150,8 +150,11 @@ fn apply_transforms(scene: &mut Scene) {
 
 fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     apply_transforms(&mut scene);
-    let shadermode = match scene.shadermode { ShaderMode::Lit => lit_shader,ShaderMode::BVH => bvh_shader,ShaderMode::Solid => _solid_shader};
-
+    let shadermode = match scene.shadermode {
+        ShaderMode::Lit => lit_shader,
+        ShaderMode::BVH => bvh_shader,
+        ShaderMode::Solid => _solid_shader,
+    };
 
     shade_pixels(
         canvas,
@@ -171,7 +174,11 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     let mut threads = Stopwatch::start_new();
     let mut handles = Vec::new();
     let mut canvases: Vec<RgbImage> = Vec::new();
-    let shadermode = match scene.shadermode { ShaderMode::Lit => lit_shader,ShaderMode::BVH => bvh_shader,ShaderMode::Solid => _solid_shader};
+    let shadermode = match scene.shadermode {
+        ShaderMode::Lit => lit_shader,
+        ShaderMode::BVH => bvh_shader,
+        ShaderMode::Solid => _solid_shader,
+    };
 
     let width = scene.camera.sensor.horizontal_res / scene.threads;
     let height = scene.camera.sensor.vertical_res;

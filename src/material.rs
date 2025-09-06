@@ -1,26 +1,51 @@
-use crate::lighting::{black_spectra, Spectra};
+use crate::{
+    geometry::primitives::Vector,
+    lighting::{black_spectra, const_spectra, monochroma_spectra, RadiometricUnit, Spectra},
+    ray_tracing::rendering_equation::{lamberts_law, BRDF},
+};
+use std::f32::consts::PI;
 
-#[derive(Clone)]
-pub enum ShaderType {
+#[derive(Clone, Debug, Copy, PartialEq)]
+pub enum MaterialType {
     Void,
-    MatteWhite
+    MatteWhite,
+    BSDF,
 }
-
 
 /// physical object in space with associated data
 // I want shaders to simply be a trait
 // any function that takes in all the necessary data and returns a light value is a shader
-pub struct Void {
-    pub color: f32,
+#[derive(Clone, Debug, PartialEq, Copy)]
+pub struct Material {
+    material_type: MaterialType,
 }
 
-pub trait Shader {
-  fn shade(&self) -> Spectra;
+// pub trait Material {
+//   fn shade(&self) -> Spectra;
+// }
+
+impl BRDF for Material {
+    fn rendering_equation(
+        &self,
+        x: &Vector,       // position vector of equation
+        ω_i: &Vector,     // vector to light
+        ω_o: &Vector,     // light exit path
+        normal: &Vector,  // surface normal
+        incoming_radiance: Spectra, // the radiant flux of the lightsource encoded as a spectrum
+    ) -> Spectra {
+
+        let lamberts_law = lamberts_law(&ω_i, &normal);
+        let outgoing_radiance: Spectra =
+            lamberts_law * incoming_radiance;
+        return outgoing_radiance;
+    }
 }
 
-impl Shader for Void {
-    fn shade(&self) -> Spectra {
-        black_spectra(crate::lighting::RadiometricUnit::Radiance)
+impl Material {
+    pub const fn new() -> Material {
+        Material {
+            material_type: MaterialType::MatteWhite,
+        }
     }
 }
 

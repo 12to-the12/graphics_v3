@@ -4,9 +4,10 @@ use std::ops::Add;
 use image::{Rgb, RgbImage};
 use ndarray::Array1;
 
-use crate::ray_tracing::rendering_equation::Material;
-
-use crate::geometry::transformations::{compile_transforms, Transform};
+use crate::{
+    geometry::transformations::{compile_transforms, Transform},
+    material::Material,
+};
 // use crate::ray_tracing::rendering_equation::BRDF;
 
 /// geometry defining spatial surface
@@ -84,7 +85,7 @@ impl Vertex {
 const VERTEX: Vertex = Vertex {
     position: ORIGIN,
     uv_coord: (0., 0.),
-    shader: Material {},
+    shader: Material::new(),
 };
 
 pub fn vertex(x: f32, y: f32, z: f32) -> Vertex {
