@@ -79,7 +79,7 @@ pub fn simple_scene<'b>() -> Scene {
 
     let lightb = point_light(vector(10.0, -10.0, -5.0), RIGHT, norm_black_body(4000.));
     // println!("{:?}",light.radiant_flux.from_λ(700.));
-    let lights = vec![LightType::PointLight(light),LightType::PointLight(lightb),];
+    let lights = vec![LightType::PointLight(light), LightType::PointLight(lightb)];
     let meshes = Vec::new();
     let mut objects = Vec::new();
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
@@ -109,7 +109,7 @@ pub fn simple_scene<'b>() -> Scene {
     // meshes.push(mesh);
 
     let object = Object {
-        position: vector(0., 0.,-10.0),
+        position: vector(0., 0., -10.0),
         meshes: vec![mesh],
         ..OBJECT
     };

@@ -50,7 +50,7 @@ mod tests {
 
     use crate::{
         color::luminous_efficiency::_photopic_conversion,
-        lighting::{black_spectra, Spectra,RadiometricUnit},
+        lighting::{black_spectra, RadiometricUnit, Spectra},
     };
 
     // use super::PHOTOPIC_CONVERSION;

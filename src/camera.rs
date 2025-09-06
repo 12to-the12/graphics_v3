@@ -166,8 +166,8 @@ mod tests {
         // a camera with infinitesimal focal length
         let cam = _camera(vector(0.0, 0.0, 0.0), _lens(1e-6), _sensor(1., 10, 10));
         // subtends a hemisphere
-        assert_relative_eq!(cam._frustrum_solid_angle(),2.*PI);
-        assert_relative_eq!(cam._pixel_solid_angle(),2.*PI / 100.);
+        assert_relative_eq!(cam._frustrum_solid_angle(), 2. * PI);
+        assert_relative_eq!(cam._pixel_solid_angle(), 2. * PI / 100.);
         // assert_eq!(cam._frustrum_solid_angle(), 2. * PI);
 
         // assert_eq!(cam._pixel_solid_angle(), 2. * PI / 100.);

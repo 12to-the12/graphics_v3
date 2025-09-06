@@ -128,7 +128,6 @@ fn rasterize(canvas: &mut RgbImage, mut scene: Scene) {
     raster_time.stop();
     if scene.logging > 0 {
         println!("raster_time: {:?}", raster_time.elapsed());
-
     }
 
     solid(canvas, scene);
@@ -227,8 +226,6 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     if scene.logging > 0 {
         println!("reassembly: {:?}", reassembly.elapsed());
     }
-
-
 }
 
 /// this serves as an abstraction away from rasterization, so that ray tracing can be dropped into the pipeline

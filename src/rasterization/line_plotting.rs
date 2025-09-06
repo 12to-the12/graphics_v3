@@ -109,7 +109,6 @@ pub fn plot_triangle(triangle: Triangle, canvas: &mut RgbImage, color: Rgb<u8>) 
     #[cfg(debug_assertions)]
     assert!(c.y as u32 <= canvas.height());
 
-
     plot_line(canvas, a, b, color);
     plot_line(canvas, b, c, color);
     plot_line(canvas, c, a, color);

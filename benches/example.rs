@@ -9,7 +9,6 @@
 // // #[path = "../src/main.rs"]
 // // mod main;
 
-
 // #[path = "../src/coordinate_space.rs"]
 // mod coordinate_space;
 
@@ -33,8 +32,6 @@
 // // use crate::geometry_pipeline::geometry_pipeline;
 
 // // use crate::scene::simple_scene;
-
-
 
 // // use main::save_image;
 

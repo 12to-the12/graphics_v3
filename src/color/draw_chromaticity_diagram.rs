@@ -36,7 +36,8 @@ pub fn coloring_book(canvas: &mut RgbImage) {
     }
 
     for λ in 380..700 {
-        let spectra = monochroma_spectra((λ as f32)/1., 1.,crate::lighting::RadiometricUnit::Flux);
+        let spectra =
+            monochroma_spectra((λ as f32) / 1., 1., crate::lighting::RadiometricUnit::Flux);
         let xyY = CIEXYZ_to_xyY(spectra_to_CIEXYZ(&spectra));
         canvas.put_pixel(
             (xyY.0 * (canvas.width() as f32)) as u32,
@@ -61,7 +62,7 @@ pub fn coloring_book(canvas: &mut RgbImage) {
     // }
 
     for temp in 1_000..100_000 {
-        let spectra = black_body(temp as f32,crate::lighting::RadiometricUnit::Flux);
+        let spectra = black_body(temp as f32, crate::lighting::RadiometricUnit::Flux);
         let xyY = CIEXYZ_to_xyY(spectra_to_CIEXYZ(&spectra));
 
         canvas.put_pixel(

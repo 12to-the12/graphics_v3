@@ -27,16 +27,14 @@ pub struct Material {
 impl BRDF for Material {
     fn rendering_equation(
         &self,
-        x: &Vector,       // position vector of equation
-        ω_i: &Vector,     // vector to light
-        ω_o: &Vector,     // light exit path
-        normal: &Vector,  // surface normal
+        x: &Vector,                 // position vector of equation
+        ω_i: &Vector,               // vector to light
+        ω_o: &Vector,               // light exit path
+        normal: &Vector,            // surface normal
         incoming_radiance: Spectra, // the radiant flux of the lightsource encoded as a spectrum
     ) -> Spectra {
-
         let lamberts_law = lamberts_law(&ω_i, &normal);
-        let outgoing_radiance: Spectra =
-            lamberts_law * incoming_radiance;
+        let outgoing_radiance: Spectra = lamberts_law * incoming_radiance;
         return outgoing_radiance;
     }
 }

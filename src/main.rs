@@ -12,12 +12,12 @@ mod object;
 mod scene;
 
 mod geometry;
+mod material;
 mod rasterization;
 mod ray_tracing;
-mod material;
 
-extern crate stopwatch;
 extern crate approx;
+extern crate stopwatch;
 
 use color::colorspace_conversion::{spectra_to_CIEXYZ, spectra_to_sRGB, CIEXYZ_to_xyY};
 use color::draw_chromaticity_diagram::coloring_book;
