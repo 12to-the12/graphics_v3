@@ -17,11 +17,11 @@ pub fn lamberts_law(ω_i: &Vector, normal: &Vector) -> f32 {
 pub trait BRDF {
     fn rendering_equation(
         &self,
-        x: &Vector,       // position vector of equation
-        ω_i: &Vector,     // vector to light
-        ω_o: &Vector,     // light exit path
-        normal: &Vector,  // surface normal
-        spectra: Spectra, // the radiant flux of the lightsource encoded as a spectrum
+        x: &Vector,                          // position vector of equation
+        ω_i: &Vector,                        // vector to light
+        ω_o: &Vector,                        // light exit path
+        normal: &Vector,                     // surface normal
+        incoming_radiant_intensity: Spectra, // the radiant flux of the lightsource encoded as a spectrum
     ) -> Spectra;
     // fn evaluate_BRDF(&self, x: &Vector, ω_i: &Vector, ω_0: &Vector, spectra: &Spectra) -> Spectra;
 }

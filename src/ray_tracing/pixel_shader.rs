@@ -1,7 +1,7 @@
 use crate::color::colorspace_conversion::spectra_to_display;
 use crate::geometry::primitives::{polygon, ray, vector, Ray, Vector};
 use crate::lighting::{black_spectra, Light, LightType, RadiometricUnit, Spectra};
-use crate::material::{ShaderNode,PBR};
+use crate::material::{ShaderNode, PBR};
 use crate::object::{Object, OBJECT};
 use crate::ray_tracing::ray_polygon_intersection::{
     _ray_polygon_intersection_test, probe_ray_polygon_intersection,
@@ -130,15 +130,60 @@ pub fn bvh_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 }
 pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = pixel_to_ray(x, y, scene);
-    let output: Spectra = shoot_ray(ray,scene);
-    let flux = (scene.camera.sensor._pixel_area()*output).set_unit(RadiometricUnit::Flux);
-    let joules = scene.camera.exposure_time*flux;
-    return spectra_to_display(&joules);
-
+    let output: Spectra = match shoot_ray(ray, scene) {
+        None => black_spectra(RadiometricUnit::Flux),
+        Some((object, x, ω_o, normal)) => {
+            let output = compute_light(scene, object, x, ω_o, normal);
+            let flux = (scene.camera.sensor._pixel_area() * output).set_unit(RadiometricUnit::Flux);
+            scene.camera.exposure_time * flux
+        }
+    };
+    return spectra_to_display(&output);
 }
 
-pub fn shoot_ray(ray: Ray, scene: &Scene) -> Spectra {
-    
+pub fn compute_light(
+    scene: &Scene,
+    closest_object: Object,
+    intersection_point: Vector,
+    direction: Vector,
+    normal: Vector,
+) -> Spectra {
+    let mut output = black_spectra(RadiometricUnit::Flux);
+    for light in scene.lights.clone() {
+        // our job here is to find the amount of energy transmitted to the pixel from the light
+        let value = match light {
+            LightType::PointLight(value) => value,
+        };
+        let to_light = &intersection_point.clone().to(value.position);
+
+        let _distance_to_surface: f32 = direction.magnitude();
+
+        // if the angle between the surface and light is obtuse, it's facing away
+        if to_light.dot(&normal) < 0. {
+            continue;
+        }
+
+        let closest_material: &ShaderNode = &closest_object.material;
+        let radiance: Spectra = match closest_material {
+            ShaderNode::Void => black_spectra(crate::lighting::RadiometricUnit::Radiance),
+            ShaderNode::PBR(pbr) => pbr.rendering_equation(
+                &intersection_point,
+                to_light,
+                &direction,
+                &normal,
+                value.radiant_intensity(intersection_point),
+            ),
+            ShaderNode::Literal(spectra) => spectra.clone(),
+        };
+
+        if radiance.total() > 0. {
+            output = output + radiance;
+        }
+    }
+    output
+}
+
+pub fn shoot_ray(ray: Ray, scene: &Scene) -> Option<(Object, Vector, Vector, Vector)> {
     let mut hit = false;
     let mut closest: f32 = 1e6;
     let mut closest_object: &Object = &OBJECT;
@@ -150,9 +195,6 @@ pub fn shoot_ray(ray: Ray, scene: &Scene) -> Spectra {
         if scene.spatial_acceleration_structures && !object.ray_intercept(&ray) {
             continue;
         }
-        // else {
-        //     return Rgb([255, 255, 255]);
-        // }
         for mesh in &object.meshes {
             // once per mesh
             for poly in mesh.polygons.clone() {
@@ -173,10 +215,6 @@ pub fn shoot_ray(ray: Ray, scene: &Scene) -> Spectra {
                         panic!();
                     }
                 }
-                // } else {
-                //     return Rgb([0, 0, 0]);
-                // }
-                // return ray_polygon_intersection_test(&ray, &polygon);
             }
         }
     }
@@ -184,96 +222,19 @@ pub fn shoot_ray(ray: Ray, scene: &Scene) -> Spectra {
     if hit {
         let mut direction: Vector = ray.direction.clone();
         direction.norm();
-        let intersection_point: Vector = (closest * direction.clone()) + ray.position;
+        direction = closest * direction; // explicitly not a unit vector
+        let intersection_point: Vector = (direction.clone()) + ray.position;
 
-        let mut output: Spectra = black_spectra(crate::lighting::RadiometricUnit::Radiance);
-        for light in scene.lights.clone() {
-            // our job here is to find the amount of energy transmitted to the pixel from the light
-            let value = match light {
-                LightType::PointLight(value) => value,
-            };
-            let to_light = &intersection_point.clone().to(value.position);
-
-            let _distance_to_surface: f32 = closest;
-            // let _distance_to_light: f32 = to_light.magnitude();
-
-            // let radiance = rendering_equation(
-            //     &intersection_point,
-            //     to_light,
-            //     &direction,
-            //     &surface_normal,
-            //     light.radiant_flux,
-            //     diffuse_white,
-            //     no_emission,
-            //     normal_incoming_spectral_radiance,
-            // );
-
-            // let radiance = white_matte_equation(
-            //     &intersection_point,
-            //     to_light,
-            //     &direction,
-            //     &surface_normal,
-            //     value.radiant_flux,
-            // );
-
-            // if the angle between the surface and light is obtuse, it's facing away
-            if to_light.dot(&surface_normal)<0.{
-                continue;
-            }
-
-            let closest_material: &ShaderNode = &closest_object.material;
-            let radiance:Spectra = match closest_material {
-                ShaderNode::Void => black_spectra(crate::lighting::RadiometricUnit::Radiance),
-                ShaderNode::PBR(pbr) => pbr.rendering_equation(
-                &intersection_point,
-                to_light,
-                &direction,
-                &surface_normal,
-                value.radiant_intensity(intersection_point)
-            ),
-                ShaderNode::Literal(spectra) => spectra.clone(),
-            };
-            // let radiance = closest_material
-
-            // let θ = (irradiance).acos().to_degrees();
-
-            // let mut brightness = θ; // [0 -> 180]
-            // brightness -= 90.;
-
-            // if brightness < 0. {
-            //     brightness = 0.;
-            // }
-            // brightness /= 90.;
-            // // 1 should map to 180° and 0 should be anything below 90°
-            // // brightness *= 3.;
-
-            // let mut brightness = radiance.from_λ(555.);
-            // let mut brightness = spectra_to_sRGB(&radiance);
-            // brightness *= 255.;
-
-            // r += brightness;
-            // g += brightness;
-            // b += brightness;
-
-            if radiance.total() > 0. {
-                output = output + radiance;
-            }
-        }
-        if scene.logging >= 2 {
-            // println!("{:?}", spectra_to_display(&output));
-        }
-        return output
-        // let r = r as u8;
-        // let g = g as u8;
-        // let b = b as u8;
-        // return Rgb([r, g, b]);
+        return Some((
+            closest_object.clone(),
+            intersection_point,
+            direction,
+            surface_normal,
+        ));
     } else {
-        // return Rgb([0, 0, 0]);
-        return scene.background.clone();
-        // return scene.background;
-    } // Rgb([x, y, y])
+        return None;
+    }
 }
-
 
 /// yeah, the math was hard for me too 2023-11-20
 pub fn pixel_to_ray(x: u32, y: u32, scene: &Scene) -> Ray {

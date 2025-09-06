@@ -9,7 +9,7 @@ use std::f32::consts::PI;
 pub enum ShaderNode {
     Void,
     PBR(PBR),
-    Literal(Spectra)
+    Literal(Spectra),
 }
 
 /// physical object in space with associated data
@@ -18,7 +18,7 @@ pub enum ShaderNode {
 #[derive(Clone, Debug, PartialEq)]
 pub struct PBR {
     metallic: f32,
-    roughness: f32
+    roughness: f32,
 }
 
 // pub trait PBR {
@@ -28,10 +28,10 @@ pub struct PBR {
 impl BRDF for PBR {
     fn rendering_equation(
         &self,
-        x: &Vector,                 // position vector of equation
-        ω_i: &Vector,               // vector to light
-        ω_o: &Vector,               // light exit path
-        normal: &Vector,            // surface normal
+        x: &Vector,                          // position vector of equation
+        ω_i: &Vector,                        // vector to light
+        ω_o: &Vector,                        // light exit path
+        normal: &Vector,                     // surface normal
         incoming_radiant_intensity: Spectra, // the radiant flux of the lightsource encoded as a spectrum
     ) -> Spectra {
         let r = ω_i.magnitude();
@@ -39,14 +39,16 @@ impl BRDF for PBR {
         let r_o = ω_o.magnitude();
         let incident_factor = lamberts_law(&ω_i, &normal); // cos(θ)
         let outgoing_incident_factor = lamberts_law(&ω_o, &normal); // cos(θ)
-        let surface_irradiance = (1./(r*r))*(incident_factor*incoming_radiant_intensity.clone());
+        let surface_irradiance =
+            (1. / (r * r)) * (incident_factor * incoming_radiant_intensity.clone());
 
         // irradiance over a hemisphere divided by outgoing incidence
-        let isotrophic_surface_radiance = (1./(2.*PI))/outgoing_incident_factor*surface_irradiance;
+        let isotrophic_surface_radiance =
+            (1. / (2. * PI)) / outgoing_incident_factor * surface_irradiance;
         // with that value we know exactly how bright our surface is in the viewing direction
         // now we need the distance to observer and sensor area to compute watts delivered
-        let observer_irradiance = ((1./(r_o*r_o))*isotrophic_surface_radiance).set_unit(RadiometricUnit::Irradiance);
-
+        let observer_irradiance = ((1. / (r_o * r_o)) * isotrophic_surface_radiance)
+            .set_unit(RadiometricUnit::Irradiance);
 
         let simple: Spectra = incident_factor * incoming_radiant_intensity;
         return simple;
@@ -56,8 +58,8 @@ impl BRDF for PBR {
 impl PBR {
     pub const fn new() -> PBR {
         PBR {
-            metallic:0.23,
-            roughness:0.23
+            metallic: 0.23,
+            roughness: 0.23,
         }
     }
 }
