@@ -3,10 +3,10 @@ use crate::{geometry::primitives::Vector, lighting::Spectra};
 // #[derive(Clone, Debug, PartialEq, Copy)]
 // pub struct Material {}
 
-pub fn lamberts_law(ω_i: &Vector, normal: &Vector) -> f32 {
-    let divisor: f32 = ω_i.magnitude() * normal.magnitude();
+pub fn lamberts_law(ω: &Vector, normal: &Vector) -> f32 {
+    let divisor: f32 = ω.magnitude() * normal.magnitude();
 
-    return ω_i.dot(normal) / divisor;
+    return ω.dot(normal) / divisor;
 }
 
 pub trait BRDF {

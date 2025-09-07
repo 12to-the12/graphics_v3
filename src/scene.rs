@@ -3,6 +3,7 @@ use crate::camera::{Camera, Lens, Sensor};
 use crate::geometry::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
 use crate::geometry::primitives::{vector, Mesh};
+use crate::material::{ShaderNode, PBR};
 use crate::object::{Object, OBJECT};
 // use crate::primitives::Object;
 use crate::lighting::{black_spectra, norm_black_body, point_light, LightType, Spectra};
@@ -70,19 +71,20 @@ pub fn simple_scene<'b>() -> Scene {
         // orientation: Polar
         lens,
         sensor,
+        exposure_time:20_000_000.,
         ..CAMERA
     };
     let mut lights = vec![];
 
-    let light = point_light(vector(-5.0, 0.0, -0.0), RIGHT, norm_black_body(2000.));
+    let light = point_light(vector(-5.0, 3.0, -5.0), RIGHT, norm_black_body(1500.));
     // let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, 1000*const_spectra(380.));
     // let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, monochroma_spectra(460.,5e-1));
     lights.push(LightType::PointLight(light));
 
-    let lightb = point_light(vector(5.0, -0.0, -0.0), RIGHT, norm_black_body(4000.));
+    let lightb = point_light(vector(5.0, 1.0, -5.0), RIGHT, norm_black_body(3000.));
     lights.push(LightType::PointLight(lightb));
 
-    let lightc = point_light(vector(0.0, 10.0, -10.0), RIGHT, norm_black_body(5000.));
+    let lightc = point_light(vector(-5.0, 5.0, -12.0), RIGHT, norm_black_body(6000.));
     lights.push(LightType::PointLight(lightc));
 
     let meshes = Vec::new();
@@ -114,15 +116,16 @@ pub fn simple_scene<'b>() -> Scene {
     // meshes.push(mesh);
 
     let object = Object {
-        position: vector(0., 0., -7.0),
+        position: vector(0., 0., -6.0),
         meshes: vec![mesh],
+        material: ShaderNode::PBR(PBR::new(1.0,0.0)),
         ..OBJECT
     };
     objects.push(object);
 
     let mesh: Mesh = load_wavefront_obj("models/plane.obj".to_string());
     let object = Object {
-        position: vector(0., -2., -5.0),
+        position: vector(0., -2., 0.0),
         meshes: vec![mesh],
         ..OBJECT
     };

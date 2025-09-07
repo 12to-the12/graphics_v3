@@ -241,17 +241,19 @@ pub fn shoot_ray(ray: Ray, scene: &Scene) -> Option<(Object, Vector, Vector, Vec
         direction.norm();
         direction = closest_dist * direction; // explicitly not a unit vector
         let mut intersection_point: Vector = (direction.clone()) + ray.position;
-
+        let to_camera = -1.*direction;
         // to prevent shader acne
         let mut offset = surface_normal.clone();
         offset.norm();
         offset = 1e-5 * offset;
         intersection_point = intersection_point + offset;
 
+        
+
         return Some((
             closest_object.clone(),
             intersection_point,
-            direction,
+            to_camera,
             surface_normal,
         ));
     } else {

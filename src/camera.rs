@@ -149,7 +149,7 @@ pub const CAMERA: Camera = Camera {
     sensor: SENSOR,
     _near_clipping_plane: 1e-1,
     _far_clipping_plane: 1e6,
-    exposure_time: 1_000.,
+    exposure_time: 1.,
 };
 
 #[cfg(test)]

@@ -17,8 +17,8 @@ pub enum ShaderNode {
 // any function that takes in all the necessary data and returns a light value is a shader
 #[derive(Clone, Debug, PartialEq)]
 pub struct PBR {
-    metallic: f32,
-    roughness: f32,
+    pub metallic: f32,
+    pub roughness: f32,
 }
 
 // pub trait PBR {
@@ -41,25 +41,24 @@ impl BRDF for PBR {
         let outgoing_incident_factor = lamberts_law(&ω_o, &normal); // cos(θ)
         let surface_irradiance =
             (1. / (r * r)) * (incident_factor * incoming_radiant_intensity.clone());
-
         // irradiance over a hemisphere divided by outgoing incidence
         let isotrophic_surface_radiance =
             (1. / (2. * PI)) / outgoing_incident_factor * surface_irradiance;
         // with that value we know exactly how bright our surface is in the viewing direction
         // now we need the distance to observer and sensor area to compute watts delivered
-        let observer_irradiance = ((1. / (r_o * r_o)) * isotrophic_surface_radiance)
-            .set_unit(RadiometricUnit::Irradiance);
 
-        let simple: Spectra = incident_factor * incoming_radiant_intensity;
-        return simple;
+        let observer_irradiance: Spectra = ((1. / (r_o * r_o)) * isotrophic_surface_radiance)
+            .set_unit(RadiometricUnit::Irradiance);
+        return observer_irradiance;
+        // let simple: Spectra = incident_factor * incoming_radiant_intensity;
     }
 }
 
 impl PBR {
-    pub const fn new() -> PBR {
+    pub const fn new(metallic:f32,roughness:f32) -> PBR {
         PBR {
-            metallic: 0.23,
-            roughness: 0.23,
+            metallic,
+            roughness,
         }
     }
 }

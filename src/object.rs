@@ -44,7 +44,7 @@ pub const OBJECT: Object = Object {
     _orientation: _UP,
     _scale: 1.,
     _children: Vec::new(),
-    material: ShaderNode::PBR(PBR::new()),
+    material: ShaderNode::PBR(PBR::new(0.0,1.0)),
     meshes: Vec::new(),
 };
 
