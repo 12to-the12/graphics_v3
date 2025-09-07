@@ -139,8 +139,8 @@ fn apply_transforms(scene: &mut Scene) {
             // for mesh in scene.meshes.iter_mut() {
             let to_world_space = build_translation_transform(object.position.clone());
             mesh.add_transform(to_world_space);
-            let to_camera_space = build_camera_space_transform(&scene.camera);
-            mesh.add_transform(to_camera_space);
+            // let to_camera_space = build_camera_space_transform(&scene.camera);
+            // mesh.add_transform(to_camera_space);
 
             mesh.apply_transformations();
         }

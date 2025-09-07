@@ -8,7 +8,7 @@ use crate::{
 };
 
 /// physical object in space with associated data
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Object {
     pub position: Vector,
     pub _orientation: Orientation,

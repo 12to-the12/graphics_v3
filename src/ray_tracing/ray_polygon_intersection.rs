@@ -17,7 +17,7 @@ pub fn _ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> bool {
 /// returns whether it intersects, the ray, and the distance
 #[allow(non_snake_case)]
 pub fn probe_ray_polygon_intersection(ray: &Ray, polygon: &Polygon) -> (bool, Vector, f32) {
-    // println!("{:?}\n\n\n",polygon);
+
     // first, if the ray is parallel to the plane the polygon lies in, they do not intersect
     // you can also discard backfacing normals
 
@@ -137,9 +137,11 @@ fn project_vector(a: &Vector, b: &Vector) -> Vector {
 
 #[allow(non_snake_case)]
 fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Option<(Vector, f32)> {
-    let ray = &ray.direction;
+    let ray_origin = &ray.position;
+    let ray: &Vector = &ray.direction;
+
     // ray_origin = np.array([0, 0, 0])
-    let ray_origin = vector(0., 0., 0.);
+    // let ray_origin = vector(0., 0., 0.);
     // N = normal_of_polygon(points)
     let N = polygon.get_normal();
 
@@ -164,6 +166,8 @@ fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Option<(Vector, f32)>
     //     # print('the plane normal and ray are at right angles, no intersection is possible')
     //     return np.array([0., 0., 0.])
     // C = points[0]  # any point that lies on the shared plane
+
+    // C is defined as a point that lies on the plane
     let C: Vector = polygon.a.as_vector();
     // V = ray
     let V = &ray;
@@ -176,7 +180,7 @@ fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Option<(Vector, f32)>
     // # if the ray is a unit vector it is the distance from ray_origin to the intersection
 
     // I = ray_origin + k * V
-    let I = V.times(k);
+    let I = *ray_origin + V.times(k);
     // # print(f'k: {k}')
     // if k < 0:
     //     return np.array([0., 0., 0.])  # ray is facing away from plaen
@@ -197,6 +201,13 @@ fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Option<(Vector, f32)>
 
 #[cfg(test)]
 mod tests {
+    use crate::{
+        geometry::{
+            orientation::_UP,
+            primitives::{polygon, ray, vector, vertex, Polygon, Ray},
+        },
+        ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection,
+    };
 
     /// useful table: https://www.nikonians.org/reviews/fov-tables
     #[test]
@@ -207,5 +218,44 @@ mod tests {
 
         // polygon(a, b, c)
         assert_eq!(1, 1); //
+    }
+
+    #[test]
+    fn ray_polygon_test_simple_polygon() {
+        let polygon = polygon(
+            vertex(2.0, 0.0, -2.0),
+            vertex(0.0, 2.0, -2.0),
+            vertex(0.0, 0.0, -2.0),
+        );
+        let ray = ray(vector(1.0, 1.0, 0.), vector(0., 0.0, -1.0));
+        println!("{:?}", polygon.get_normal());
+        println!("{:?}", probe_ray_polygon_intersection(&ray, &polygon));
+        assert!(probe_ray_polygon_intersection(&ray, &polygon).0);
+    }
+    #[test]
+    fn ray_polygon_another_polygon() {
+        let polygon = polygon(
+            vertex(-4.0, -1.0, -0.0),
+            vertex(-4.0, 1.0, -2.0),
+            vertex(-4.0, 1.0, -0.0),
+        );
+        let ray = ray(vector(0.0, 0.5, -1.), vector(-50., 0.0, 0.0));
+        println!("{:?}", polygon.get_normal());
+        println!("{:?}", probe_ray_polygon_intersection(&ray, &polygon));
+        assert!(probe_ray_polygon_intersection(&ray, &polygon).0);
+    }
+    #[test]
+    fn ray_polygon_test_polygon() {
+        let polygon = polygon(
+            vertex(-1.0, -1.0, -1.0),
+            vertex(-1.0, 1.0, -3.0),
+            vertex(-1.0, 1.0, -1.0),
+        );
+        let ray = ray(vector(0.0, 0.5, -2.), vector(-50., 0.0, 0.0));
+        println!("ray position: {:?}", ray.position);
+        println!("ray direction: {:?}", ray.direction);
+        println!("normal: {:?}", polygon.get_normal());
+        println!("intersection result: {:?}", probe_ray_polygon_intersection(&ray, &polygon));
+        assert!(probe_ray_polygon_intersection(&ray, &polygon).0);
     }
 }

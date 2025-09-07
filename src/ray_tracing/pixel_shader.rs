@@ -1,6 +1,8 @@
 use crate::color::colorspace_conversion::spectra_to_display;
 use crate::geometry::primitives::{polygon, ray, vector, Ray, Vector};
-use crate::lighting::{black_spectra, Light, LightType, RadiometricUnit, Spectra};
+use crate::lighting::{
+    black_spectra, monochroma_spectra, Light, LightType, RadiometricUnit, Spectra,
+};
 use crate::material::{ShaderNode, PBR};
 use crate::object::{Object, OBJECT};
 use crate::ray_tracing::ray_polygon_intersection::{
@@ -134,10 +136,10 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
         None => black_spectra(RadiometricUnit::Flux),
         Some((object, x, ω_o, normal)) => {
             let output = compute_light(scene, object, x, ω_o, normal);
-            let flux = (scene.camera.sensor._pixel_area() * output).set_unit(RadiometricUnit::Flux);
-            scene.camera.exposure_time * flux
+            scene.camera.exposure_time * scene.camera.sensor._pixel_area() * output
         }
     };
+
     return spectra_to_display(&output);
 }
 
@@ -149,17 +151,38 @@ pub fn compute_light(
     normal: Vector,
 ) -> Spectra {
     let mut output = black_spectra(RadiometricUnit::Flux);
-    for light in scene.lights.clone() {
+    'lights: for light in scene.lights.clone() {
         // our job here is to find the amount of energy transmitted to the pixel from the light
-        let value = match light {
-            LightType::PointLight(value) => value,
+        let light = match light {
+            LightType::PointLight(light) => light,
         };
-        let to_light = &intersection_point.clone().to(value.position);
+        let to_light = &intersection_point.clone().to(light.position);
+
+        let occlusion_ray = ray(intersection_point, to_light.clone());
+        // if (occlusion_ray.position.x < 3.) {
+        //     println!("{:?}", occlusion_ray);
+        // }
+
+        for objects in scene.objects.iter() {
+            if objects.ray_intercept(&occlusion_ray) {
+                let occlusion = shoot_ray(occlusion_ray.clone(), &scene);
+                if occlusion.is_some() {
+                    // continue
+                    output = output +  black_spectra(RadiometricUnit::Flux);
+                    continue 'lights
+                    // return monochroma_spectra(700., 100., RadiometricUnit::Flux);
+                }
+                // else{
+                //     println!("{:?}",occlusion_ray);
+                // }
+            }
+        }
 
         let _distance_to_surface: f32 = direction.magnitude();
 
         // if the angle between the surface and light is obtuse, it's facing away
         if to_light.dot(&normal) < 0. {
+            // return monochroma_spectra(550., 1., RadiometricUnit::Flux)
             continue;
         }
 
@@ -171,26 +194,25 @@ pub fn compute_light(
                 to_light,
                 &direction,
                 &normal,
-                value.radiant_intensity(intersection_point),
+                light.radiant_intensity(intersection_point),
             ),
             ShaderNode::Literal(spectra) => spectra.clone(),
         };
 
-        if radiance.total() > 0. {
-            output = output + radiance;
-        }
+        output = output + radiance;
     }
     output
 }
 
 pub fn shoot_ray(ray: Ray, scene: &Scene) -> Option<(Object, Vector, Vector, Vector)> {
     let mut hit = false;
-    let mut closest: f32 = 1e6;
+    let mut closest_dist: f32 = 1e6;
     let mut closest_object: &Object = &OBJECT;
     let mut surface_normal: Vector;
     surface_normal = vector(1., 1., 1.);
     // here we're at once per pixel
     for object in &scene.objects {
+        
         // this is once per object
         if scene.spatial_acceleration_structures && !object.ray_intercept(&ray) {
             continue;
@@ -203,9 +225,9 @@ pub fn shoot_ray(ray: Ray, scene: &Scene) -> Option<(Object, Vector, Vector, Vec
                 let c = mesh.output_vertices[poly[2]].clone();
                 let polygon = polygon(a, b, c);
                 let (b, _i, dist) = probe_ray_polygon_intersection(&ray, &polygon);
-                if b && dist < closest {
+                if b && dist < closest_dist {
                     closest_object = object;
-                    closest = dist;
+                    closest_dist = dist;
                     hit = true;
                     surface_normal = polygon.get_normal();
                     if surface_normal.dot(&ray.direction) > 0. {
@@ -222,8 +244,14 @@ pub fn shoot_ray(ray: Ray, scene: &Scene) -> Option<(Object, Vector, Vector, Vec
     if hit {
         let mut direction: Vector = ray.direction.clone();
         direction.norm();
-        direction = closest * direction; // explicitly not a unit vector
-        let intersection_point: Vector = (direction.clone()) + ray.position;
+        direction = closest_dist * direction; // explicitly not a unit vector
+        let mut intersection_point: Vector = (direction.clone()) + ray.position;
+
+        // to prevent shader acne
+        let mut offset = surface_normal.clone();
+        offset.norm();
+        offset = 1e-5 * offset;
+        intersection_point = intersection_point + offset;
 
         return Some((
             closest_object.clone(),

@@ -24,3 +24,8 @@ The material class needs to encapsulate any sort of material response, from perf
 another task:
 how do we track watts that land on our image sensor?
 with an isotrophic light source directly shining into it, we can estimate the solid angle of the photosite with respect to the source to integrate away the steridians, but what about a bounce?
+
+
+The polygons are in camera space!
+That's why they're double offset!
+And also why the functions are broken if not used from the same angle
