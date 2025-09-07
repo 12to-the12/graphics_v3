@@ -2,8 +2,7 @@ use std::ops::IndexMut;
 
 use crate::geometry::primitives::vector;
 use crate::geometry::transformations::{
-    build_arbitrary_rotation_transform, build_translation_transform, build_y_rotation_transform,
-    build_z_rotation_transform,
+    build_arbitrary_rotation_transform, build_y_rotation_transform,
 };
 use crate::object::Object;
 use crate::scene::Scene;

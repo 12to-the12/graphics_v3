@@ -17,7 +17,6 @@ pub fn _ray_polygon_intersection_test(ray: &Ray, polygon: &Polygon) -> bool {
 /// returns whether it intersects, the ray, and the distance
 #[allow(non_snake_case)]
 pub fn probe_ray_polygon_intersection(ray: &Ray, polygon: &Polygon) -> (bool, Vector, f32) {
-
     // first, if the ray is parallel to the plane the polygon lies in, they do not intersect
     // you can also discard backfacing normals
 
@@ -255,7 +254,10 @@ mod tests {
         println!("ray position: {:?}", ray.position);
         println!("ray direction: {:?}", ray.direction);
         println!("normal: {:?}", polygon.get_normal());
-        println!("intersection result: {:?}", probe_ray_polygon_intersection(&ray, &polygon));
+        println!(
+            "intersection result: {:?}",
+            probe_ray_polygon_intersection(&ray, &polygon)
+        );
         assert!(probe_ray_polygon_intersection(&ray, &polygon).0);
     }
 }

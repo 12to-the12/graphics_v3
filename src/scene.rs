@@ -2,12 +2,11 @@ use crate::camera::CAMERA;
 use crate::camera::{Camera, Lens, Sensor};
 use crate::geometry::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
-use crate::geometry::primitives::{sample_mesh, vector, vertex, Mesh};
+use crate::geometry::primitives::{vector, Mesh};
 use crate::object::{Object, OBJECT};
 // use crate::primitives::Object;
-use crate::lighting::{black_spectra, norm_black_body, point_light, LightType, PointLight, Spectra};
+use crate::lighting::{black_spectra, norm_black_body, point_light, LightType, Spectra};
 use crate::load_object_file::load_wavefront_obj;
-use image::Rgb;
 
 #[derive(Clone)]
 pub enum ShaderMode {

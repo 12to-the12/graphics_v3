@@ -1,9 +1,4 @@
-use std::f32::consts::PI;
-
-use crate::{
-    geometry::primitives::Vector,
-    lighting::{black_spectra, const_spectra, RadiometricUnit, Spectra},
-};
+use crate::{geometry::primitives::Vector, lighting::Spectra};
 
 // #[derive(Clone, Debug, PartialEq, Copy)]
 // pub struct Material {}

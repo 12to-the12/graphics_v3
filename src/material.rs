@@ -1,6 +1,6 @@
 use crate::{
     geometry::primitives::Vector,
-    lighting::{black_spectra, const_spectra, monochroma_spectra, RadiometricUnit, Spectra},
+    lighting::{RadiometricUnit, Spectra},
     ray_tracing::rendering_equation::{lamberts_law, BRDF},
 };
 use std::f32::consts::PI;
@@ -9,7 +9,7 @@ use std::f32::consts::PI;
 pub enum ShaderNode {
     Void,
     PBR(PBR),
-    Literal(Spectra),
+    _Literal(Spectra),
 }
 
 /// physical object in space with associated data

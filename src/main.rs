@@ -19,10 +19,8 @@ mod ray_tracing;
 extern crate approx;
 extern crate stopwatch;
 
-use color::colorspace_conversion::{spectra_to_CIEXYZ, spectra_to_sRGB, CIEXYZ_to_xyY};
 use color::draw_chromaticity_diagram::coloring_book;
 use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
-use lighting::monochroma_spectra;
 use std::{thread, time::Duration};
 use stopwatch::Stopwatch;
 

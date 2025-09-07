@@ -3,8 +3,8 @@ use crate::{
         orientation::{Orientation, _UP},
         primitives::{Mesh, Ray, Vector, ORIGIN},
     },
-    material::{PBR,ShaderNode},
-    ray_tracing::ray_sphere_intersection::ray_sphere_intersection, scene::ShaderMode,
+    material::{ShaderNode, PBR},
+    ray_tracing::ray_sphere_intersection::ray_sphere_intersection,
 };
 
 /// physical object in space with associated data

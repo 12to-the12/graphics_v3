@@ -1,11 +1,10 @@
-use std::ops::Add;
-
 // use image::{ImageBuffer, Rgb, RgbImage};
 use image::{Rgb, RgbImage};
 use ndarray::Array1;
 
 use crate::{
-    geometry::transformations::{compile_transforms, Transform}, material::ShaderNode,
+    geometry::transformations::{compile_transforms, Transform},
+    material::ShaderNode,
 };
 // use crate::ray_tracing::rendering_equation::BRDF;
 

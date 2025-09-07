@@ -3,10 +3,7 @@ use std::f32::consts::{E, PI};
 const _π: f32 = PI;
 use crate::{
     color::luminous_efficiency::luminous_efficacy,
-    geometry::{
-        orientation::Orientation,
-        primitives::{Vector, Vertex},
-    },
+    geometry::{orientation::Orientation, primitives::Vector},
 };
 extern crate ndarray;
 use ndarray::prelude::*;
@@ -76,9 +73,9 @@ pub struct Spectra {
 }
 
 impl Spectra {
-    pub fn set_unit(mut self,unit:RadiometricUnit) -> Spectra{
+    pub fn set_unit(mut self, unit: RadiometricUnit) -> Spectra {
         self.unit = unit;
-        return self
+        return self;
     }
 }
 impl std::ops::Mul<Spectra> for f32 {

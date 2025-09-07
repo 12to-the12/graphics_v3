@@ -1,15 +1,11 @@
 use crate::color::colorspace_conversion::spectra_to_display;
 use crate::geometry::primitives::{polygon, ray, vector, Ray, Vector};
-use crate::lighting::{
-    black_spectra, monochroma_spectra, Light, LightType, RadiometricUnit, Spectra,
-};
-use crate::material::{ShaderNode, PBR};
+use crate::lighting::{black_spectra, Light, LightType, RadiometricUnit, Spectra};
+use crate::material::ShaderNode;
 use crate::object::{Object, OBJECT};
-use crate::ray_tracing::ray_polygon_intersection::{
-    _ray_polygon_intersection_test, probe_ray_polygon_intersection,
-};
+use crate::ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection;
 
-use crate::ray_tracing::rendering_equation::{lamberts_law, BRDF};
+use crate::ray_tracing::rendering_equation::BRDF;
 use crate::scene::Scene;
 use image::{Rgb, RgbImage};
 use stopwatch::Stopwatch;
@@ -168,8 +164,8 @@ pub fn compute_light(
                 let occlusion = shoot_ray(occlusion_ray.clone(), &scene);
                 if occlusion.is_some() {
                     // continue
-                    output = output +  black_spectra(RadiometricUnit::Flux);
-                    continue 'lights
+                    output = output + black_spectra(RadiometricUnit::Flux);
+                    continue 'lights;
                     // return monochroma_spectra(700., 100., RadiometricUnit::Flux);
                 }
                 // else{
@@ -196,7 +192,7 @@ pub fn compute_light(
                 &normal,
                 light.radiant_intensity(intersection_point),
             ),
-            ShaderNode::Literal(spectra) => spectra.clone(),
+            ShaderNode::_Literal(spectra) => spectra.clone(),
         };
 
         output = output + radiance;
@@ -212,7 +208,6 @@ pub fn shoot_ray(ray: Ray, scene: &Scene) -> Option<(Object, Vector, Vector, Vec
     surface_normal = vector(1., 1., 1.);
     // here we're at once per pixel
     for object in &scene.objects {
-        
         // this is once per object
         if scene.spatial_acceleration_structures && !object.ray_intercept(&ray) {
             continue;

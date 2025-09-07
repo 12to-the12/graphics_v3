@@ -14,7 +14,7 @@ use crate::geometry::transformations::{
 use crate::rasterization::line_plotting::plot_triangle;
 use crate::rasterization::rasterization::rasterize_triangle;
 use crate::ray_tracing::pixel_shader::{_solid_shader, bvh_shader, lit_shader, shade_pixels};
-use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
+use image::{ImageBuffer, Rgb, RgbImage};
 use stopwatch::Stopwatch;
 
 /// transforms from world space to camera space

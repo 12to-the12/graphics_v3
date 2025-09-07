@@ -1,7 +1,7 @@
 #![allow(nonstandard_style)]
 // use crate::coordinate_space::Orientation;
 use crate::geometry::primitives::Vector;
-use approx::assert_relative_eq;
+
 #[derive(Clone)]
 pub struct Camera {
     pub position: Vector,
@@ -156,7 +156,7 @@ pub const CAMERA: Camera = Camera {
 mod tests {
     use std::f32::consts::PI;
 
-    use approx::relative_eq;
+    use approx::assert_relative_eq;
 
     use crate::geometry::primitives::vector;
 
