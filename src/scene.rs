@@ -63,7 +63,7 @@ pub fn simple_scene<'b>() -> Scene {
         width: 36.0, // 36 mm
         // height: 24.0,
         horizontal_res: 420,
-        vertical_res: 360,
+        vertical_res: 320,
     };
     let camera = Camera {
         position: vector(0.0, 0.0, 10.0),
@@ -72,13 +72,19 @@ pub fn simple_scene<'b>() -> Scene {
         sensor,
         ..CAMERA
     };
-    let light = point_light(vector(-10.0, 10.0, -5.0), RIGHT, norm_black_body(2000.));
+    let mut lights = vec![];
+
+    let light = point_light(vector(-5.0, 0.0, -0.0), RIGHT, norm_black_body(2000.));
     // let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, 1000*const_spectra(380.));
     // let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, monochroma_spectra(460.,5e-1));
+    lights.push(LightType::PointLight(light));
 
-    let lightb = point_light(vector(10.0, -10.0, -5.0), RIGHT, norm_black_body(4000.));
-    // println!("{:?}",light.radiant_flux.from_λ(700.));
-    let lights = vec![LightType::PointLight(light), LightType::PointLight(lightb)];
+    let lightb = point_light(vector(5.0, -0.0, -0.0), RIGHT, norm_black_body(4000.));
+    lights.push(LightType::PointLight(lightb));
+
+    let lightc = point_light(vector(0.0, 10.0, -10.0), RIGHT, norm_black_body(5000.));
+    lights.push(LightType::PointLight(lightc));
+
     let meshes = Vec::new();
     let mut objects = Vec::new();
     // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
@@ -102,13 +108,21 @@ pub fn simple_scene<'b>() -> Scene {
     };
     objects.push(object);
 
-    let mesh = load_wavefront_obj("models/sphere.obj".to_string());
+    let mesh: Mesh = load_wavefront_obj("models/sphere.obj".to_string());
     // let mesh = sample_mesh();
     // mesh.position = vector(3.0, 0.0, -10.0);
     // meshes.push(mesh);
 
     let object = Object {
-        position: vector(0., 0., -10.0),
+        position: vector(0., 0., -7.0),
+        meshes: vec![mesh],
+        ..OBJECT
+    };
+    objects.push(object);
+
+    let mesh: Mesh = load_wavefront_obj("models/plane.obj".to_string());
+    let object = Object {
+        position: vector(0., -2., -5.0),
         meshes: vec![mesh],
         ..OBJECT
     };
@@ -127,7 +141,7 @@ pub fn simple_scene<'b>() -> Scene {
         logging: 0,
         objects,
         spatial_acceleration_structures: true,
-        threads: 64,
+        threads: 60,
     };
     return scene;
 }
