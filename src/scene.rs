@@ -15,7 +15,7 @@ pub enum ShaderMode {
     Lit,
 }
 
-#[derive(Clone)]
+#[derive(Clone,PartialEq)]
 pub enum Rendermode {
     _RayTrace,
     ThreadedRayTrace,
