@@ -135,7 +135,7 @@ pub fn black_spectra(unit: RadiometricUnit) -> Spectra {
     }
 }
 
-pub fn const_spectra(value: f32, unit: RadiometricUnit) -> Spectra {
+pub fn _const_spectra(value: f32, unit: RadiometricUnit) -> Spectra {
     Spectra {
         spectra: Array::from_elem(40, value),
         unit: unit,

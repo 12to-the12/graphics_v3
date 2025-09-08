@@ -94,7 +94,7 @@ pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
                 let b = mesh.output_vertices[poly[1]].clone();
                 let c = mesh.output_vertices[poly[2]].clone();
                 let polygon = polygon(a, b, c);
-                let (b, _i, dist) = probe_ray_polygon_intersection(&ray, &polygon);
+                let (b, _i, _dist) = probe_ray_polygon_intersection(&ray, &polygon);
                 if b {
                     hit = true;
                     break;

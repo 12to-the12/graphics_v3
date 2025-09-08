@@ -28,7 +28,7 @@ pub struct PBR {
 impl BRDF for PBR {
     fn rendering_equation(
         &self,
-        x: &Vector,                          // position vector of equation
+        _x: &Vector,                          // position vector of equation
         ω_i: &Vector,                        // vector to light
         ω_o: &Vector,                        // light exit path
         normal: &Vector,                     // surface normal

@@ -46,7 +46,7 @@ pub fn check_debug() {
     println!("Debugging disabled");
 }
 
-fn render_animation() {
+fn _render_animation() {
     for counter in 0..100 {
         let mut frame = Stopwatch::start_new();
 

@@ -334,7 +334,7 @@ pub fn _unit_cube() -> Mesh {
     return mesh;
 }
 
-pub fn sample_mesh() -> Mesh {
+pub fn _sample_mesh() -> Mesh {
     let a: Vertex = vertex(0., 0., 0.); //0  left down bottom from above
     let b: Vertex = vertex(1., 0., 0.); //1 right down bottom from above
     let c: Vertex = vertex(0., 1., 0.); //2  left   up bottom from above

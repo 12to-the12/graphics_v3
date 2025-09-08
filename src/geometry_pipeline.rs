@@ -79,7 +79,7 @@ fn vertex_shader(scene: &mut Scene) {
 
 fn _wire_frame(canvas: &mut RgbImage, scene: Scene) {
     let color = Rgb([0, 255, 0]);
-    for mut mesh in scene.meshes {
+    for mut mesh in scene._meshes {
         mesh.apply_transformations();
         for poly in mesh.polygons {
             let a = &mesh.output_vertices[poly[0]]; // currently vertexes;
@@ -153,8 +153,8 @@ fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     apply_transforms(&mut scene);
     let shadermode = match scene.shadermode {
         ShaderMode::Lit => lit_shader,
-        ShaderMode::BVH => bvh_shader,
-        ShaderMode::Solid => _solid_shader,
+        ShaderMode::_BVH => bvh_shader,
+        ShaderMode::_Solid => _solid_shader,
     };
 
     shade_pixels(
@@ -177,8 +177,8 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     let mut canvases: Vec<RgbImage> = Vec::new();
     let shadermode = match scene.shadermode {
         ShaderMode::Lit => lit_shader,
-        ShaderMode::BVH => bvh_shader,
-        ShaderMode::Solid => _solid_shader,
+        ShaderMode::_BVH => bvh_shader,
+        ShaderMode::_Solid => _solid_shader,
     };
 
     let width = scene.camera.sensor.horizontal_res / scene.threads;

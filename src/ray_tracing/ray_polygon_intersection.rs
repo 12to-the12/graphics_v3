@@ -202,8 +202,7 @@ fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Option<(Vector, f32)>
 mod tests {
     use crate::{
         geometry::{
-            orientation::_UP,
-            primitives::{polygon, ray, vector, vertex, Polygon, Ray},
+            primitives::{polygon, ray, vector, vertex},
         },
         ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection,
     };

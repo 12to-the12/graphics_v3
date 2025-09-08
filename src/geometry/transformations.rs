@@ -95,7 +95,7 @@ pub fn build_y_rotation_transform(θ: f32) -> Transform {
     ]);
     Transform { matrix }
 }
-pub fn build_z_rotation_transform(θ: f32) -> Transform {
+pub fn _build_z_rotation_transform(θ: f32) -> Transform {
     let matrix = arr2(&[
         [cos(θ), -sin(θ), 0.0, 0.0],
         [sin(θ), cos(θ), 0.0, 0.0],
@@ -294,7 +294,7 @@ mod tests {
     }
     #[test]
     fn verify_z_rotation_implementation() {
-        let transform = build_z_rotation_transform(90f32.to_radians());
+        let transform = _build_z_rotation_transform(90f32.to_radians());
         let myvertex = arr1(&[1.0, 2.0, 3.0, 1.0]);
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();

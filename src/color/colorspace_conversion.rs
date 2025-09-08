@@ -17,10 +17,10 @@ pub fn _black_body_xyY(temp: f32) -> (f32, f32, f32) {
 }
 
 pub fn _black_body_sRGB(temp: f32) -> (f32, f32, f32) {
-    spectra_to_sRGB(&norm_black_body(temp))
+    _spectra_to_sRGB(&norm_black_body(temp))
 }
 
-pub fn spectra_to_sRGB(spectra: &Spectra) -> (f32, f32, f32) {
+pub fn _spectra_to_sRGB(spectra: &Spectra) -> (f32, f32, f32) {
     let XYZ = spectra_to_CIEXYZ(spectra);
     let xyY = CIEXYZ_to_xyY(XYZ);
     let sRGB = xyY_to_sRGB(xyY);

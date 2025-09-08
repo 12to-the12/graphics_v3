@@ -11,8 +11,8 @@ use crate::load_object_file::load_wavefront_obj;
 
 #[derive(Clone)]
 pub enum ShaderMode {
-    BVH,
-    Solid,
+    _BVH,
+    _Solid,
     Lit,
 }
 
@@ -38,7 +38,7 @@ pub struct Scene {
     pub camera: Camera,
     pub lights: Vec<LightType>,
     pub objects: Vec<Object>,
-    pub meshes: Vec<Mesh>,
+    pub _meshes: Vec<Mesh>,
     // pub unified_mesh: Vec<Polygon<'a>>,
     // pub unified_vertices: Vec<Vertex>, // pub materials: Vec<Material>,
     // pub image_assets: Vec<Image>,
@@ -136,7 +136,7 @@ pub fn simple_scene<'b>() -> Scene {
     let scene = Scene {
         camera,
         lights,
-        meshes,
+        _meshes: meshes,
         background,
         tick: 0,
         rendermode: Rendermode::ThreadedRayTrace,
