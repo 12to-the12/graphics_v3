@@ -2,7 +2,7 @@ use crate::color::colorspace_conversion::spectra_to_display;
 use crate::geometry::primitives::{polygon, ray, vector, Ray, Vector};
 use crate::lighting::{black_spectra, Light, LightType, RadiometricUnit, Spectra};
 use crate::material::ShaderNode;
-use crate::object::{Object, OBJECT};
+use crate::object::Object;
 use crate::ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection;
 
 use crate::ray_tracing::rendering_equation::BRDF;
@@ -182,18 +182,26 @@ pub fn compute_light(
             continue;
         }
 
-        let closest_material: &ShaderNode = &closest_object.material;
-        let radiance: Spectra = match closest_material {
-            ShaderNode::Void => black_spectra(crate::lighting::RadiometricUnit::Radiance),
-            ShaderNode::PBR(pbr) => pbr.rendering_equation(
-                &intersection_point,
-                to_light,
-                &direction,
-                &normal,
-                light.radiant_intensity(intersection_point),
-            ),
-            ShaderNode::_Literal(spectra) => spectra.clone(),
-        };
+        let radiance = closest_object.material.rendering_equation(
+            &intersection_point,
+            to_light,
+            &direction,
+            &normal,
+            light.radiant_intensity(intersection_point),
+        );
+
+        // let closest_material: &ShaderNode = &closest_object.material;
+        // let radiance: Spectra = match closest_material {
+        //     ShaderNode::Void => black_spectra(crate::lighting::RadiometricUnit::Radiance),
+        //     ShaderNode::PBR(pbr) => pbr.rendering_equation(
+        //         &intersection_point,
+        //         to_light,
+        //         &direction,
+        //         &normal,
+        //         light.radiant_intensity(intersection_point),
+        //     ),
+        //     ShaderNode::_Literal(spectra) => spectra.clone(),
+        // };
 
         output = output + radiance;
     }
@@ -203,7 +211,7 @@ pub fn compute_light(
 pub fn shoot_ray(ray: Ray, scene: &Scene) -> Option<(Object, Vector, Vector, Vector)> {
     let mut hit = false;
     let mut closest_dist: f32 = 1e6;
-    let mut closest_object: &Object = &OBJECT;
+    let mut closest_object: &Object = &Object::default();
     let mut surface_normal: Vector;
     surface_normal = vector(1., 1., 1.);
     // here we're at once per pixel
@@ -241,14 +249,12 @@ pub fn shoot_ray(ray: Ray, scene: &Scene) -> Option<(Object, Vector, Vector, Vec
         direction.norm();
         direction = closest_dist * direction; // explicitly not a unit vector
         let mut intersection_point: Vector = (direction.clone()) + ray.position;
-        let to_camera = -1.*direction;
+        let to_camera = -1. * direction;
         // to prevent shader acne
         let mut offset = surface_normal.clone();
         offset.norm();
         offset = 1e-5 * offset;
         intersection_point = intersection_point + offset;
-
-        
 
         return Some((
             closest_object.clone(),

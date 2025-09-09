@@ -1,20 +1,22 @@
+use std::sync::Arc;
+
 use crate::{
     geometry::{
         orientation::{Orientation, _UP},
         primitives::{Mesh, Ray, Vector, ORIGIN},
     },
-    material::{ShaderNode, PBR},
-    ray_tracing::ray_sphere_intersection::ray_sphere_intersection,
+    material::PBR,
+    ray_tracing::{ray_sphere_intersection::ray_sphere_intersection, rendering_equation::BRDF},
 };
 
 /// physical object in space with associated data
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 pub struct Object {
     pub position: Vector,
     pub _orientation: Orientation,
     pub _scale: f32,
     pub _children: Vec<Object>,
-    pub material: ShaderNode,
+    pub material: Arc<dyn BRDF>,
     pub meshes: Vec<Mesh>,
     // & links to textures associated with it
 }
@@ -38,15 +40,18 @@ impl Object {
     }
 }
 
-/// the defaults
-pub const OBJECT: Object = Object {
-    position: ORIGIN,
-    _orientation: _UP,
-    _scale: 1.,
-    _children: Vec::new(),
-    material: ShaderNode::PBR(PBR::new(0.0,1.0)),
-    meshes: Vec::new(),
-};
+impl Default for Object {
+    fn default() -> Object {
+        Object {
+            position: ORIGIN,
+            _orientation: _UP,
+            _scale: 1.,
+            _children: Vec::new(),
+            material: Arc::new(PBR::new(0.0, 1.0)),
+            meshes: Vec::new(),
+        }
+    }
+}
 
 // struct MeshPool {
 //     meshes: Vec
@@ -56,7 +61,7 @@ pub const OBJECT: Object = Object {
 mod tests {
     use crate::geometry::primitives::_unit_cube;
 
-    use super::{Object, OBJECT};
+    use super::Object;
 
     /// useful table: https://www.nikonians.org/reviews/fov-tables
     #[test]
@@ -64,7 +69,7 @@ mod tests {
         let mymesh = _unit_cube();
         let myobject: Object = Object {
             meshes: vec![mymesh],
-            ..OBJECT
+            ..Object::default()
         };
         assert_eq!(myobject.get_radius(), f32::sqrt(3.));
     }

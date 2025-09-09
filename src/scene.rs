@@ -1,10 +1,12 @@
+use std::sync::Arc;
+
 use crate::camera::CAMERA;
 use crate::camera::{Camera, Lens, Sensor};
 use crate::geometry::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
 use crate::geometry::primitives::{vector, Mesh};
-use crate::material::{ShaderNode, PBR};
-use crate::object::{Object, OBJECT};
+use crate::material::PBR;
+use crate::object::Object;
 // use crate::primitives::Object;
 use crate::lighting::{black_spectra, norm_black_body, point_light, LightType, Spectra};
 use crate::load_object_file::load_wavefront_obj;
@@ -16,7 +18,7 @@ pub enum ShaderMode {
     Lit,
 }
 
-#[derive(Clone,PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum Rendermode {
     _RayTrace,
     ThreadedRayTrace,
@@ -33,7 +35,7 @@ pub enum Rendermode {
 ///
 /// I have settled on unified
 /// To implement a unified mesh, references need to stay valid
-#[derive(Clone)]
+// #[derive(Clone)]
 pub struct Scene {
     pub camera: Camera,
     pub lights: Vec<LightType>,
@@ -71,7 +73,7 @@ pub fn simple_scene<'b>() -> Scene {
         // orientation: Polar
         lens,
         sensor,
-        exposure_time:20_000_000.,
+        exposure_time: 20_000_000.,
         ..CAMERA
     };
     let mut lights = vec![];
@@ -96,7 +98,7 @@ pub fn simple_scene<'b>() -> Scene {
     let object = Object {
         position: vector(-3.0, 0.0, -10.0),
         meshes: vec![mesh],
-        ..OBJECT
+        ..Object::default()
     };
 
     objects.push(object);
@@ -106,7 +108,7 @@ pub fn simple_scene<'b>() -> Scene {
     let object = Object {
         position: vector(3.0, 0.0, -10.0),
         meshes: vec![mesh],
-        ..OBJECT
+        ..Object::default()
     };
     objects.push(object);
 
@@ -118,8 +120,8 @@ pub fn simple_scene<'b>() -> Scene {
     let object = Object {
         position: vector(0., 0., -6.0),
         meshes: vec![mesh],
-        material: ShaderNode::PBR(PBR::new(1.0,0.0)),
-        ..OBJECT
+        material: Arc::new(PBR::new(1.0, 0.0)),
+        ..Object::default()
     };
     objects.push(object);
 
@@ -127,7 +129,7 @@ pub fn simple_scene<'b>() -> Scene {
     let object = Object {
         position: vector(0., -2., 0.0),
         meshes: vec![mesh],
-        ..OBJECT
+        ..Object::default()
     };
     objects.push(object);
 

@@ -169,21 +169,22 @@ fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
 }
 fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     apply_transforms(&mut scene);
+    let threadcount = scene.threads;
 
-    let data = Arc::new(scene.clone()); // necessary for borrowing in threads
-
-    let mut threads = Stopwatch::start_new();
-    let mut handles = Vec::new();
-    let mut canvases: Vec<RgbImage> = Vec::new();
+    let width = scene.camera.sensor.horizontal_res / scene.threads;
+    let height = scene.camera.sensor.vertical_res;
     let shadermode = match scene.shadermode {
         ShaderMode::Lit => lit_shader,
         ShaderMode::_BVH => bvh_shader,
         ShaderMode::_Solid => _solid_shader,
     };
+    let data = Arc::new(scene); // necessary for borrowing in threads
 
-    let width = scene.camera.sensor.horizontal_res / scene.threads;
-    let height = scene.camera.sensor.vertical_res;
-    for i in 0..scene.threads {
+    let mut threads = Stopwatch::start_new();
+    let mut handles = Vec::new();
+    let mut canvases: Vec<RgbImage> = Vec::new();
+
+    for i in 0..threadcount {
         // sliced vertically
 
         let data_clone = Arc::clone(&data);
@@ -206,9 +207,9 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     }
 
     threads.stop();
-    if scene.logging > 0 {
-        println!("threads: {:?}", threads.elapsed());
-    }
+    // if scene.logging > 0 {
+    //     println!("threads: {:?}", threads.elapsed());
+    // }
     let mut reassembly = Stopwatch::start_new();
 
     // let painted_mini_canvas = handle.join().unwrap();
@@ -225,9 +226,9 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     }
 
     reassembly.stop();
-    if scene.logging > 0 {
-        println!("reassembly: {:?}", reassembly.elapsed());
-    }
+    // if scene.logging > 0 {
+    //     println!("reassembly: {:?}", reassembly.elapsed());
+    // }
 }
 
 /// this serves as an abstraction away from rasterization, so that ray tracing can be dropped into the pipeline

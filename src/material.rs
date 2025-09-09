@@ -28,7 +28,7 @@ pub struct PBR {
 impl BRDF for PBR {
     fn rendering_equation(
         &self,
-        _x: &Vector,                          // position vector of equation
+        _x: &Vector,                         // position vector of equation
         ω_i: &Vector,                        // vector to light
         ω_o: &Vector,                        // light exit path
         normal: &Vector,                     // surface normal
@@ -55,7 +55,7 @@ impl BRDF for PBR {
 }
 
 impl PBR {
-    pub const fn new(metallic:f32,roughness:f32) -> PBR {
+    pub const fn new(metallic: f32, roughness: f32) -> PBR {
         PBR {
             metallic,
             roughness,

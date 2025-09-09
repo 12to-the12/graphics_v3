@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use crate::{geometry::primitives::Vector, lighting::Spectra};
 
 // #[derive(Clone, Debug, PartialEq, Copy)]
@@ -9,7 +11,7 @@ pub fn lamberts_law(ω: &Vector, normal: &Vector) -> f32 {
     return ω.dot(normal) / divisor;
 }
 
-pub trait BRDF {
+pub trait BRDF: Debug + Sync + Send {
     fn rendering_equation(
         &self,
         x: &Vector,                          // position vector of equation
