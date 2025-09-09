@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{fmt::Debug, sync::Arc};
 
 use crate::{
     geometry::{
@@ -9,9 +9,15 @@ use crate::{
     ray_tracing::{ray_sphere_intersection::ray_sphere_intersection, rendering_equation::BRDF},
 };
 
+pub trait Entity: Debug + Sync + Send {
+    fn get_position(&self) -> Vector {
+        ORIGIN
+    }
+}
 /// physical object in space with associated data
 #[derive(Debug, Clone)]
 pub struct Object {
+    pub _parent: Option<Arc<dyn Entity>>,
     pub position: Vector,
     pub _orientation: Orientation,
     pub _scale: f32,
@@ -43,6 +49,7 @@ impl Object {
 impl Default for Object {
     fn default() -> Object {
         Object {
+            _parent: None,
             position: ORIGIN,
             _orientation: _UP,
             _scale: 1.,
@@ -50,6 +57,16 @@ impl Default for Object {
             material: Arc::new(PBR::new(0.0, 1.0)),
             meshes: Vec::new(),
         }
+    }
+}
+
+/// this will be modified in the future to accomodate a hierarchial parent child node system
+impl Entity for Object {
+    fn get_position(&self) -> Vector
+    where
+        Self: Sized,
+    {
+        self.position
     }
 }
 

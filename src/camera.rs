@@ -1,8 +1,8 @@
 #![allow(nonstandard_style)]
 // use crate::coordinate_space::Orientation;
-use crate::geometry::primitives::Vector;
+use crate::{geometry::primitives::Vector, object::Entity};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Camera {
     pub position: Vector,
     // orientation: Orientation, // some object that implements get_orientation?
@@ -78,9 +78,18 @@ impl Default for Camera {
     }
 }
 
+impl Entity for Camera {
+    fn get_position(&self) -> Vector
+    where
+        Self: Sized,
+    {
+        self.position
+    }
+}
+
 /// models a camera lens
 /// defines the field of view
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Lens {
     /// ƒ-stop is focal length / aperture pupil diameter https://www.wikiwand.com/en/F-number
     pub _aperture: f32,
@@ -114,7 +123,7 @@ impl Default for Lens {
 /// models a camera sensor
 /// notably used to accurately model the frequency response
 /// I would like to implement a number of predefined lenses in addition to offering a generic
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Sensor {
     /// the width of the sensor in millimeters
     pub width: f32,

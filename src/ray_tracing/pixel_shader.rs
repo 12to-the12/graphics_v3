@@ -1,6 +1,6 @@
 use crate::color::colorspace_conversion::spectra_to_display;
 use crate::geometry::primitives::{Polygon, Ray, Vector};
-use crate::lighting::{black_spectra, Light, LightType, RadiometricUnit, Spectra};
+use crate::lighting::{black_spectra, RadiometricUnit, Spectra};
 use crate::object::Object;
 use crate::ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection;
 
@@ -145,12 +145,9 @@ pub fn compute_light(
     normal: Vector,
 ) -> Spectra {
     let mut output = black_spectra(RadiometricUnit::Flux);
-    'lights: for light in scene.lights.clone() {
+    'lights: for light in &scene.lights {
         // our job here is to find the amount of energy transmitted to the pixel from the light
-        let light = match light {
-            LightType::PointLight(light) => light,
-        };
-        let to_light = &intersection_point.clone().to(light.position);
+        let to_light = &intersection_point.clone().to(light.get_position());
 
         let occlusion_ray = Ray::new(intersection_point, to_light.clone());
         // if (occlusion_ray.position.x < 3.) {

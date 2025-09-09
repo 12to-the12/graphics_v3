@@ -7,7 +7,7 @@ use crate::geometry::primitives::{Mesh, Vector};
 use crate::material::PBR;
 use crate::object::Object;
 // use crate::primitives::Object;
-use crate::lighting::{black_spectra, norm_black_body, point_light, LightType, Spectra};
+use crate::lighting::{black_spectra, norm_black_body, Light, PointLight, Spectra};
 use crate::load_object_file::load_wavefront_obj;
 
 #[derive(Clone)]
@@ -37,7 +37,7 @@ pub enum Rendermode {
 // #[derive(Clone)]
 pub struct Scene {
     pub camera: Camera,
-    pub lights: Vec<LightType>,
+    pub lights: Vec<Arc<dyn Light>>,
     pub objects: Vec<Object>,
     pub _meshes: Vec<Mesh>,
     // pub unified_mesh: Vec<Polygon<'a>>,
@@ -75,18 +75,18 @@ pub fn simple_scene<'b>() -> Scene {
         exposure_time: 20_000_000.,
         ..Camera::default()
     };
-    let mut lights = vec![];
+    let mut lights: Vec<Arc<dyn Light>> = vec![];
 
-    let light = point_light(Vector::new(-5.0, 3.0, -5.0), RIGHT, norm_black_body(1500.));
+    let light = PointLight::new(Vector::new(-5.0, 3.0, -5.0), RIGHT, norm_black_body(1500.));
     // let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, 1000*const_spectra(380.));
     // let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, monochroma_spectra(460.,5e-1));
-    lights.push(LightType::PointLight(light));
+    lights.push(Arc::new(light));
 
-    let lightb = point_light(Vector::new(5.0, 1.0, -5.0), RIGHT, norm_black_body(3000.));
-    lights.push(LightType::PointLight(lightb));
+    let lightb = PointLight::new(Vector::new(5.0, 1.0, -5.0), RIGHT, norm_black_body(3000.));
+    lights.push(Arc::new(lightb));
 
-    let lightc = point_light(Vector::new(-5.0, 5.0, -12.0), RIGHT, norm_black_body(6000.));
-    lights.push(LightType::PointLight(lightc));
+    let lightc = PointLight::new(Vector::new(-5.0, 5.0, -12.0), RIGHT, norm_black_body(6000.));
+    lights.push(Arc::new(lightc));
 
     let meshes = Vec::new();
     let mut objects = Vec::new();

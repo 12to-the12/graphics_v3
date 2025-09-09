@@ -1,9 +1,13 @@
 #![allow(non_upper_case_globals)]
-use std::f32::consts::{E, PI};
+use std::{
+    f32::consts::{E, PI},
+    fmt::Debug,
+};
 const _π: f32 = PI;
 use crate::{
     color::luminous_efficiency::luminous_efficacy,
     geometry::{orientation::Orientation, primitives::Vector},
+    object::Entity,
 };
 extern crate ndarray;
 use ndarray::prelude::*;
@@ -16,11 +20,11 @@ pub enum RadiometricUnit {
     Radiance,   // per sr perm2
 }
 
-#[derive(Clone)]
-pub enum LightType {
-    PointLight(PointLight),
+pub trait _Spectral {
+    fn calc_spectra() -> Spectra {
+        black_spectra(RadiometricUnit::Flux)
+    }
 }
-
 /// this program uses Radiometry not Photometry because it's more physically accurate
 /// Radiant Flux is total radiation, Watts
 /// Radiant Intensity is radiation per solid angle, Watts/steridian
@@ -28,7 +32,8 @@ pub enum LightType {
 /// Radiance is radiation per solid angle per area, Watts/sr/m2
 
 /// the trait Light guarantees you can calculate the irradiance at a given point
-pub trait Light {
+/// APPARENTLY ADDING Where: Sized CAN IN FACT CAUSE ERRORS. NOTED.
+pub trait Light: Debug + Sync + Send + Entity {
     /// the apex is where the light source is observed from
     /// as it currently stands, all position vectors exist in worldspace
     fn radiant_intensity(&self, apex: Vector) -> Spectra;
@@ -36,28 +41,38 @@ pub trait Light {
 
 /// Isotrophic light source with output measured in watts in each wavelength
 /// an isotrophic light source has a radiant intensity of it's radiant flux / 4π
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct PointLight {
     pub position: Vector, // as always, this is relative to it's parent
     pub _orientation: Orientation,
     pub radiant_flux: Spectra, // power in each wavelength
 }
+
+impl PointLight {
+    pub fn new(position: Vector, orientation: Orientation, radiant_flux: Spectra) -> PointLight {
+        PointLight {
+            position,
+            _orientation: orientation,
+            radiant_flux,
+        }
+    }
+}
 impl Light for PointLight {
     /// isotrophic point light sources don't care about the apex position
-    fn radiant_intensity(&self, _apex: Vector) -> Spectra {
+    fn radiant_intensity(&self, _apex: Vector) -> Spectra
+    where
+        Self: Sized,
+    {
         return 1. / (4. * _π) * self.radiant_flux.clone();
     }
 }
 
-pub fn point_light(
-    position: Vector,
-    orientation: Orientation,
-    radiant_flux: Spectra,
-) -> PointLight {
-    PointLight {
-        position,
-        _orientation: orientation,
-        radiant_flux,
+impl Entity for PointLight {
+    fn get_position(&self) -> Vector
+    where
+        Self: Sized,
+    {
+        self.position
     }
 }
 
