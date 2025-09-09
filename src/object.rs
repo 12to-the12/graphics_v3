@@ -5,8 +5,8 @@ use crate::{
         orientation::{Orientation, _UP},
         primitives::{Mesh, Ray, Vector, ORIGIN},
     },
-    material::PBR,
-    ray_tracing::{ray_sphere_intersection::ray_sphere_intersection, rendering_equation::BRDF},
+    material::{BRDF, PBR},
+    ray_tracing::ray_sphere_intersection::ray_sphere_intersection,
 };
 
 pub trait Entity: Debug + Sync + Send {

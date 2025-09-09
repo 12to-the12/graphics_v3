@@ -1,6 +1,9 @@
 #![allow(nonstandard_style)]
 // use crate::coordinate_space::Orientation;
-use crate::{geometry::primitives::Vector, object::Entity};
+use crate::{
+    geometry::primitives::{Ray, Vector},
+    object::Entity,
+};
 
 #[derive(Clone, Debug)]
 pub struct Camera {
@@ -58,6 +61,37 @@ impl Camera {
             sensor,
             ..Camera::default()
         }
+    }
+
+    /// yeah, the math was hard for me too 2023-11-20
+    pub fn pixel_to_ray(camera: &Self, x: u32, y: u32) -> Ray {
+        let x = (x as f32) + 0.5; // centers the pixels
+        let y = (y as f32) + 0.5;
+        let camera = camera;
+        let (hres, vres) = camera.sensor.res();
+        let mut horizontal_fraction: f32 = x / (hres as f32);
+        let mut vertical_fraction: f32 = y / (vres as f32);
+
+        // let mut horizontal_fraction: f32 = x;
+        // let mut vertical_fraction: f32 = y;
+
+        horizontal_fraction -= 0.5; // [0 -> 1] becomes [-0.5 -> +0.5]
+        vertical_fraction -= 0.5; // [0 -> 1] becomes [-0.5 -> +0.5]
+
+        vertical_fraction *= -1.0; // because the coordinates are inverted
+        vertical_fraction /= camera.sensor.aspect_ratio(); // because the z value is derived from the horizontal field of view, this can be proportional to width
+
+        let direction = Vector {
+            x: horizontal_fraction,
+            y: vertical_fraction,
+            z: camera.lens.focal_length / camera.sensor.width * -1.0,
+            // z is negative, and if the ray placement is scaled to one from the sensor width,
+            // the focal length needs to be proportional
+        };
+        let position = camera.position;
+        let mut ray = Ray::new(position, direction);
+        ray.direction.norm();
+        ray
     }
 }
 

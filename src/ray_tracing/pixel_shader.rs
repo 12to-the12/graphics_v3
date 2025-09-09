@@ -1,3 +1,4 @@
+use crate::camera::Camera;
 use crate::color::colorspace_conversion::spectra_to_display;
 use crate::geometry::primitives::{Polygon, Ray, Vector};
 use crate::lighting::{black_spectra, RadiometricUnit, Spectra};
@@ -77,7 +78,7 @@ pub fn _color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 }
 
 pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
-    let ray = pixel_to_ray(x, y, scene);
+    let ray = Camera::pixel_to_ray(&scene.camera, x, y);
     let mut hit = false;
     // here we're at once per pixel
     for object in &scene.objects {
@@ -108,7 +109,7 @@ pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 }
 
 pub fn bvh_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
-    let ray = pixel_to_ray(x, y, scene);
+    let ray = Camera::pixel_to_ray(&scene.camera, x, y);
     let mut hit = false;
     // here we're at once per pixel
     for object in &scene.objects {
@@ -125,7 +126,7 @@ pub fn bvh_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     }
 }
 pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
-    let ray = pixel_to_ray(x, y, scene);
+    let ray = Camera::pixel_to_ray(&scene.camera, x, y);
     let output: Spectra = match shoot_ray(ray, scene) {
         None => black_spectra(RadiometricUnit::Flux),
         Some((object, x, ω_o, normal)) => {
@@ -262,40 +263,9 @@ pub fn shoot_ray(ray: Ray, scene: &Scene) -> Option<(Object, Vector, Vector, Vec
     }
 }
 
-/// yeah, the math was hard for me too 2023-11-20
-pub fn pixel_to_ray(x: u32, y: u32, scene: &Scene) -> Ray {
-    let x = (x as f32) + 0.5; // centers the pixels
-    let y = (y as f32) + 0.5;
-    let camera = &scene.camera;
-    let (hres, vres) = camera.sensor.res();
-    let mut horizontal_fraction: f32 = x / (hres as f32);
-    let mut vertical_fraction: f32 = y / (vres as f32);
-
-    // let mut horizontal_fraction: f32 = x;
-    // let mut vertical_fraction: f32 = y;
-
-    horizontal_fraction -= 0.5; // [0 -> 1] becomes [-0.5 -> +0.5]
-    vertical_fraction -= 0.5; // [0 -> 1] becomes [-0.5 -> +0.5]
-
-    vertical_fraction *= -1.0; // because the coordinates are inverted
-    vertical_fraction /= camera.sensor.aspect_ratio(); // because the z value is derived from the horizontal field of view, this can be proportional to width
-
-    let direction = Vector {
-        x: horizontal_fraction,
-        y: vertical_fraction,
-        z: camera.lens.focal_length / camera.sensor.width * -1.0,
-        // z is negative, and if the ray placement is scaled to one from the sensor width,
-        // the focal length needs to be proportional
-    };
-    let position = scene.camera.position;
-    let mut ray = Ray::new(position, direction);
-    ray.direction.norm();
-    ray
-}
-
 #[cfg(test)]
 mod tests {
-    use crate::scene::simple_scene;
+    use crate::{camera::Camera, scene::simple_scene};
 
     use super::*;
 
@@ -310,7 +280,7 @@ mod tests {
 
         scene.camera.sensor.horizontal_res = 3;
         scene.camera.sensor.vertical_res = 3;
-        ray = pixel_to_ray(0, 2, &scene);
+        ray = Camera::pixel_to_ray(&scene.camera, 0, 2);
 
         // println!("direction: {:?}", ray.direction);
 
@@ -322,7 +292,7 @@ mod tests {
 
         scene.camera.sensor.horizontal_res = 1;
         scene.camera.sensor.vertical_res = 1;
-        ray = pixel_to_ray(0, 0, &scene);
+        ray = Camera::pixel_to_ray(&scene.camera, 0, 0);
 
         // println!("direction: {:?}", ray.direction);
 

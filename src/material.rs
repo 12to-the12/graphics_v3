@@ -1,9 +1,8 @@
 use crate::{
     geometry::primitives::Vector,
     lighting::{RadiometricUnit, Spectra},
-    ray_tracing::rendering_equation::{lamberts_law, BRDF},
 };
-use std::f32::consts::PI;
+use std::{f32::consts::PI, fmt::Debug};
 
 /// physical object in space with associated data
 // I want shaders to simply be a trait
@@ -14,9 +13,23 @@ pub struct PBR {
     pub roughness: f32,
 }
 
-// pub trait PBR {
-//   fn shade(&self) -> Spectra;
-// }
+pub fn lamberts_law(ω: &Vector, normal: &Vector) -> f32 {
+    let divisor: f32 = ω.magnitude() * normal.magnitude();
+
+    return ω.dot(normal) / divisor;
+}
+
+pub trait BRDF: Debug + Sync + Send {
+    fn rendering_equation(
+        &self,
+        x: &Vector,                          // position vector of equation
+        ω_i: &Vector,                        // vector to light
+        ω_o: &Vector,                        // light exit path
+        normal: &Vector,                     // surface normal
+        incoming_radiant_intensity: Spectra, // the radiant flux of the lightsource encoded as a spectrum
+    ) -> Spectra;
+    // fn evaluate_BRDF(&self, x: &Vector, ω_i: &Vector, ω_0: &Vector, spectra: &Spectra) -> Spectra;
+}
 
 impl BRDF for PBR {
     fn rendering_equation(
