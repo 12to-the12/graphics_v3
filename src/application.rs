@@ -1,6 +1,6 @@
 use std::ops::IndexMut;
 
-use crate::geometry::primitives::vector;
+use crate::geometry::primitives::Vector;
 use crate::geometry::transformations::{
     build_arbitrary_rotation_transform, build_y_rotation_transform,
 };
@@ -23,7 +23,7 @@ pub fn application(scene: &mut Scene) -> &Scene {
         .index_mut(0)
         .add_transform(build_arbitrary_rotation_transform(
             tick.to_radians(),
-            vector(0., 0., -1.),
+            Vector::new(0., 0., -1.),
         ));
 
     objects
@@ -32,7 +32,7 @@ pub fn application(scene: &mut Scene) -> &Scene {
         .index_mut(0)
         .add_transform(build_arbitrary_rotation_transform(
             tick.to_radians(),
-            vector(1., 1., 1.),
+            Vector::new(1., 1., 1.),
         ));
 
     // meshes[0].add_transform(build_y_rotation_transform(tick.to_radians() * 3.));

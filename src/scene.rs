@@ -3,7 +3,7 @@ use std::sync::Arc;
 use crate::camera::{Camera, Lens, Sensor};
 use crate::geometry::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
-use crate::geometry::primitives::{vector, Mesh};
+use crate::geometry::primitives::{Mesh, Vector};
 use crate::material::PBR;
 use crate::object::Object;
 // use crate::primitives::Object;
@@ -68,7 +68,7 @@ pub fn simple_scene<'b>() -> Scene {
         vertical_res: 320,
     };
     let camera = Camera {
-        position: vector(0.0, 0.0, 10.0),
+        position: Vector::new(0.0, 0.0, 10.0),
         // orientation: Polar
         lens,
         sensor,
@@ -77,15 +77,15 @@ pub fn simple_scene<'b>() -> Scene {
     };
     let mut lights = vec![];
 
-    let light = point_light(vector(-5.0, 3.0, -5.0), RIGHT, norm_black_body(1500.));
+    let light = point_light(Vector::new(-5.0, 3.0, -5.0), RIGHT, norm_black_body(1500.));
     // let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, 1000*const_spectra(380.));
     // let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, monochroma_spectra(460.,5e-1));
     lights.push(LightType::PointLight(light));
 
-    let lightb = point_light(vector(5.0, 1.0, -5.0), RIGHT, norm_black_body(3000.));
+    let lightb = point_light(Vector::new(5.0, 1.0, -5.0), RIGHT, norm_black_body(3000.));
     lights.push(LightType::PointLight(lightb));
 
-    let lightc = point_light(vector(-5.0, 5.0, -12.0), RIGHT, norm_black_body(6000.));
+    let lightc = point_light(Vector::new(-5.0, 5.0, -12.0), RIGHT, norm_black_body(6000.));
     lights.push(LightType::PointLight(lightc));
 
     let meshes = Vec::new();
@@ -95,7 +95,7 @@ pub fn simple_scene<'b>() -> Scene {
     let mesh = load_wavefront_obj("models/cube.obj".to_string());
     // meshes.push(mesh);
     let object = Object {
-        position: vector(-3.0, 0.0, -10.0),
+        position: Vector::new(-3.0, 0.0, -10.0),
         meshes: vec![mesh],
         ..Object::default()
     };
@@ -105,7 +105,7 @@ pub fn simple_scene<'b>() -> Scene {
     let mesh = load_wavefront_obj("models/cube.obj".to_string());
     // meshes.push(mesh);
     let object = Object {
-        position: vector(3.0, 0.0, -10.0),
+        position: Vector::new(3.0, 0.0, -10.0),
         meshes: vec![mesh],
         ..Object::default()
     };
@@ -117,7 +117,7 @@ pub fn simple_scene<'b>() -> Scene {
     // meshes.push(mesh);
 
     let object = Object {
-        position: vector(0., 0., -6.0),
+        position: Vector::new(0., 0., -6.0),
         meshes: vec![mesh],
         material: Arc::new(PBR::new(1.0, 0.0)),
         ..Object::default()
@@ -126,7 +126,7 @@ pub fn simple_scene<'b>() -> Scene {
 
     let mesh: Mesh = load_wavefront_obj("models/plane.obj".to_string());
     let object = Object {
-        position: vector(0., -2., 0.0),
+        position: Vector::new(0., -2., 0.0),
         meshes: vec![mesh],
         ..Object::default()
     };

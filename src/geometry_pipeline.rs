@@ -3,7 +3,7 @@ use std::thread::{self};
 
 use crate::application::application;
 use crate::camera::Camera;
-use crate::geometry::primitives::{triangle, vector};
+use crate::geometry::primitives::{Triangle, Vector};
 // use crate::primitives::LineCollection;
 use crate::scene::{Rendermode, Scene, ShaderMode};
 // use crate::primitives::PolygonCollection;
@@ -40,15 +40,15 @@ fn build_to_display_transform(scene: &Scene) -> Transform {
 
     let mut display = Vec::new();
     // to de center the coordinates
-    display.push(build_scale_transform(vector(1.0, aspect_ratio, 1.0)));
+    display.push(build_scale_transform(Vector::new(1.0, aspect_ratio, 1.0)));
 
-    display.push(build_scale_transform(vector(-1.0, 1.0, 0.0)));
+    display.push(build_scale_transform(Vector::new(-1.0, 1.0, 0.0)));
 
-    display.push(build_translation_transform(vector(1.0, 1.0, 0.0)));
-    display.push(build_scale_transform(vector(0.5, 0.5, 1.0)));
+    display.push(build_translation_transform(Vector::new(1.0, 1.0, 0.0)));
+    display.push(build_scale_transform(Vector::new(0.5, 0.5, 1.0)));
 
     // to make them pixel correct
-    display.push(build_scale_transform(vector(hres, vres, 1.0)));
+    display.push(build_scale_transform(Vector::new(hres, vres, 1.0)));
     compile_transforms(&display)
 }
 
@@ -86,7 +86,7 @@ fn _wire_frame(canvas: &mut RgbImage, scene: Scene) {
             let b = &mesh.output_vertices[poly[1]];
             let c = &mesh.output_vertices[poly[2]];
 
-            plot_triangle(triangle(a, b, c), canvas, color)
+            plot_triangle(Triangle::new(a, b, c), canvas, color)
         }
     }
 }
@@ -100,7 +100,7 @@ fn solid(canvas: &mut RgbImage, scene: Scene) {
                 let b = &mesh.output_vertices[poly[1]];
                 let c = &mesh.output_vertices[poly[2]];
 
-                rasterize_triangle(triangle(a, b, c), canvas);
+                rasterize_triangle(Triangle::new(a, b, c), canvas);
             }
         }
     }

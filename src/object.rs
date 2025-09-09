@@ -59,14 +59,14 @@ impl Default for Object {
 
 #[cfg(test)]
 mod tests {
-    use crate::geometry::primitives::_unit_cube;
+    use crate::geometry::primitives::Mesh;
 
     use super::Object;
 
     /// useful table: https://www.nikonians.org/reviews/fov-tables
     #[test]
     fn test_radius() {
-        let mymesh = _unit_cube();
+        let mymesh = Mesh::_unit_cube();
         let myobject: Object = Object {
             meshes: vec![mymesh],
             ..Object::default()

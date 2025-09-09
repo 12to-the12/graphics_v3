@@ -52,6 +52,12 @@ impl Vertex {
         let z = self.position.z;
         Vector { x, y, z }
     }
+    pub fn new(x: f32, y: f32, z: f32) -> Vertex {
+        return Vertex {
+            position: Vector::new(x, y, z),
+            ..Vertex::default()
+        };
+    }
 }
 
 // impl std::ops::Mul<Vertex> for f32 {
@@ -85,16 +91,9 @@ impl Default for Vertex {
     }
 }
 
-pub fn vertex(x: f32, y: f32, z: f32) -> Vertex {
-    return Vertex {
-        position: vector(x, y, z),
-        ..Vertex::default()
-    };
-}
-
 pub fn vertex_from_array(arr: Array1<f32>) -> Vertex {
     let w = arr[3];
-    let position_vector = vector(arr[0] / w, arr[1] / w, arr[2] / w);
+    let position_vector = Vector::new(arr[0] / w, arr[1] / w, arr[2] / w);
     return Vertex {
         position: position_vector,
         ..Vertex::default()
@@ -211,10 +210,9 @@ impl Vector {
         let z = self.z * -1.0;
         Vector { x, y, z }
     }
-}
-
-pub fn vector(x: f32, y: f32, z: f32) -> Vector {
-    return Vector { x, y, z };
+    pub fn new(x: f32, y: f32, z: f32) -> Vector {
+        return Vector { x, y, z };
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -248,15 +246,16 @@ impl Polygon {
         let y = a.z * b.x - a.x * b.z;
         let z = a.x * b.y - a.y * b.x;
 
-        let mut out = vector(x, y, z);
+        let mut out = Vector::new(x, y, z);
         out.norm();
         out
     }
+
+    pub fn new(a: Vertex, b: Vertex, c: Vertex) -> Polygon {
+        Polygon { a, b, c }
+    }
 }
 
-pub fn polygon(a: Vertex, b: Vertex, c: Vertex) -> Polygon {
-    Polygon { a, b, c }
-}
 // pub fn polygon<'a>(a: &'a Vertex, b: &'a Vertex, c: &'a Vertex) -> Polygon {
 //     Polygon { a, b, c }
 // }
@@ -291,63 +290,64 @@ impl Mesh {
     pub fn _get_transforms(&self) -> &Vec<Transform> {
         return &self.transform_log;
     }
-}
-pub fn mesh(vertices: Vec<Vertex>, polygons: Vec<Vec<usize>>) -> Mesh {
-    Mesh {
-        vertices,
-        polygons,
-        output_vertices: Vec::new(),
-        transform_log: Vec::new(),
+    pub fn new(vertices: Vec<Vertex>, polygons: Vec<Vec<usize>>) -> Mesh {
+        Mesh {
+            vertices,
+            polygons,
+            output_vertices: Vec::new(),
+            transform_log: Vec::new(),
+        }
     }
-}
-pub fn _unit_cube() -> Mesh {
-    let a: Vertex = vertex(-1.0, -1.0, -1.0); //0  left down far from above
-    let b: Vertex = vertex(1.0, -1.0, -1.0); //1 right down far from above
-    let c: Vertex = vertex(-1.0, 1.0, -1.0); //2  left   up far from above
-    let d: Vertex = vertex(1.0, 1.0, -1.0); //3 right   up far from above
-    let e: Vertex = vertex(-1.0, -1.0, 1.0); //4  left down    close from above
-    let f: Vertex = vertex(1.0, -1.0, 1.0); //5 right down    close from above
-    let g: Vertex = vertex(-1.0, 1.0, 1.0); //6  left   up    close from above
-    let h: Vertex = vertex(1.0, 1.0, 1.0); //7 right   up    close from above
 
-    let polygons = vec![
-        vec![0, 2, 1], // bottom 0123
-        vec![1, 2, 3], // bottom
-        vec![4, 5, 6], // close 4567
-        vec![6, 5, 7], // close
-        vec![0, 1, 4], // down 01 45
-        vec![4, 1, 5], // down
-        vec![2, 6, 3], // up 23 67
-        vec![3, 6, 7], // up
-        vec![0, 4, 2], // right 0 2 4 6
-        vec![2, 4, 6], // right
-        vec![1, 3, 5], // left 1 3 5 7
-        vec![5, 3, 7], // left
-    ];
-    let mesh = Mesh {
-        vertices: vec![a, b, c, d, e, f, g, h],
-        polygons,
-        output_vertices: Vec::new(),
-        transform_log: Vec::new(),
-    };
-    return mesh;
-}
+    pub fn _unit_cube() -> Mesh {
+        let a: Vertex = Vertex::new(-1.0, -1.0, -1.0); //0  left down far from above
+        let b: Vertex = Vertex::new(1.0, -1.0, -1.0); //1 right down far from above
+        let c: Vertex = Vertex::new(-1.0, 1.0, -1.0); //2  left   up far from above
+        let d: Vertex = Vertex::new(1.0, 1.0, -1.0); //3 right   up far from above
+        let e: Vertex = Vertex::new(-1.0, -1.0, 1.0); //4  left down    close from above
+        let f: Vertex = Vertex::new(1.0, -1.0, 1.0); //5 right down    close from above
+        let g: Vertex = Vertex::new(-1.0, 1.0, 1.0); //6  left   up    close from above
+        let h: Vertex = Vertex::new(1.0, 1.0, 1.0); //7 right   up    close from above
 
-pub fn _sample_mesh() -> Mesh {
-    let a: Vertex = vertex(0., 0., 0.); //0  left down bottom from above
-    let b: Vertex = vertex(1., 0., 0.); //1 right down bottom from above
-    let c: Vertex = vertex(0., 1., 0.); //2  left   up bottom from above
+        let polygons = vec![
+            vec![0, 2, 1], // bottom 0123
+            vec![1, 2, 3], // bottom
+            vec![4, 5, 6], // close 4567
+            vec![6, 5, 7], // close
+            vec![0, 1, 4], // down 01 45
+            vec![4, 1, 5], // down
+            vec![2, 6, 3], // up 23 67
+            vec![3, 6, 7], // up
+            vec![0, 4, 2], // right 0 2 4 6
+            vec![2, 4, 6], // right
+            vec![1, 3, 5], // left 1 3 5 7
+            vec![5, 3, 7], // left
+        ];
+        let mesh = Mesh {
+            vertices: vec![a, b, c, d, e, f, g, h],
+            polygons,
+            output_vertices: Vec::new(),
+            transform_log: Vec::new(),
+        };
+        return mesh;
+    }
 
-    let polygons = vec![
-        vec![0, 1, 2], // bottom 0123
-    ];
-    let mesh = Mesh {
-        vertices: vec![a, b, c],
-        polygons,
-        output_vertices: Vec::new(),
-        transform_log: Vec::new(),
-    };
-    return mesh;
+    pub fn _sample_mesh() -> Mesh {
+        let a: Vertex = Vertex::new(0., 0., 0.); //0  left down bottom from above
+        let b: Vertex = Vertex::new(1., 0., 0.); //1 right down bottom from above
+        let c: Vertex = Vertex::new(0., 1., 0.); //2  left   up bottom from above
+
+        let polygons = vec![
+            vec![0, 1, 2], // bottom 0123
+        ];
+        let mesh = Mesh {
+            vertices: vec![a, b, c],
+            polygons,
+            output_vertices: Vec::new(),
+            transform_log: Vec::new(),
+        };
+        return mesh;
+    }
 }
 
 /// 2D line
@@ -386,22 +386,22 @@ impl Triangle {
         let max = Point { x, y };
         _BoundingBox2D { min, max }
     }
-}
-pub fn triangle(a: &Vertex, b: &Vertex, c: &Vertex) -> Triangle {
-    let a = Point {
-        x: a.position.x as i32,
-        y: a.position.y as i32,
-    };
-    let b = Point {
-        x: b.position.x as i32,
-        y: b.position.y as i32,
-    };
-    let c = Point {
-        x: c.position.x as i32,
-        y: c.position.y as i32,
-    };
+    pub fn new(a: &Vertex, b: &Vertex, c: &Vertex) -> Triangle {
+        let a = Point {
+            x: a.position.x as i32,
+            y: a.position.y as i32,
+        };
+        let b = Point {
+            x: b.position.x as i32,
+            y: b.position.y as i32,
+        };
+        let c = Point {
+            x: c.position.x as i32,
+            y: c.position.y as i32,
+        };
 
-    Triangle { a, b, c }
+        Triangle { a, b, c }
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -410,23 +410,25 @@ pub struct Ray {
     pub direction: Vector,
 }
 
-pub fn ray(position: Vector, direction: Vector) -> Ray {
-    direction.clone().norm();
-    Ray {
-        position,
-        direction,
+impl Ray {
+    pub fn new(position: Vector, direction: Vector) -> Ray {
+        direction.clone().norm();
+        Ray {
+            position,
+            direction,
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::geometry::primitives::vector;
+    use crate::geometry::primitives::Vector;
 
     /// useful table: https://www.nikonians.org/reviews/fov-tables
     #[test]
     fn test_negative_vectors() {
-        let myvec = vector(1., 2., 3.);
+        let myvec = Vector::new(1., 2., 3.);
         let anothervec = -myvec;
-        assert_eq!(anothervec, vector(-1., -2., -3.));
+        assert_eq!(anothervec, Vector::new(-1., -2., -3.));
     }
 }

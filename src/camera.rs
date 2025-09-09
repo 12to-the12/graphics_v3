@@ -14,14 +14,6 @@ pub struct Camera {
     pub exposure_time: f32,
 }
 
-pub fn _camera(position: Vector, lens: Lens, sensor: Sensor) -> Camera {
-    Camera {
-        position,
-        lens,
-        sensor,
-        ..Camera::default()
-    }
-}
 // impl Default for Camera {
 //     fn default() -> Camera {
 //         Camera {
@@ -58,6 +50,32 @@ impl Camera {
     pub fn _pixel_solid_angle(&self) -> f32 {
         return self._frustrum_solid_angle() / self.sensor._pixels() as f32;
     }
+
+    pub fn _new(position: Vector, lens: Lens, sensor: Sensor) -> Camera {
+        Camera {
+            position,
+            lens,
+            sensor,
+            ..Camera::default()
+        }
+    }
+}
+
+impl Default for Camera {
+    fn default() -> Self {
+        Camera {
+            position: Vector {
+                x: 0.,
+                y: 0.,
+                z: 0.,
+            },
+            lens: Lens::default(),
+            sensor: Sensor::default(),
+            _near_clipping_plane: 1e-1,
+            _far_clipping_plane: 1e6,
+            exposure_time: 1.,
+        }
+    }
 }
 
 /// models a camera lens
@@ -73,11 +91,23 @@ pub struct Lens {
     pub _focus_distance: f32,
 }
 
-pub fn _lens(focal_length: f32) -> Lens {
-    Lens {
-        _aperture: 8.,
-        focal_length,
-        _focus_distance: 1.,
+impl Lens {
+    pub fn _new(focal_length: f32) -> Lens {
+        Lens {
+            _aperture: 8.,
+            focal_length,
+            _focus_distance: 1.,
+        }
+    }
+}
+
+impl Default for Lens {
+    fn default() -> Self {
+        Lens {
+            _aperture: 12.0,
+            focal_length: 50.0,
+            _focus_distance: 20.0,
+        }
     }
 }
 
@@ -91,14 +121,6 @@ pub struct Sensor {
     pub horizontal_res: u32,
     pub vertical_res: u32,
     // put frequency response here
-}
-
-pub fn _sensor(width: f32, horizontal_res: u32, vertical_res: u32) -> Sensor {
-    Sensor {
-        width,
-        horizontal_res,
-        vertical_res,
-    }
 }
 
 impl Sensor {
@@ -124,6 +146,14 @@ impl Sensor {
         let pixel_count = self.horizontal_res * self.vertical_res;
         self._sensor_area() / pixel_count as f32
     }
+
+    pub fn _new(width: f32, horizontal_res: u32, vertical_res: u32) -> Sensor {
+        Sensor {
+            width,
+            horizontal_res,
+            vertical_res,
+        }
+    }
 }
 impl Default for Sensor {
     fn default() -> Self {
@@ -135,32 +165,6 @@ impl Default for Sensor {
         }
     }
 }
-impl Default for Lens {
-    fn default() -> Self {
-        Lens {
-            _aperture: 12.0,
-            focal_length: 50.0,
-            _focus_distance: 20.0,
-        }
-    }
-}
-
-impl Default for Camera {
-    fn default() -> Self {
-        Camera {
-            position: Vector {
-                x: 0.,
-                y: 0.,
-                z: 0.,
-            },
-            lens: Lens::default(),
-            sensor: Sensor::default(),
-            _near_clipping_plane: 1e-1,
-            _far_clipping_plane: 1e6,
-            exposure_time: 1.,
-        }
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -168,13 +172,17 @@ mod tests {
 
     use approx::assert_relative_eq;
 
-    use crate::geometry::primitives::vector;
+    use crate::geometry::primitives::Vector;
 
     use super::*;
     #[test]
     fn lens_solid_angle() {
         // a camera with infinitesimal focal length
-        let cam = _camera(vector(0.0, 0.0, 0.0), _lens(1e-6), _sensor(1., 10, 10));
+        let cam = Camera::_new(
+            Vector::new(0.0, 0.0, 0.0),
+            Lens::_new(1e-6),
+            Sensor::_new(1., 10, 10),
+        );
         // subtends a hemisphere
         assert_relative_eq!(cam._frustrum_solid_angle(), 2. * PI);
         assert_relative_eq!(cam._pixel_solid_angle(), 2. * PI / 100.);

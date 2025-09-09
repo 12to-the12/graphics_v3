@@ -1,4 +1,4 @@
-use crate::geometry::primitives::{vector, Polygon, Ray, Vector};
+use crate::geometry::primitives::{Polygon, Ray, Vector};
 use stopwatch::Stopwatch;
 
 #[allow(non_snake_case)]
@@ -33,7 +33,7 @@ pub fn probe_ray_polygon_intersection(ray: &Ray, polygon: &Polygon) -> (bool, Ve
     // I = ray_plane_intersection(ray, points)  # the point of intersection
     let result = ray_plane_intersection(ray, polygon);
     if result.is_none() {
-        return (false, vector(0., 0., 0.), 0.);
+        return (false, Vector::new(0., 0., 0.), 0.);
     }
 
     let (I, dist) = result.unwrap();
@@ -201,7 +201,7 @@ fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Option<(Vector, f32)>
 #[cfg(test)]
 mod tests {
     use crate::{
-        geometry::primitives::{polygon, ray, vector, vertex},
+        geometry::primitives::{Polygon, Ray, Vector, Vertex},
         ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection,
     };
 
@@ -218,36 +218,36 @@ mod tests {
 
     #[test]
     fn ray_polygon_test_simple_polygon() {
-        let polygon = polygon(
-            vertex(2.0, 0.0, -2.0),
-            vertex(0.0, 2.0, -2.0),
-            vertex(0.0, 0.0, -2.0),
+        let polygon = Polygon::new(
+            Vertex::new(2.0, 0.0, -2.0),
+            Vertex::new(0.0, 2.0, -2.0),
+            Vertex::new(0.0, 0.0, -2.0),
         );
-        let ray = ray(vector(1.0, 1.0, 0.), vector(0., 0.0, -1.0));
+        let ray = Ray::new(Vector::new(1.0, 1.0, 0.), Vector::new(0., 0.0, -1.0));
         println!("{:?}", polygon.get_normal());
         println!("{:?}", probe_ray_polygon_intersection(&ray, &polygon));
         assert!(probe_ray_polygon_intersection(&ray, &polygon).0);
     }
     #[test]
     fn ray_polygon_another_polygon() {
-        let polygon = polygon(
-            vertex(-4.0, -1.0, -0.0),
-            vertex(-4.0, 1.0, -2.0),
-            vertex(-4.0, 1.0, -0.0),
+        let polygon = Polygon::new(
+            Vertex::new(-4.0, -1.0, -0.0),
+            Vertex::new(-4.0, 1.0, -2.0),
+            Vertex::new(-4.0, 1.0, -0.0),
         );
-        let ray = ray(vector(0.0, 0.5, -1.), vector(-50., 0.0, 0.0));
+        let ray = Ray::new(Vector::new(0.0, 0.5, -1.), Vector::new(-50., 0.0, 0.0));
         println!("{:?}", polygon.get_normal());
         println!("{:?}", probe_ray_polygon_intersection(&ray, &polygon));
         assert!(probe_ray_polygon_intersection(&ray, &polygon).0);
     }
     #[test]
     fn ray_polygon_test_polygon() {
-        let polygon = polygon(
-            vertex(-1.0, -1.0, -1.0),
-            vertex(-1.0, 1.0, -3.0),
-            vertex(-1.0, 1.0, -1.0),
+        let polygon = Polygon::new(
+            Vertex::new(-1.0, -1.0, -1.0),
+            Vertex::new(-1.0, 1.0, -3.0),
+            Vertex::new(-1.0, 1.0, -1.0),
         );
-        let ray = ray(vector(0.0, 0.5, -2.), vector(-50., 0.0, 0.0));
+        let ray = Ray::new(Vector::new(0.0, 0.5, -2.), Vector::new(-50., 0.0, 0.0));
         println!("ray position: {:?}", ray.position);
         println!("ray direction: {:?}", ray.direction);
         println!("normal: {:?}", polygon.get_normal());

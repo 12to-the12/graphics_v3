@@ -1,5 +1,5 @@
 use crate::color::colorspace_conversion::spectra_to_display;
-use crate::geometry::primitives::{polygon, ray, vector, Ray, Vector};
+use crate::geometry::primitives::{Polygon, Ray, Vector};
 use crate::lighting::{black_spectra, Light, LightType, RadiometricUnit, Spectra};
 use crate::object::Object;
 use crate::ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection;
@@ -91,7 +91,7 @@ pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
                 let a = mesh.output_vertices[poly[0]].clone();
                 let b = mesh.output_vertices[poly[1]].clone();
                 let c = mesh.output_vertices[poly[2]].clone();
-                let polygon = polygon(a, b, c);
+                let polygon = Polygon::new(a, b, c);
                 let (b, _i, _dist) = probe_ray_polygon_intersection(&ray, &polygon);
                 if b {
                     hit = true;
@@ -152,7 +152,7 @@ pub fn compute_light(
         };
         let to_light = &intersection_point.clone().to(light.position);
 
-        let occlusion_ray = ray(intersection_point, to_light.clone());
+        let occlusion_ray = Ray::new(intersection_point, to_light.clone());
         // if (occlusion_ray.position.x < 3.) {
         //     println!("{:?}", occlusion_ray);
         // }
@@ -211,7 +211,7 @@ pub fn shoot_ray(ray: Ray, scene: &Scene) -> Option<(Object, Vector, Vector, Vec
     let mut closest_dist: f32 = 1e6;
     let mut closest_object: &Object = &Object::default();
     let mut surface_normal: Vector;
-    surface_normal = vector(1., 1., 1.);
+    surface_normal = Vector::new(1., 1., 1.);
     // here we're at once per pixel
     for object in &scene.objects {
         // this is once per object
@@ -224,7 +224,7 @@ pub fn shoot_ray(ray: Ray, scene: &Scene) -> Option<(Object, Vector, Vector, Vec
                 let a = mesh.output_vertices[poly[0]].clone();
                 let b = mesh.output_vertices[poly[1]].clone();
                 let c = mesh.output_vertices[poly[2]].clone();
-                let polygon = polygon(a, b, c);
+                let polygon = Polygon::new(a, b, c);
                 let (b, _i, dist) = probe_ray_polygon_intersection(&ray, &polygon);
                 if b && dist < closest_dist {
                     closest_object = object;
@@ -291,7 +291,7 @@ pub fn pixel_to_ray(x: u32, y: u32, scene: &Scene) -> Ray {
         // the focal length needs to be proportional
     };
     let position = scene.camera.position;
-    let mut ray = ray(position, direction);
+    let mut ray = Ray::new(position, direction);
     ray.direction.norm();
     ray
 }
@@ -317,7 +317,7 @@ mod tests {
 
         // println!("direction: {:?}", ray.direction);
 
-        let mut foil = vector(-0.3333333, -0.3333333, -0.5);
+        let mut foil = Vector::new(-0.3333333, -0.3333333, -0.5);
         foil.norm();
         assert_eq!(ray.direction.x, foil.x); //
         assert_eq!(ray.direction.y, foil.y); //
@@ -329,7 +329,7 @@ mod tests {
 
         // println!("direction: {:?}", ray.direction);
 
-        let mut foil = vector(00.0, 0.0, -0.5);
+        let mut foil = Vector::new(00.0, 0.0, -0.5);
         foil.norm();
         assert_eq!(ray.direction.x, foil.x); //
         assert_eq!(ray.direction.y, foil.y); //

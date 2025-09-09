@@ -40,7 +40,7 @@ mod tests {
 
     use crate::geometry::{
         orientation::J,
-        primitives::{vector, Ray, ORIGIN},
+        primitives::{Ray, Vector, ORIGIN},
     };
 
     use super::ray_sphere_intersection;
@@ -50,24 +50,24 @@ mod tests {
     #[test]
     fn test_simple_intersection() {
         let ray = Ray {
-            position: vector(0., 0., 0.),
-            direction: vector(0., 0., 1.),
+            position: Vector::new(0., 0., 0.),
+            direction: Vector::new(0., 0., 1.),
         };
-        let position = vector(0., 0., 5.);
+        let position = Vector::new(0., 0., 5.);
         let radius = 1.;
         let result = ray_sphere_intersection(&ray, &position, &radius);
         assert!(result);
 
         let ray = Ray {
-            position: vector(0., 0., 0.),
-            direction: vector(0., 1., 0.),
+            position: Vector::new(0., 0., 0.),
+            direction: Vector::new(0., 1., 0.),
         };
-        let position = vector(0., 0., 5.);
+        let position = Vector::new(0., 0., 5.);
         let radius = 1.;
         let result = ray_sphere_intersection(&ray, &position, &radius);
         assert!(!result);
 
-        let position = vector(0., 5., 0.);
+        let position = Vector::new(0., 5., 0.);
         let radius = 4.;
 
         let ray = Ray {
@@ -78,31 +78,31 @@ mod tests {
 
         let ray = Ray {
             position: ORIGIN,
-            direction: vector(4., 2., 0.),
+            direction: Vector::new(4., 2., 0.),
         };
         assert!(!ray_sphere_intersection(&ray, &position, &radius));
 
         let ray = Ray {
             position: ORIGIN,
-            direction: vector(1., 1., 0.),
+            direction: Vector::new(1., 1., 0.),
         };
         assert!(ray_sphere_intersection(&ray, &position, &radius));
     }
     #[test]
     fn test_intersection() {
         let ray = Ray {
-            position: vector(0., 0., 200.),
-            direction: vector(0., 0., 1.),
+            position: Vector::new(0., 0., 200.),
+            direction: Vector::new(0., 0., 1.),
         };
-        let position = vector(0., 0., 205.);
+        let position = Vector::new(0., 0., 205.);
         let radius = 1.;
         assert!(ray_sphere_intersection(&ray, &position, &radius));
 
         let ray = Ray {
-            position: vector(2., 0., 200.),
-            direction: vector(0., 0., 1.),
+            position: Vector::new(2., 0., 200.),
+            direction: Vector::new(0., 0., 1.),
         };
-        let position = vector(0., 0., 205.);
+        let position = Vector::new(0., 0., 205.);
         let radius = 1.;
         assert!(!ray_sphere_intersection(&ray, &position, &radius));
     }

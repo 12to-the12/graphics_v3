@@ -193,21 +193,21 @@ pub fn compile_transforms(transforms: &Vec<Transform>) -> Transform {
 mod tests {
     use crate::camera::{Camera, Lens, Sensor};
 
-    use crate::geometry::primitives::{vector, vertex};
+    use crate::geometry::primitives::Vertex;
 
     use super::*;
 
     #[test]
     fn test_translate() {
-        let myvertex = vertex(1.0, 2.0, 3.0);
+        let myvertex = Vertex::new(1.0, 2.0, 3.0);
         let myvertexlist = vec![myvertex];
         // let offset = vector(-1.0, 3.0, -7.3);
         // let mytransform = Transform::Translation(offset);
         // apply_transform(&mut myvertexlist, mytransform);
-        let mytransform = build_translation_transform(vector(-1.0, 3.0, -7.3));
+        let mytransform = build_translation_transform(Vector::new(-1.0, 3.0, -7.3));
         let myvertexlist = mytransform.process(myvertexlist);
-        assert_eq!(myvertexlist[0], vertex(0.0, 5.0, -4.3));
-        assert_ne!(myvertexlist[0], vertex(1.0, 2.0, 3.0));
+        assert_eq!(myvertexlist[0], Vertex::new(0.0, 5.0, -4.3));
+        assert_ne!(myvertexlist[0], Vertex::new(1.0, 2.0, 3.0));
     }
     /// https://vitaminac.github.io/Matrices-in-Computer-Graphics/#Translation-Matrix
     #[test]
@@ -228,7 +228,7 @@ mod tests {
         let myvertex = arr1(&[-169.0, 0.0, 729.7, 1.0]);
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
-        assert_eq!(vertex(-169.0, 0.0, 729.7), myvertex);
+        assert_eq!(Vertex::new(-169.0, 0.0, 729.7), myvertex);
     }
     #[test]
     fn translation_matrix_integrity() {
@@ -244,11 +244,11 @@ mod tests {
     }
     #[test]
     fn verify_translation_implementation() {
-        let transform = build_translation_transform(vector(1.1, 0.0, -7.6));
+        let transform = build_translation_transform(Vector::new(1.1, 0.0, -7.6));
         let myvertex = arr1(&[1.0, 2.0, 3.0, 1.0]);
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
-        assert_eq!(vertex(2.1, 2.0, -4.6), myvertex);
+        assert_eq!(Vertex::new(2.1, 2.0, -4.6), myvertex);
     }
     #[test]
     fn scale_matrix_integrity() {
@@ -265,7 +265,7 @@ mod tests {
     }
     #[test]
     fn verify_scale_implementation() {
-        let transform = build_scale_transform(vector(3.0, -2.0, 2.2));
+        let transform = build_scale_transform(Vector::new(3.0, -2.0, 2.2));
         let myvertex = arr1(&[1.0, 2.0, 3.0, 1.0]);
         let vertex_list = vec![vertex_from_array(myvertex)];
         let myvertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
@@ -304,7 +304,7 @@ mod tests {
     }
     #[test]
     fn verify_quaternions() {
-        let vector = vector(1., 0., 0.);
+        let vector = Vector::new(1., 0., 0.);
         let angle = 90f32.to_radians();
 
         let transform = build_arbitrary_rotation_transform(angle, vector);
@@ -331,7 +331,7 @@ mod tests {
             vertical_res: 300,
         };
         let camera = Camera {
-            position: vector(0.0, 0.0, 0.0),
+            position: Vector::new(0.0, 0.0, 0.0),
             // orientation: Polar
             lens,
             sensor,

@@ -1,4 +1,4 @@
-use crate::geometry::primitives::{mesh, vertex, Mesh};
+use crate::geometry::primitives::{Mesh, Vertex};
 use std::fs;
 pub fn load_wavefront_obj(path: String) -> Mesh {
     let data = fs::read_to_string(path).expect("Unable to read file");
@@ -24,7 +24,7 @@ pub fn load_wavefront_obj(path: String) -> Mesh {
             let x: f32 = numbers.next().unwrap().parse().unwrap();
             let y: f32 = numbers.next().unwrap().parse().unwrap();
             let z: f32 = numbers.next().unwrap().parse().unwrap();
-            vertices.push(vertex(x, y, z));
+            vertices.push(Vertex::new(x, y, z));
         }
         // adds a face
         else if line.starts_with("f ") {
@@ -45,5 +45,5 @@ pub fn load_wavefront_obj(path: String) -> Mesh {
             polygons.push(polygon);
         }
     }
-    mesh(vertices, polygons)
+    Mesh::new(vertices, polygons)
 }
