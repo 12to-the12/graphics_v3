@@ -5,13 +5,6 @@ use crate::{
 };
 use std::f32::consts::PI;
 
-#[derive(Clone, Debug, PartialEq)]
-pub enum ShaderNode {
-    Void,
-    PBR(PBR),
-    _Literal(Spectra),
-}
-
 /// physical object in space with associated data
 // I want shaders to simply be a trait
 // any function that takes in all the necessary data and returns a light value is a shader

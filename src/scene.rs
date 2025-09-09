@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use crate::camera::CAMERA;
 use crate::camera::{Camera, Lens, Sensor};
 use crate::geometry::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
@@ -74,7 +73,7 @@ pub fn simple_scene<'b>() -> Scene {
         lens,
         sensor,
         exposure_time: 20_000_000.,
-        ..CAMERA
+        ..Camera::default()
     };
     let mut lights = vec![];
 

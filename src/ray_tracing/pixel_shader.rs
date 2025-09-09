@@ -1,11 +1,9 @@
 use crate::color::colorspace_conversion::spectra_to_display;
 use crate::geometry::primitives::{polygon, ray, vector, Ray, Vector};
 use crate::lighting::{black_spectra, Light, LightType, RadiometricUnit, Spectra};
-use crate::material::ShaderNode;
 use crate::object::Object;
 use crate::ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection;
 
-use crate::ray_tracing::rendering_equation::BRDF;
 use crate::scene::Scene;
 use image::{Rgb, RgbImage};
 use stopwatch::Stopwatch;

@@ -2,10 +2,7 @@
 use image::{Rgb, RgbImage};
 use ndarray::Array1;
 
-use crate::{
-    geometry::transformations::{compile_transforms, Transform},
-    material::ShaderNode,
-};
+use crate::geometry::transformations::{compile_transforms, Transform};
 // use crate::ray_tracing::rendering_equation::BRDF;
 
 /// geometry defining spatial surface
@@ -13,7 +10,6 @@ use crate::{
 pub struct Vertex {
     pub position: Vector,
     pub uv_coord: (f32, f32),
-    pub shader: ShaderNode,
     // pub x: f32,
     // pub y: f32,
     // pub z: f32,
@@ -80,16 +76,19 @@ impl Vertex {
 //     }
 // }
 
-const VERTEX: Vertex = Vertex {
-    position: ORIGIN,
-    uv_coord: (0., 0.),
-    shader: ShaderNode::Void,
-};
+impl Default for Vertex {
+    fn default() -> Self {
+        Vertex {
+            position: ORIGIN,
+            uv_coord: (0., 0.),
+        }
+    }
+}
 
 pub fn vertex(x: f32, y: f32, z: f32) -> Vertex {
     return Vertex {
         position: vector(x, y, z),
-        ..VERTEX
+        ..Vertex::default()
     };
 }
 
@@ -98,7 +97,7 @@ pub fn vertex_from_array(arr: Array1<f32>) -> Vertex {
     let position_vector = vector(arr[0] / w, arr[1] / w, arr[2] / w);
     return Vertex {
         position: position_vector,
-        ..VERTEX
+        ..Vertex::default()
     };
 }
 

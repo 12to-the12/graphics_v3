@@ -19,7 +19,7 @@ pub fn _camera(position: Vector, lens: Lens, sensor: Sensor) -> Camera {
         position,
         lens,
         sensor,
-        ..CAMERA
+        ..Camera::default()
     }
 }
 // impl Default for Camera {
@@ -125,32 +125,42 @@ impl Sensor {
         self._sensor_area() / pixel_count as f32
     }
 }
+impl Default for Sensor {
+    fn default() -> Self {
+        Sensor {
+            width: 36.0, // mm
+            // height: 24.0,
+            horizontal_res: 1500,
+            vertical_res: 1000,
+        }
+    }
+}
+impl Default for Lens {
+    fn default() -> Self {
+        Lens {
+            _aperture: 12.0,
+            focal_length: 50.0,
+            _focus_distance: 20.0,
+        }
+    }
+}
 
-pub const LENS: Lens = Lens {
-    _aperture: 12.0,
-    focal_length: 50.0,
-    _focus_distance: 20.0,
-};
-
-pub const SENSOR: Sensor = Sensor {
-    width: 36.0, // mm
-    // height: 24.0,
-    horizontal_res: 1500,
-    vertical_res: 1000,
-};
-
-pub const CAMERA: Camera = Camera {
-    position: Vector {
-        x: 0.,
-        y: 0.,
-        z: 0.,
-    },
-    lens: LENS,
-    sensor: SENSOR,
-    _near_clipping_plane: 1e-1,
-    _far_clipping_plane: 1e6,
-    exposure_time: 1.,
-};
+impl Default for Camera {
+    fn default() -> Self {
+        Camera {
+            position: Vector {
+                x: 0.,
+                y: 0.,
+                z: 0.,
+            },
+            lens: Lens::default(),
+            sensor: Sensor::default(),
+            _near_clipping_plane: 1e-1,
+            _far_clipping_plane: 1e6,
+            exposure_time: 1.,
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -180,7 +190,7 @@ mod tests {
     /// useful table: https://www.nikonians.org/reviews/fov-tables
     #[test]
     fn field_of_view() {
-        let mut camera = CAMERA;
+        let mut camera = Camera::default();
         assert_eq!(camera.horizontal_field_of_view().round(), 40.0); // 39.59775
         assert_eq!(camera._vertical_field_of_view().round(), 27.0); //
 
@@ -196,7 +206,7 @@ mod tests {
     }
     #[test]
     fn pixel_size() {
-        assert_eq!(SENSOR._sensor_area(), 864.0);
-        assert_eq!(SENSOR._pixel_area(), 0.000576);
+        assert_eq!(Sensor::default()._sensor_area(), 864.0);
+        assert_eq!(Sensor::default()._pixel_area(), 0.000576);
     }
 }

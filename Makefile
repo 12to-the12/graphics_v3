@@ -1,16 +1,18 @@
 default: run
 all:run
 
-build:
+build: format
 	cargo build --release
-run:
+run: format
 	cargo run --release
 
-test:
+test: format
 	cargo test
 
 
-check:
+format:
+	cargo fmt
+check: format
 	cargo check
 
 open: open_pictures run
