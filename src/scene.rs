@@ -82,37 +82,35 @@ pub fn simple_scene<'b>() -> Scene {
 
     let meshes = Vec::new();
     let mut objects = Vec::new();
-    let mesh = load_wavefront_obj("models/cube.obj".to_string());
+    let cube = load_wavefront_obj("models/cube.obj".to_string());
+    let sphere: Mesh = load_wavefront_obj("models/sphere.obj".to_string());
+    let plane: Mesh = load_wavefront_obj("models/plane.obj".to_string());
     let object = Object {
         position: Vector::new(-3.0, 0.0, -10.0),
-        meshes: vec![mesh],
+        meshes: vec![cube.clone()],
         ..Object::default()
     };
 
     objects.push(object);
 
-    let mesh = load_wavefront_obj("models/cube.obj".to_string());
     let object = Object {
         position: Vector::new(3.0, 0.0, -10.0),
-        meshes: vec![mesh],
+        meshes: vec![cube.clone()],
         ..Object::default()
     };
     objects.push(object);
-
-    let mesh: Mesh = load_wavefront_obj("models/sphere.obj".to_string());
 
     let object = Object {
         position: Vector::new(0., 0., -6.0),
-        meshes: vec![mesh],
-        material: Arc::new(PBR::new(1.0, 0.0)),
+        meshes: vec![sphere],
+        material: Arc::new(PBR::default()),
         ..Object::default()
     };
     objects.push(object);
 
-    let mesh: Mesh = load_wavefront_obj("models/plane.obj".to_string());
     let object = Object {
         position: Vector::new(0., -2., 0.0),
-        meshes: vec![mesh],
+        meshes: vec![plane],
         ..Object::default()
     };
     objects.push(object);

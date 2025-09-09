@@ -56,7 +56,7 @@ impl Default for Object {
             _orientation: _UP,
             _scale: 1.,
             _children: Vec::new(),
-            material: Arc::new(PBR::new(0.0, 1.0)),
+            material: Arc::new(PBR::default()),
             meshes: Vec::new(),
         }
     }

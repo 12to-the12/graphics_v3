@@ -150,6 +150,13 @@ pub fn black_spectra(unit: RadiometricUnit) -> Spectra {
     }
 }
 
+pub fn white_spectra(unit: RadiometricUnit) -> Spectra {
+    Spectra {
+        spectra: Array::ones(40),
+        unit: unit,
+    }
+}
+
 pub fn _const_spectra(value: f32, unit: RadiometricUnit) -> Spectra {
     Spectra {
         spectra: Array::from_elem(40, value),
