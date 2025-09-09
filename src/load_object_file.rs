@@ -10,12 +10,9 @@ pub fn load_wavefront_obj(path: String) -> Mesh {
     for line in data.split("\n") {
         // discards if it's a comment
         if line.starts_with("#") {
-            // println!("discarding comment")
         }
         // adds a vertex
         else if line.starts_with("v ") {
-            // println!("{}", line);
-
             let mut numbers = line
                 .trim()
                 .strip_prefix("v ")
@@ -28,8 +25,6 @@ pub fn load_wavefront_obj(path: String) -> Mesh {
         }
         // adds a face
         else if line.starts_with("f ") {
-            // println!("{}", line);
-
             let numbers = line
                 .trim()
                 .strip_prefix("f ")

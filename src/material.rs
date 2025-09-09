@@ -28,7 +28,6 @@ pub trait BRDF: Debug + Sync + Send {
         normal: &Vector,                     // surface normal
         incoming_radiant_intensity: Spectra, // the radiant flux of the lightsource encoded as a spectrum
     ) -> Spectra;
-    // fn evaluate_BRDF(&self, x: &Vector, ω_i: &Vector, ω_0: &Vector, spectra: &Spectra) -> Spectra;
 }
 
 impl BRDF for PBR {
@@ -56,7 +55,6 @@ impl BRDF for PBR {
         let observer_irradiance: Spectra = ((1. / (r_o * r_o)) * isotrophic_surface_radiance)
             .set_unit(RadiometricUnit::Irradiance);
         return observer_irradiance;
-        // let simple: Spectra = incident_factor * incoming_radiant_intensity;
     }
 }
 
@@ -68,35 +66,3 @@ impl PBR {
         }
     }
 }
-
-// /// the defaults
-// pub const OBJECT: Object = Object {
-//     position: ORIGIN,
-//     _orientation: _UP,
-//     _scale: 1.,
-//     _children: Vec::new(),
-//     _shaders: Vec::new(),
-//     meshes: Vec::new(),
-// };
-
-// struct MeshPool {
-//     meshes: Vec
-// }
-
-// #[cfg(test)]
-// mod tests {
-//     use crate::geometry::primitives::_unit_cube;
-
-//     use super::{Object, OBJECT};
-
-//     /// useful table: https://www.nikonians.org/reviews/fov-tables
-//     #[test]
-//     fn test_radius() {
-//         let mymesh = _unit_cube();
-//         let myobject: Object = Object {
-//             meshes: vec![mymesh],
-//             ..OBJECT
-//         };
-//         assert_eq!(myobject.get_radius(), f32::sqrt(3.));
-//     }
-// }

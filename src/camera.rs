@@ -17,19 +17,6 @@ pub struct Camera {
     pub exposure_time: f32,
 }
 
-// impl Default for Camera {
-//     fn default() -> Camera {
-//         Camera {
-//             position: ORIGIN,
-//             lens: LENS,
-//             sensor: SENSOR,
-//             near_clipping_plane: 1e-1,
-//             far_clipping_plane: 1e6,
-//             shutter_speed: 1.,
-//         }
-//     }
-// }
-
 impl Camera {
     /// get the horizontal field of view in degrees
     pub fn horizontal_field_of_view(&self) -> f32 {
@@ -71,9 +58,6 @@ impl Camera {
         let (hres, vres) = camera.sensor.res();
         let mut horizontal_fraction: f32 = x / (hres as f32);
         let mut vertical_fraction: f32 = y / (vres as f32);
-
-        // let mut horizontal_fraction: f32 = x;
-        // let mut vertical_fraction: f32 = y;
 
         horizontal_fraction -= 0.5; // [0 -> 1] becomes [-0.5 -> +0.5]
         vertical_fraction -= 0.5; // [0 -> 1] becomes [-0.5 -> +0.5]

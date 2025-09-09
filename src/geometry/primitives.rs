@@ -10,9 +10,6 @@ use crate::geometry::transformations::{compile_transforms, Transform};
 pub struct Vertex {
     pub position: Vector,
     pub uv_coord: (f32, f32),
-    // pub x: f32,
-    // pub y: f32,
-    // pub z: f32,
 }
 
 pub const ORIGIN: Vector = Vector {
@@ -22,13 +19,6 @@ pub const ORIGIN: Vector = Vector {
 };
 
 impl Vertex {
-    // pub fn to_point(&self) -> Point {
-    //     let factor: f32 = self.z;
-    //     return Point {
-    //         x: (self.x.round() / factor) as i32,
-    //         y: (self.y.round() / factor) as i32,
-    //     };
-    // }
     pub fn _add(&mut self, other: &Vector) {
         self.position.x += other.x;
         self.position.y += other.y;
@@ -60,28 +50,6 @@ impl Vertex {
     }
 }
 
-// impl std::ops::Mul<Vertex> for f32 {
-//     type Output = Vertex;
-//     fn mul(self, rhs: Vertex) -> Vertex {
-//         Vertex {
-//             x: rhs.x * self,
-//             y: rhs.y * self,
-//             z: rhs.z * self,
-//         }
-//     }
-// }
-
-// impl std::ops::Add<Vertex> for Vertex {
-//     type Output = Vertex;
-//     fn add(self, rhs: Vertex) -> Vertex {
-//         Vertex {
-//             x: rhs.x + self.x,
-//             y: rhs.y + self.y,
-//             z: rhs.z + self.z,
-//         }
-//     }
-// }
-
 impl Default for Vertex {
     fn default() -> Self {
         Vertex {
@@ -109,10 +77,6 @@ pub struct Vector {
     pub z: f32,
 }
 
-// fn square(x:f32) -> f32 {
-//     x**2
-//     x.pow(2)
-// }
 impl std::ops::Mul<Vector> for f32 {
     type Output = Vector;
     fn mul(self, rhs: Vector) -> Vector {
@@ -217,10 +181,6 @@ impl Vector {
 
 #[derive(Clone, Debug)]
 pub struct Polygon {
-    // <'a>
-    // pub a: &'a Vertex,
-    // pub b: &'a Vertex,
-    // pub c: &'a Vertex,
     pub a: Vertex,
     pub b: Vertex,
     pub c: Vertex,
@@ -232,10 +192,6 @@ impl Polygon {
         let _a: &Vector = &self.a.position;
         let _b: &Vector = &self.b.position;
         let _c: &Vector = &self.c.position;
-
-        //     plot_line(canvas, a, b, color);
-        //     plot_line(canvas, b, c, color);
-        //     plot_line(canvas, c, a, color);
     }
     /// ONLY WORKS FOR TRIGON
     pub fn get_normal(&self) -> Vector {
@@ -255,10 +211,6 @@ impl Polygon {
         Polygon { a, b, c }
     }
 }
-
-// pub fn polygon<'a>(a: &'a Vertex, b: &'a Vertex, c: &'a Vertex) -> Polygon {
-//     Polygon { a, b, c }
-// }
 
 pub struct _Line3D {
     pub a: Vertex,

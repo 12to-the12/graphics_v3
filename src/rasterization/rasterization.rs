@@ -5,7 +5,6 @@ use image::{Rgb, RgbImage};
 pub fn rasterize_triangle(triangle: Triangle, canvas: &mut RgbImage) {
     let color = Rgb([0, 255, 0]);
     plot_triangle(triangle.clone(), canvas, color);
-    // canvas.put_pixel(x as u32, y as u32, color);
 
     // get bounding box
     // sort points by Y from smallest,

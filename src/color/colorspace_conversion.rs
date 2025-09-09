@@ -9,7 +9,6 @@ use crate::{
 };
 
 pub fn _black_body_xyY(temp: f32) -> (f32, f32, f32) {
-    // println!("peak wavelength: {}", peak_blackbody(temp));
     let spectra = norm_black_body(temp);
     let XYZ = spectra_to_CIEXYZ(&spectra);
     let xyY = CIEXYZ_to_xyY(XYZ);
@@ -90,14 +89,6 @@ pub fn sRGB_to_display(sRGB: (f32, f32, f32)) -> Rgb<u8> {
     let sB = sRGB.2;
 
     if sR < 0. || sG < 0. || sB < 0. {
-        // if sR > 1. || sG > 1. || sB > 1. || sR < 0. || sG < 0. || sB < 0. {
-
-        // if sR > 1. || sG > 1. || sB > 1. {
-        // let sR = pixel_ready(sR / 5.);
-        // let sG = pixel_ready(sG / 5.);
-        // let sB = pixel_ready(sB / 5.);
-        // return Rgb([sR, sG, sB]);
-
         return Rgb([255, 0, 255]);
     }
     // println!("{x} {y}");

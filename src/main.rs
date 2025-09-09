@@ -71,7 +71,6 @@ fn main_loop() {
 
         println!("");
         single(counter);
-        // sleep(REST);
         frame.stop();
         println!("frame: {:?}", frame.elapsed());
         if REST > frame.elapsed() {
@@ -80,7 +79,6 @@ fn main_loop() {
         }
 
         counter += 1;
-        // counter %= 360.0;
     }
 }
 fn single(i: usize) {
@@ -91,7 +89,6 @@ fn single(i: usize) {
     save_image(render);
 }
 // REST is ms per frame
-// const REST: u64 = 1000 / 1 as u64; // ms/frame @ 1 fps
 const FPS: f32 = 4.;
 const REST: Duration = Duration::from_millis((1000. / FPS) as u64); // ms/frame @ 8 fps
                                                                     // const REST: u64 = 1000 / 12 as u64; // const REST: u64 = 1000/12 as u64;// ms/frame @ 12 fps
@@ -101,7 +98,6 @@ fn draw_colors() {
     let vertical_res = horizontal_res;
     let mut canvas: RgbImage = ImageBuffer::new(horizontal_res, vertical_res);
     coloring_book(&mut canvas);
-    // draw_colors_in_xyz(&mut canvas);
     canvas
         .save_with_format("color_gamut.png", ImageFormat::Png)
         .unwrap();

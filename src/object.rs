@@ -13,6 +13,8 @@ pub trait Entity: Debug + Sync + Send {
     fn get_position(&self) -> Vector {
         ORIGIN
     }
+    // fn get_transforms(&self) -> &Vec<Transform>;
+    // fn append_transforms(&self) -> &Vec<Transform>; // add position and scale and shit to log
 }
 /// physical object in space with associated data
 #[derive(Debug, Clone)]
@@ -69,10 +71,6 @@ impl Entity for Object {
         self.position
     }
 }
-
-// struct MeshPool {
-//     meshes: Vec
-// }
 
 #[cfg(test)]
 mod tests {

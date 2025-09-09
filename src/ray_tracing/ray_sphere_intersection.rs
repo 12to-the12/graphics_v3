@@ -14,7 +14,6 @@ pub fn ray_sphere_intersection(ray: &Ray, position: &Vector, radius: &f32) -> bo
     let c = &(O - *C).magnitude().powi(2) - R.powi(2);
 
     let L = position.clone() - ray.position;
-    // println!("{:?}", L);
     let tca = L.dot(&ray.direction);
     if tca < 0. {
         return false;
@@ -23,9 +22,6 @@ pub fn ray_sphere_intersection(ray: &Ray, position: &Vector, radius: &f32) -> bo
     if d2 > radius * radius {
         return false;
     }
-    // let thc = f32::sqrt(radius*radius-d2);
-    // let t0 = tca-thc;
-    // let t1 = tca+thc;
     // the discriminant thing
     let Δ = b * b - 4. * a * c;
     if Δ >= 0. {

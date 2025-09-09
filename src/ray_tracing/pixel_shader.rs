@@ -26,28 +26,11 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
         for x in x_start..x_end {
             let color = closure(x, y, scene);
             mini_canvas.put_pixel(x - x_start as u32, y - y_start as u32, color);
-            // for personal canvas
-            // canvas.put_pixel(x as u32, y as u32, color);
-            // canvas
-            // .save_with_format("rust-output.bmp", ImageFormat::Bmp)
-            // .unwrap();
         }
     }
 
-    // for y in 0..height {
-    //     for x in 0..width {
-    //         let color = closure(x, y, scene);
-    //         canvas.put_pixel(x as u32, y as u32, color);
-    //         // canvas
-    //         // .save_with_format("rust-output.bmp", ImageFormat::Bmp)
-    //         // .unwrap();
-    //         // println!("px");
-    //     }
-    // }
     shading.stop();
-    if scene.logging > 1 {
-        // println!("  shading: {:?}", shading.elapsed());
-    }
+    if scene.logging > 1 {}
 }
 
 pub fn _color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
@@ -151,22 +134,14 @@ pub fn compute_light(
         let to_light = &intersection_point.clone().to(light.get_position());
 
         let occlusion_ray = Ray::new(intersection_point, to_light.clone());
-        // if (occlusion_ray.position.x < 3.) {
-        //     println!("{:?}", occlusion_ray);
-        // }
 
         for objects in scene.objects.iter() {
             if objects.ray_intercept(&occlusion_ray) {
                 let occlusion = shoot_ray(occlusion_ray.clone(), &scene);
                 if occlusion.is_some() {
-                    // continue
                     output = output + black_spectra(RadiometricUnit::Flux);
                     continue 'lights;
-                    // return monochroma_spectra(700., 100., RadiometricUnit::Flux);
                 }
-                // else{
-                //     println!("{:?}",occlusion_ray);
-                // }
             }
         }
 
@@ -174,7 +149,6 @@ pub fn compute_light(
 
         // if the angle between the surface and light is obtuse, it's facing away
         if to_light.dot(&normal) < 0. {
-            // return monochroma_spectra(550., 1., RadiometricUnit::Flux)
             continue;
         }
 
@@ -185,19 +159,6 @@ pub fn compute_light(
             &normal,
             light.radiant_intensity(intersection_point),
         );
-
-        // let closest_material: &ShaderNode = &closest_object.material;
-        // let radiance: Spectra = match closest_material {
-        //     ShaderNode::Void => black_spectra(crate::lighting::RadiometricUnit::Radiance),
-        //     ShaderNode::PBR(pbr) => pbr.rendering_equation(
-        //         &intersection_point,
-        //         to_light,
-        //         &direction,
-        //         &normal,
-        //         light.radiant_intensity(intersection_point),
-        //     ),
-        //     ShaderNode::_Literal(spectra) => spectra.clone(),
-        // };
 
         output = output + radiance;
     }

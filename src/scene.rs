@@ -40,12 +40,6 @@ pub struct Scene {
     pub lights: Vec<Arc<dyn Light>>,
     pub objects: Vec<Object>,
     pub _meshes: Vec<Mesh>,
-    // pub unified_mesh: Vec<Polygon<'a>>,
-    // pub unified_vertices: Vec<Vertex>, // pub materials: Vec<Material>,
-    // pub image_assets: Vec<Image>,
-    // pub time: Time, // timestamp to render at
-    // pub settings: Settings,
-    // geometry: <T,Mesh>,
     pub background: Spectra,
     pub tick: usize,
     pub rendermode: Rendermode,
@@ -78,8 +72,6 @@ pub fn simple_scene<'b>() -> Scene {
     let mut lights: Vec<Arc<dyn Light>> = vec![];
 
     let light = PointLight::new(Vector::new(-5.0, 3.0, -5.0), RIGHT, norm_black_body(1500.));
-    // let light = point_light(vertex(-100.0, 0.0, 0.0), RIGHT, 1000*const_spectra(380.));
-    // let lightb = point_light(vertex(100.0, 100.0, 100.0), RIGHT, monochroma_spectra(460.,5e-1));
     lights.push(Arc::new(light));
 
     let lightb = PointLight::new(Vector::new(5.0, 1.0, -5.0), RIGHT, norm_black_body(3000.));
@@ -90,10 +82,7 @@ pub fn simple_scene<'b>() -> Scene {
 
     let meshes = Vec::new();
     let mut objects = Vec::new();
-    // let mesh = unit_cube(vector(0.0, 0.0, -5.0));
-    // let mesh = sample_mesh(vector(0.0, 0.0, -3.0));
     let mesh = load_wavefront_obj("models/cube.obj".to_string());
-    // meshes.push(mesh);
     let object = Object {
         position: Vector::new(-3.0, 0.0, -10.0),
         meshes: vec![mesh],
@@ -103,7 +92,6 @@ pub fn simple_scene<'b>() -> Scene {
     objects.push(object);
 
     let mesh = load_wavefront_obj("models/cube.obj".to_string());
-    // meshes.push(mesh);
     let object = Object {
         position: Vector::new(3.0, 0.0, -10.0),
         meshes: vec![mesh],
@@ -112,9 +100,6 @@ pub fn simple_scene<'b>() -> Scene {
     objects.push(object);
 
     let mesh: Mesh = load_wavefront_obj("models/sphere.obj".to_string());
-    // let mesh = sample_mesh();
-    // mesh.position = vector(3.0, 0.0, -10.0);
-    // meshes.push(mesh);
 
     let object = Object {
         position: Vector::new(0., 0., -6.0),
@@ -132,7 +117,6 @@ pub fn simple_scene<'b>() -> Scene {
     };
     objects.push(object);
 
-    // let background = Rgb([0, 0, 0]);
     let background = black_spectra(crate::lighting::RadiometricUnit::Flux);
     let scene = Scene {
         camera,

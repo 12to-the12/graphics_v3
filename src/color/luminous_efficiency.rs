@@ -27,8 +27,6 @@ const LUMINOUS_EFFICACY: [f32; 40] = [
 // neither of these are valid, they need to average or something, not sum
 // lm/w
 pub fn _photopic_conversion(spectra: Spectra) -> f32 {
-    // println!("{:?}", &spectra.spectra);
-
     let watts = Array::from_vec(_PHOTOPIC_CONVERSION.to_vec());
     let lumens_spectra = watts * spectra.spectra; // watts* (lumens/watt)
     let lumens = Array::sum(&lumens_spectra);
@@ -37,8 +35,6 @@ pub fn _photopic_conversion(spectra: Spectra) -> f32 {
 
 // neither of these are valid, they need to average or something, not sum
 pub fn luminous_efficacy(spectra: Spectra) -> f32 {
-    // println!("{:?}", &spectra.spectra);
-
     let efficacy = Array::from_vec(LUMINOUS_EFFICACY.to_vec());
     let lumens_spectra = efficacy * spectra.spectra;
     let result = Array::sum(&lumens_spectra);
@@ -52,9 +48,6 @@ mod tests {
         color::luminous_efficiency::_photopic_conversion,
         lighting::{black_spectra, RadiometricUnit, Spectra},
     };
-
-    // use super::PHOTOPIC_CONVERSION;
-
     #[test]
     fn test_luminous_efficacy_of_darkness() {
         let spectra: Spectra = black_spectra(RadiometricUnit::Radiance);
@@ -79,20 +72,4 @@ mod tests {
         let lumens: f32 = _photopic_conversion(radiant_flux);
         assert_eq!(lumens, 1359.136);
     }
-
-    // #[test]
-    // fn test_luminous_efficacy_of_blackbody() {
-    //     // in terms of radiance (watts/meter^2/steradian), we want radiant flux (watts)
-    //     let radiance: Spectra = black_body(2700.);
-    //     let radiant_exitance: Spectra = Spectra {
-    //         spectra: radiance.spectra.clone() * 4. * PI,
-    //     };
-    //     let radius: f32 = 1.; // meters
-    //     let area = 4.*PI*radius.powi(2);
-    //     let flux: Spectra = Spectra {
-    //         spectra: radiant_exitance.spectra.clone() * area,
-    //     };
-    //     let efficacy: f32 = luminous_efficacy(flux);
-    //     assert_eq!(efficacy, 12.6);
-    // }
 }

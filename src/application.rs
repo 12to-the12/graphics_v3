@@ -12,11 +12,7 @@ use crate::scene::Scene;
 pub fn application(scene: &mut Scene) -> &Scene {
     let tick = scene.tick as f32;
     let objects: &mut Vec<Object> = &mut scene.objects;
-    // scene.lights[0].position.x += 2.*tick;
 
-    // scene.lights[0].direction = vector(-1., 0., 0.);
-
-    // meshes[0].add_transform(build_x_rotation_transform(tick.to_radians() * 3.));
     objects
         .index_mut(0)
         .meshes
@@ -35,25 +31,17 @@ pub fn application(scene: &mut Scene) -> &Scene {
             Vector::new(1., 1., 1.),
         ));
 
-    // meshes[0].add_transform(build_y_rotation_transform(tick.to_radians() * 3.));
     objects
         .index_mut(1)
         .meshes
         .index_mut(0)
         .add_transform(build_y_rotation_transform(tick.to_radians() * -3.));
 
-    // objects
-    //     .index_mut(2)
-    //     .position
-    //     .translate(vector(0.1 * scene.tick as f32, 0., 0.));
     objects
         .index_mut(2)
         .meshes
         .index_mut(0)
         .add_transform(build_y_rotation_transform(tick.to_radians() * 2.));
-
-    // mesh.add_transform(build_x_rotation_transform(-30_f32.to_radians()));
-    // mesh.add_transform(build_translation_transform(vector(0., -2., 2.)));
 
     return scene;
 }

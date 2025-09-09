@@ -28,10 +28,6 @@ fn build_to_projection_transform(scene: &Scene) -> Transform {
     return build_projection_transform(&scene.camera);
 }
 
-// fn build_to_clip_transform(scene: &Scene) -> Transform {
-//  return build_clip_transform(&scene.camera);
-// }
-
 fn build_to_display_transform(scene: &Scene) -> Transform {
     let camera = &scene.camera;
     let aspect_ratio = camera.sensor.aspect_ratio();
@@ -220,9 +216,6 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
         for (x, y, pixel) in mini_canvas.enumerate_pixels() {
             canvas.put_pixel(x + (i as u32) * width, y, *pixel);
         }
-        // canvas.clone()
-        // .save_with_format("rust-output.png", ImageFormat::Png)
-        // .unwrap();
     }
 
     reassembly.stop();

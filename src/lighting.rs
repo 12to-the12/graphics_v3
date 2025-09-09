@@ -179,7 +179,6 @@ const c: f32 = 299_792_458.;
 const _b: f32 = 2.897771955e-3;
 
 /// get the peak wavelength of a blackbody in nanometers
-///
 pub fn _peak_blackbody(temp: f32) -> f32 {
     let peak_in_meters = _b / temp;
     let peak_in_nm = peak_in_meters * 1e9;
@@ -246,11 +245,9 @@ mod tests {
     fn test_planks_law() {
         // peak emission for a campfire
         let spectral_radiance: f32 = plancks_law(&2000., &1500.);
-        // spectral_radiance = (spectral_radiance as f64* 1e39_f64) as f32;
         assert_eq!(spectral_radiance, 31012.611); //
 
         let spectral_radiance: f32 = plancks_law(&780., &2700.);
-        // spectral_radiance = (spectral_radiance as f64* 1e39_f64) as f32;
         assert_eq!(spectral_radiance, 445564.66); //
     }
     #[test]
@@ -259,7 +256,6 @@ mod tests {
         let radiance_spectra: Spectra = black_body(2700., RadiometricUnit::Flux);
         // 780nm
         let peak = radiance_spectra.from_λ(770.);
-        // spectral_radiance = (spectral_radiance as f64* 1e39_f64) as f32;
         assert_eq!(peak, 434_868.25); //
     }
 }

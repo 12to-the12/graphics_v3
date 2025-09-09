@@ -9,7 +9,6 @@ pub fn integrated_x_response(spectra: &Spectra) -> f32 {
         sum += λx_response(λ as f32) * spectra.from_λ(λ as f32);
     }
     return sum * spectra.get_sample_width();
-    // return sum;
 }
 
 pub fn integrated_y_response(spectra: &Spectra) -> f32 {
@@ -18,7 +17,6 @@ pub fn integrated_y_response(spectra: &Spectra) -> f32 {
         sum += λy_response(λ as f32) * spectra.from_λ(λ as f32);
     }
     return sum * spectra.get_sample_width();
-    // return sum;
 }
 
 pub fn integrated_z_response(spectra: &Spectra) -> f32 {
@@ -27,7 +25,6 @@ pub fn integrated_z_response(spectra: &Spectra) -> f32 {
         sum += λz_response(λ as f32) * spectra.from_λ(λ as f32);
     }
     return sum * spectra.get_sample_width();
-    // return sum;
 }
 
 // contribution at given wavelength
@@ -58,18 +55,6 @@ pub fn λz_response(λ: f32) -> f32 {
     }
     return Z[(λ as usize - 380) / 5];
 }
-
-// #[cfg(test)]
-// mod tests {
-//     use crate::cie_color_matching_functions::{λx_response, λy_response, λz_response};
-
-//     #[test]
-//     fn test_values() {
-//         assert_eq!(λx_response(360.), 0.0001299);
-//         assert_eq!(λy_response(1e5), 0.);
-//         assert_eq!(λz_response(360. + 12.), 0.002435809,);
-//     }
-// }
 
 /// 380-830 5nm increments
 const X: [f32; 91] = [
