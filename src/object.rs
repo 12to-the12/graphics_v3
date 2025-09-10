@@ -13,6 +13,10 @@ pub trait Entity: Debug + Sync + Send {
     fn get_position(&self) -> Vector {
         ORIGIN
     }
+
+    fn _get_parent(&self) -> Option<Arc<dyn Entity>> {
+        None
+    }
     // fn get_transforms(&self) -> &Vec<Transform>;
     // fn append_transforms(&self) -> &Vec<Transform>; // add position and scale and shit to log
 }
@@ -23,7 +27,7 @@ pub struct Object {
     pub position: Vector,
     pub _orientation: Orientation,
     pub _scale: f32,
-    pub _children: Vec<Object>,
+    pub _children: Vec<Arc<dyn Entity>>,
     pub material: Arc<dyn BRDF>,
     pub meshes: Vec<Mesh>,
     // & links to textures associated with it
@@ -45,6 +49,10 @@ impl Object {
         let position = self.position;
         let radius = self.get_radius();
         return ray_sphere_intersection(ray, &position, &radius);
+    }
+
+    pub fn _add_child(mut self, child: Arc<dyn Entity>) -> () {
+        self._children.push(child.clone());
     }
 }
 

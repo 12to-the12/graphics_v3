@@ -1,4 +1,6 @@
 #![allow(nonstandard_style)]
+use std::sync::Arc;
+
 // use crate::coordinate_space::Orientation;
 use crate::{
     geometry::primitives::{Ray, Vector},
@@ -8,6 +10,7 @@ use crate::{
 #[derive(Clone, Debug)]
 pub struct Camera {
     pub position: Vector,
+    pub _parent: Option<Arc<dyn Entity>>,
     // orientation: Orientation, // some object that implements get_orientation?
     pub lens: Lens,
     pub sensor: Sensor,
@@ -87,6 +90,7 @@ impl Default for Camera {
                 y: 0.,
                 z: 0.,
             },
+            _parent: None,
             lens: Lens::default(),
             sensor: Sensor::default(),
             _near_clipping_plane: 1e-1,
@@ -102,6 +106,9 @@ impl Entity for Camera {
         Self: Sized,
     {
         self.position
+    }
+    fn _get_parent(&self) -> Option<Arc<dyn Entity>> {
+        self._parent.clone()
     }
 }
 

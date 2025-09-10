@@ -338,6 +338,7 @@ mod tests {
             _near_clipping_plane: 1e-1,
             _far_clipping_plane: 1e6,
             exposure_time: 1.,
+            ..Camera::default()
         };
         let transform = build_projection_transform(&camera);
         println!("{:?}", camera.horizontal_field_of_view());
