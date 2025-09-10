@@ -1,8 +1,8 @@
 // use image::{ImageBuffer, Rgb, RgbImage};
+use crate::geometry::transformations::{compile_transforms, Transform};
 use image::{Rgb, RgbImage};
 use ndarray::Array1;
-
-use crate::geometry::transformations::{compile_transforms, Transform};
+use rand::Rng;
 // use crate::ray_tracing::rendering_equation::BRDF;
 
 /// geometry defining spatial surface
@@ -88,6 +88,17 @@ impl std::ops::Mul<Vector> for f32 {
     }
 }
 
+impl std::ops::Div<f32> for Vector {
+    type Output = Vector;
+    fn div(self, rhs: f32) -> Vector {
+        Vector {
+            x: self.x / rhs,
+            y: self.y / rhs,
+            z: self.z / rhs,
+        }
+    }
+}
+
 impl std::ops::Add<Vector> for Vector {
     type Output = Vector;
     fn add(self, rhs: Vector) -> Vector {
@@ -132,12 +143,16 @@ impl Vector {
         (self.x.powf(2.0) + self.y.powf(2.0) + self.z.powf(2.0)).sqrt()
     }
     /// normalizes the vector
-    pub fn norm(&mut self) {
-        let mag = self.magnitude();
-        self.x /= mag;
-        self.y /= mag;
-        self.z /= mag;
+    pub fn unitized(self) -> Vector {
+        self / self.magnitude()
     }
+    pub fn unitize(&mut self) {
+        let mag = self.magnitude();
+        self.x = self.x / mag;
+        self.y = self.y / mag;
+        self.z = self.z / mag;
+    }
+
     pub fn as_array(&self) -> [f32; 3] {
         [self.x, self.y, self.z]
     }
@@ -179,6 +194,21 @@ impl Vector {
     }
 }
 
+/// actually even in a cube
+pub fn even_over_sphere() -> Vector {
+    let mut rng = rand::thread_rng();
+    Vector::new(rng.gen(), rng.gen(), rng.gen()).unitized()
+}
+
+/// just an approximation
+pub fn even_over_hemisphere(normal: Vector) -> Vector {
+    let output = even_over_sphere();
+    if output.dot(&normal) < 0. {
+        return -1. * output;
+    }
+    output
+}
+
 #[derive(Clone, Debug)]
 pub struct Polygon {
     pub a: Vertex,
@@ -202,9 +232,7 @@ impl Polygon {
         let y = a.z * b.x - a.x * b.z;
         let z = a.x * b.y - a.y * b.x;
 
-        let mut out = Vector::new(x, y, z);
-        out.norm();
-        out
+        Vector::new(x, y, z).unitized()
     }
 
     pub fn new(a: Vertex, b: Vertex, c: Vertex) -> Polygon {
@@ -364,7 +392,7 @@ pub struct Ray {
 
 impl Ray {
     pub fn new(position: Vector, direction: Vector) -> Ray {
-        direction.clone().norm();
+        let direction = direction.unitized();
         Ray {
             position,
             direction,

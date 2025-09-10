@@ -108,13 +108,13 @@ pub fn _build_z_rotation_transform(θ: f32) -> Transform {
 // quaternions! See my notes
 // assumes radians
 pub fn build_arbitrary_rotation_transform(θ: f32, mut axis: Vector) -> Transform {
-    axis.norm();
+    axis.unitize();
     let q0 = cos(θ / 2.);
     let factor = sin(θ / 2.);
     let q1 = axis.x * factor;
     let q2 = axis.y * factor;
     let q3 = axis.z * factor;
-    let matrix = arr2(&[
+    let matrix: ndarray::ArrayBase<ndarray::OwnedRepr<f32>, ndarray::Dim<[usize; 2]>> = arr2(&[
         [
             sq(q0) + sq(q1) - sq(q2) - sq(q3),
             2. * q1 * q2 - 2. * q0 * q3,
@@ -338,6 +338,7 @@ mod tests {
             _near_clipping_plane: 1e-1,
             _far_clipping_plane: 1e6,
             exposure_time: 1.,
+            ..Camera::default()
         };
         let transform = build_projection_transform(&camera);
         println!("{:?}", camera.horizontal_field_of_view());

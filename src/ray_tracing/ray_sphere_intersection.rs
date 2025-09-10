@@ -4,7 +4,7 @@ use crate::geometry::primitives::{Ray, Vector};
 
 pub fn ray_sphere_intersection(ray: &Ray, position: &Vector, radius: &f32) -> bool {
     let mut ray = ray.clone();
-    ray.direction.norm();
+    ray.direction.unitize();
     let a = 1.;
     let C = position;
     let R = radius;

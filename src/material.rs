@@ -1,6 +1,6 @@
 use crate::{
     geometry::primitives::Vector,
-    lighting::{monochroma_spectra, white_spectra, RadiometricUnit, Spectra},
+    lighting::{white_spectra, RadiometricUnit, Spectra},
 };
 use std::{f32::consts::PI, fmt::Debug};
 

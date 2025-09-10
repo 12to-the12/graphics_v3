@@ -93,6 +93,17 @@ impl Spectra {
         return self;
     }
 }
+
+impl std::ops::Div<f32> for Spectra {
+    type Output = Spectra;
+    fn div(self, rhs: f32) -> Spectra {
+        return Spectra {
+            spectra: self.spectra / rhs,
+            unit: self.unit,
+        };
+    }
+}
+
 impl std::ops::Mul<Spectra> for f32 {
     type Output = Spectra;
     fn mul(self, rhs: Spectra) -> Spectra {
