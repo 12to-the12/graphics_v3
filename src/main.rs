@@ -17,6 +17,7 @@ mod rasterization;
 mod ray_tracing;
 
 extern crate approx;
+extern crate rand;
 extern crate stopwatch;
 
 use color::draw_chromaticity_diagram::coloring_book;

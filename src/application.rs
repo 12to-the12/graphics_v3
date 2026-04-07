@@ -12,6 +12,8 @@ use crate::scene::Scene;
 pub fn application(scene: &mut Scene) -> &Scene {
     let tick = scene.tick as f32;
     let objects: &mut Vec<Object> = &mut scene.objects;
+    let lights = &mut scene.lights;
+    // lights.index_mut(0).set_position();
 
     objects
         .index_mut(0)

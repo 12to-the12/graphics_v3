@@ -46,7 +46,10 @@ pub struct Scene {
     pub shadermode: ShaderMode,
     pub logging: u8,
     pub spatial_acceleration_structures: bool,
+    pub _recursive_raycasting: bool,
     pub threads: u32,
+    pub samples: u32,
+    pub max_depth: u32,
 }
 
 pub fn simple_scene<'b>() -> Scene {
@@ -58,26 +61,26 @@ pub fn simple_scene<'b>() -> Scene {
     let sensor = Sensor {
         width: 36.0, // 36 mm
         // height: 24.0,
-        horizontal_res: 420,
-        vertical_res: 320,
+        horizontal_res: 210,
+        vertical_res: 160,
     };
     let camera = Camera {
         position: Vector::new(0.0, 0.0, 10.0),
         // orientation: Polar
         lens,
         sensor,
-        exposure_time: 20_000_000.,
+        exposure_time: 2_000_000.,
         ..Camera::default()
     };
     let mut lights: Vec<Arc<dyn Light>> = vec![];
 
-    let light = PointLight::new(Vector::new(-5.0, 3.0, -5.0), RIGHT, norm_black_body(1500.));
-    lights.push(Arc::new(light));
+    // let light = PointLight::new(Vector::new(-3.0, 3.0, -3.0), RIGHT, norm_black_body(1500.));
+    // lights.push(Arc::new(light));
 
-    let lightb = PointLight::new(Vector::new(5.0, 1.0, -5.0), RIGHT, norm_black_body(3000.));
-    lights.push(Arc::new(lightb));
+    // let lightb = PointLight::new(Vector::new(-3.0, 1.0, -3.0), RIGHT, norm_black_body(3000.));
+    // lights.push(Arc::new(lightb));
 
-    let lightc = PointLight::new(Vector::new(-5.0, 5.0, -12.0), RIGHT, norm_black_body(6000.));
+    let lightc = PointLight::new(Vector::new(0.0, 5.0, -3.0), RIGHT, norm_black_body(6000.));
     lights.push(Arc::new(lightc));
 
     let meshes = Vec::new();
@@ -85,6 +88,7 @@ pub fn simple_scene<'b>() -> Scene {
     let cube = load_wavefront_obj("models/cube.obj".to_string());
     let sphere: Mesh = load_wavefront_obj("models/sphere.obj".to_string());
     let plane: Mesh = load_wavefront_obj("models/plane.obj".to_string());
+    let wall: Mesh = load_wavefront_obj("models/wall.obj".to_string());
     let object = Object {
         position: Vector::new(-3.0, 0.0, -10.0),
         meshes: vec![cube.clone()],
@@ -101,7 +105,7 @@ pub fn simple_scene<'b>() -> Scene {
     objects.push(object);
 
     let object = Object {
-        position: Vector::new(0., 0., -6.0),
+        position: Vector::new(0., 0., -5.0),
         meshes: vec![sphere],
         material: Arc::new(PBR::default()),
         ..Object::default()
@@ -111,6 +115,13 @@ pub fn simple_scene<'b>() -> Scene {
     let object = Object {
         position: Vector::new(0., -2., 0.0),
         meshes: vec![plane],
+        ..Object::default()
+    };
+    objects.push(object);
+
+    let object = Object {
+        position: Vector::new(10., 0., 0.0),
+        meshes: vec![wall],
         ..Object::default()
     };
     objects.push(object);
@@ -126,8 +137,11 @@ pub fn simple_scene<'b>() -> Scene {
         shadermode: ShaderMode::Lit,
         logging: 0,
         objects,
-        spatial_acceleration_structures: true,
-        threads: 60,
+        spatial_acceleration_structures: false,
+        _recursive_raycasting: true,
+        threads: 42,
+        samples: 1,
+        max_depth: 4,
     };
     return scene;
 }

@@ -1,11 +1,11 @@
 use crate::camera::Camera;
 use crate::color::colorspace_conversion::spectra_to_display;
-use crate::geometry::primitives::{Polygon, Ray, Vector};
+use crate::geometry::primitives::{even_over_hemisphere, Polygon, Ray, Vector};
 use crate::lighting::{black_spectra, RadiometricUnit, Spectra};
 use crate::object::Object;
 use crate::ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection;
 
-use crate::scene::Scene;
+use crate::scene::{self, Scene};
 use image::{Rgb, RgbImage};
 use stopwatch::Stopwatch;
 
@@ -110,39 +110,57 @@ pub fn bvh_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 }
 pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = Camera::pixel_to_ray(&scene.camera, x, y);
-    let output: Spectra = match shoot_ray(ray, scene) {
-        None => black_spectra(RadiometricUnit::Flux),
-        Some((object, x, ω_o, normal)) => {
-            let output = compute_light(scene, object, x, ω_o, normal);
-            scene.camera.exposure_time * scene.camera.sensor._pixel_area() * output
-        }
-    };
+    let mut output = black_spectra(RadiometricUnit::Flux);
+    for _ in 0..scene.samples {
+        output = output + dispatch_light_ray(ray.clone(), &scene, scene.max_depth);
+    }
+    output = scene.camera.exposure_time
+        * scene.camera.sensor._pixel_area()
+        * (output / scene.samples as f32);
 
-    return spectra_to_display(&output);
+    spectra_to_display(&output)
 }
 
-pub fn compute_light(
+pub fn dispatch_light_ray(ray: Ray, scene: &Scene, depth: u32) -> Spectra {
+    let intersection = shoot_ray(ray, scene, scene.max_depth);
+    if intersection.is_none() {
+        return black_spectra(RadiometricUnit::Flux);
+    }
+    let (object, x, ω_o, normal) = intersection.unwrap();
+
+    // direct illumination
+    let direct_illumination: Spectra =
+        compute_direct_illumination(scene, object, x, ω_o, normal, depth);
+
+    return direct_illumination;
+    // if depth > 0 {
+    //     // we're assuming perfectly diffuse for right now
+    //     let new_ray: Ray = Ray::new(x, even_over_hemisphere(normal));
+    //     let indirect_illumination = dispatch_light_ray(new_ray, scene, depth - 1);
+    //     return direct_illumination + indirect_illumination;
+    // } else {
+    //     return direct_illumination;
+    // }
+}
+
+pub fn compute_direct_illumination(
     scene: &Scene,
     closest_object: Object,
     intersection_point: Vector,
     direction: Vector,
     normal: Vector,
+    depth: u32,
 ) -> Spectra {
-    let mut output = black_spectra(RadiometricUnit::Flux);
+    let mut output: Spectra = black_spectra(RadiometricUnit::Flux);
     'lights: for light in &scene.lights {
         // our job here is to find the amount of energy transmitted to the pixel from the light
         let to_light = &intersection_point.clone().to(light.get_position());
 
         let occlusion_ray = Ray::new(intersection_point, to_light.clone());
 
-        for objects in scene.objects.iter() {
-            if objects.ray_intercept(&occlusion_ray) {
-                let occlusion = shoot_ray(occlusion_ray.clone(), &scene);
-                if occlusion.is_some() {
-                    output = output + black_spectra(RadiometricUnit::Flux);
-                    continue 'lights;
-                }
-            }
+        let occlusion = shoot_ray(occlusion_ray.clone(), &scene, depth);
+        if occlusion.is_some() {
+            continue 'lights;
         }
 
         let _distance_to_surface: f32 = direction.magnitude();
@@ -165,7 +183,7 @@ pub fn compute_light(
     output
 }
 
-pub fn shoot_ray(ray: Ray, scene: &Scene) -> Option<(Object, Vector, Vector, Vector)> {
+pub fn shoot_ray(ray: Ray, scene: &Scene, depth: u32) -> Option<(Object, Vector, Vector, Vector)> {
     let mut hit = false;
     let mut closest_dist: f32 = 1e6;
     let mut closest_object: &Object = &Object::default();
@@ -203,13 +221,13 @@ pub fn shoot_ray(ray: Ray, scene: &Scene) -> Option<(Object, Vector, Vector, Vec
 
     if hit {
         let mut direction: Vector = ray.direction.clone();
-        direction.norm();
+        direction.unitize();
         direction = closest_dist * direction; // explicitly not a unit vector
         let mut intersection_point: Vector = (direction.clone()) + ray.position;
         let to_camera = -1. * direction;
         // to prevent shader acne
         let mut offset = surface_normal.clone();
-        offset.norm();
+        offset.unitize();
         offset = 1e-5 * offset;
         intersection_point = intersection_point + offset;
 
@@ -246,7 +264,7 @@ mod tests {
         // println!("direction: {:?}", ray.direction);
 
         let mut foil = Vector::new(-0.3333333, -0.3333333, -0.5);
-        foil.norm();
+        foil.unitize();
         assert_eq!(ray.direction.x, foil.x); //
         assert_eq!(ray.direction.y, foil.y); //
         assert_eq!(ray.direction.z, foil.z); //
@@ -258,7 +276,7 @@ mod tests {
         // println!("direction: {:?}", ray.direction);
 
         let mut foil = Vector::new(00.0, 0.0, -0.5);
-        foil.norm();
+        foil.unitize();
         assert_eq!(ray.direction.x, foil.x); //
         assert_eq!(ray.direction.y, foil.y); //
         assert_eq!(ray.direction.z, foil.z); //
