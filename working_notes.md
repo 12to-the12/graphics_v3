@@ -29,3 +29,7 @@ with an isotrophic light source directly shining into it, we can estimate the so
 The polygons are in camera space!
 That's why they're double offset!
 And also why the functions are broken if not used from the same angle
+
+
+
+lights need to be rotated!

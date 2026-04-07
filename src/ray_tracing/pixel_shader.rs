@@ -1,11 +1,11 @@
 use crate::camera::Camera;
 use crate::color::colorspace_conversion::spectra_to_display;
-use crate::geometry::primitives::{even_over_hemisphere, Polygon, Ray, Vector};
+use crate::geometry::primitives::{Polygon, Ray, Vector};
 use crate::lighting::{black_spectra, RadiometricUnit, Spectra};
 use crate::object::Object;
 use crate::ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection;
 
-use crate::scene::{self, Scene};
+use crate::scene::{ Scene};
 use image::{Rgb, RgbImage};
 use stopwatch::Stopwatch;
 
@@ -60,6 +60,7 @@ pub fn _color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     return Rgb([r1 as u8, g1 as u8, b1 as u8]);
 }
 
+/// shades all objects as solid
 pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = Camera::pixel_to_ray(&scene.camera, x, y);
     let mut hit = false;
@@ -91,6 +92,7 @@ pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     }
 }
 
+/// shows where bounding volume hierarchies are
 pub fn bvh_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = Camera::pixel_to_ray(&scene.camera, x, y);
     let mut hit = false;
@@ -121,7 +123,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     spectra_to_display(&output)
 }
 
-pub fn dispatch_light_ray(ray: Ray, scene: &Scene, depth: u32) -> Spectra {
+pub fn dispatch_light_ray(ray: Ray, scene: &Scene, _depth: u32) -> Spectra {
     let intersection = shoot_ray(ray, scene, scene.max_depth);
     if intersection.is_none() {
         return black_spectra(RadiometricUnit::Flux);
@@ -130,7 +132,7 @@ pub fn dispatch_light_ray(ray: Ray, scene: &Scene, depth: u32) -> Spectra {
 
     // direct illumination
     let direct_illumination: Spectra =
-        compute_direct_illumination(scene, object, x, ω_o, normal, depth);
+        compute_direct_illumination(scene, object, x, ω_o, normal, _depth);
 
     return direct_illumination;
     // if depth > 0 {
@@ -149,7 +151,7 @@ pub fn compute_direct_illumination(
     intersection_point: Vector,
     direction: Vector,
     normal: Vector,
-    depth: u32,
+    _depth: u32,
 ) -> Spectra {
     let mut output: Spectra = black_spectra(RadiometricUnit::Flux);
     'lights: for light in &scene.lights {
@@ -158,7 +160,7 @@ pub fn compute_direct_illumination(
 
         let occlusion_ray = Ray::new(intersection_point, to_light.clone());
 
-        let occlusion = shoot_ray(occlusion_ray.clone(), &scene, depth);
+        let occlusion = shoot_ray(occlusion_ray.clone(), &scene, _depth);
         if occlusion.is_some() {
             continue 'lights;
         }
@@ -183,7 +185,7 @@ pub fn compute_direct_illumination(
     output
 }
 
-pub fn shoot_ray(ray: Ray, scene: &Scene, depth: u32) -> Option<(Object, Vector, Vector, Vector)> {
+pub fn shoot_ray(ray: Ray, scene: &Scene, _depth: u32) -> Option<(Object, Vector, Vector, Vector)> {
     let mut hit = false;
     let mut closest_dist: f32 = 1e6;
     let mut closest_object: &Object = &Object::default();

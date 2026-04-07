@@ -77,18 +77,18 @@ pub fn simple_scene<'b>() -> Scene {
     // let light = PointLight::new(Vector::new(-3.0, 3.0, -3.0), RIGHT, norm_black_body(1500.));
     // lights.push(Arc::new(light));
 
-    // let lightb = PointLight::new(Vector::new(-3.0, 1.0, -3.0), RIGHT, norm_black_body(3000.));
-    // lights.push(Arc::new(lightb));
+    let lightb = PointLight::new(Vector::new(-3.0, 1.0, -3.0), RIGHT, norm_black_body(3000.));
+    lights.push(Arc::new(lightb));
 
-    let lightc = PointLight::new(Vector::new(0.0, 5.0, -3.0), RIGHT, norm_black_body(6000.));
-    lights.push(Arc::new(lightc));
+    // let lightc = PointLight::new(Vector::new(0.0, 5.0, -3.0), RIGHT, norm_black_body(6000.));
+    // lights.push(Arc::new(lightc));
 
     let meshes = Vec::new();
     let mut objects = Vec::new();
     let cube = load_wavefront_obj("models/cube.obj".to_string());
     let sphere: Mesh = load_wavefront_obj("models/sphere.obj".to_string());
-    let plane: Mesh = load_wavefront_obj("models/plane.obj".to_string());
-    let wall: Mesh = load_wavefront_obj("models/wall.obj".to_string());
+    let _plane: Mesh = load_wavefront_obj("models/plane.obj".to_string());
+    let _wall: Mesh = load_wavefront_obj("models/wall.obj".to_string());
     let object = Object {
         position: Vector::new(-3.0, 0.0, -10.0),
         meshes: vec![cube.clone()],
@@ -112,19 +112,19 @@ pub fn simple_scene<'b>() -> Scene {
     };
     objects.push(object);
 
-    let object = Object {
-        position: Vector::new(0., -2., 0.0),
-        meshes: vec![plane],
-        ..Object::default()
-    };
-    objects.push(object);
+    // let object = Object {
+    //     position: Vector::new(0., -2., 0.0),
+    //     meshes: vec![plane],
+    //     ..Object::default()
+    // };
+    // objects.push(object);
 
-    let object = Object {
-        position: Vector::new(10., 0., 0.0),
-        meshes: vec![wall],
-        ..Object::default()
-    };
-    objects.push(object);
+    // let object = Object {
+    //     position: Vector::new(10., 0., 0.0),
+    //     meshes: vec![wall],
+    //     ..Object::default()
+    // };
+    // objects.push(object);
 
     let background = black_spectra(crate::lighting::RadiometricUnit::Flux);
     let scene = Scene {

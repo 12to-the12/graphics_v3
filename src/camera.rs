@@ -76,7 +76,7 @@ impl Camera {
             // the focal length needs to be proportional
         };
         let position = camera.position;
-        let mut ray = Ray::new(position, direction);
+        let ray = Ray::new(position, direction);
         ray.direction.unitized();
         ray
     }

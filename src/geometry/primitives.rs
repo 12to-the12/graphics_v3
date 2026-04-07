@@ -195,14 +195,14 @@ impl Vector {
 }
 
 /// actually even in a cube
-pub fn even_over_sphere() -> Vector {
+pub fn _even_over_sphere() -> Vector {
     let mut rng = rand::thread_rng();
     Vector::new(rng.gen(), rng.gen(), rng.gen()).unitized()
 }
 
 /// just an approximation
-pub fn even_over_hemisphere(normal: Vector) -> Vector {
-    let output = even_over_sphere();
+pub fn _even_over_hemisphere(normal: Vector) -> Vector {
+    let output = _even_over_sphere();
     if output.dot(&normal) < 0. {
         return -1. * output;
     }

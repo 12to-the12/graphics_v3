@@ -12,3 +12,5 @@ shaders tied to objects
 
 
 actual image textures
+
+lights need to be rotated!
