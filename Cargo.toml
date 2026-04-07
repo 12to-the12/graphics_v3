@@ -12,6 +12,7 @@ ndarray = "0.15.6"
 rand = "0.8.5"
 stopwatch = "0.0.7"
 toml = "0.8.8"
+uom = "0.38.0"
 
 # # for windowing tutorial
 # winit = "0.28"
