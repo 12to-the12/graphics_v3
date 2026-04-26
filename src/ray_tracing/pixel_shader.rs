@@ -1,11 +1,11 @@
 use crate::camera::Camera;
 use crate::color::colorspace_conversion::spectra_to_display;
 use crate::geometry::primitives::{Polygon, Ray, Vector};
-use crate::lighting::{black_spectra, RadiometricUnit, Spectra};
+use crate::lighting::{RadiantIntensity, Spectra, black_spectra};
 use crate::object::Object;
 use crate::ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection;
 
-use crate::scene::{ Scene};
+use crate::scene::Scene;
 use image::{Rgb, RgbImage};
 use stopwatch::Stopwatch;
 
@@ -112,7 +112,7 @@ pub fn bvh_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 }
 pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = Camera::pixel_to_ray(&scene.camera, x, y);
-    let mut output = black_spectra(RadiometricUnit::Flux);
+    let mut output = black_spectra();
     for _ in 0..scene.samples {
         output = output + dispatch_light_ray(ray.clone(), &scene, scene.max_depth);
     }
@@ -126,7 +126,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 pub fn dispatch_light_ray(ray: Ray, scene: &Scene, _depth: u32) -> Spectra {
     let intersection = shoot_ray(ray, scene, scene.max_depth);
     if intersection.is_none() {
-        return black_spectra(RadiometricUnit::Flux);
+        return black_spectra();
     }
     let (object, x, ω_o, normal) = intersection.unwrap();
 
@@ -153,7 +153,7 @@ pub fn compute_direct_illumination(
     normal: Vector,
     _depth: u32,
 ) -> Spectra {
-    let mut output: Spectra = black_spectra(RadiometricUnit::Flux);
+    let mut output: Spectra = black_spectra();
     'lights: for light in &scene.lights {
         // our job here is to find the amount of energy transmitted to the pixel from the light
         let to_light = &intersection_point.clone().to(light.get_position());
@@ -172,15 +172,16 @@ pub fn compute_direct_illumination(
             continue;
         }
 
-        let radiance = closest_object.material.rendering_equation(
+        let radiant_exitance = closest_object.material.rendering_equation(
             &intersection_point,
             to_light,
             &direction,
             &normal,
-            light.radiant_intensity(intersection_point),
+            //  light.radiant_intensity(intersection_point),
+             RadiantIntensity::from(light.radiant_intensity(intersection_point)),
         );
 
-        output = output + radiance;
+        output = output + radiant_exitance.0;
     }
     output
 }

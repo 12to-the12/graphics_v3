@@ -12,19 +12,7 @@ use crate::{
 extern crate ndarray;
 use ndarray::prelude::*;
 
-#[derive(Clone, Debug, Copy, PartialEq)]
-pub enum RadiometricUnit {
-    Flux,
-    Intensity,  // per sr
-    Irradiance, // per m2
-    Radiance,   // per sr perm2
-}
-
-pub trait _Spectral {
-    fn calc_spectra() -> Spectra {
-        black_spectra(RadiometricUnit::Flux)
-    }
-}
+pub trait _Spectral {}
 /// this program uses Radiometry not Photometry because it's more physically accurate
 /// Radiant Flux is total radiation, Watts
 /// Radiant Intensity is radiation per solid angle, Watts/steridian
@@ -36,7 +24,7 @@ pub trait _Spectral {
 pub trait Light: Debug + Sync + Send + Entity {
     /// the apex is where the light source is observed from
     /// as it currently stands, all position vectors exist in worldspace
-    fn radiant_intensity(&self, apex: Vector) -> Spectra;
+    fn radiant_intensity(&self, apex: Vector) -> RadiantIntensity;
 }
 
 /// Isotrophic light source with output measured in watts in each wavelength
@@ -45,11 +33,11 @@ pub trait Light: Debug + Sync + Send + Entity {
 pub struct PointLight {
     pub position: Vector, // as always, this is relative to it's parent
     pub _orientation: Orientation,
-    pub radiant_flux: Spectra, // power in each wavelength
+    pub radiant_flux: RadiantFlux, // power in each wavelength
 }
 
 impl PointLight {
-    pub fn new(position: Vector, orientation: Orientation, radiant_flux: Spectra) -> PointLight {
+    pub fn new(position: Vector, orientation: Orientation, radiant_flux: RadiantFlux) -> PointLight {
         PointLight {
             position,
             _orientation: orientation,
@@ -59,11 +47,11 @@ impl PointLight {
 }
 impl Light for PointLight {
     /// isotrophic point light sources don't care about the apex position
-    fn radiant_intensity(&self, _apex: Vector) -> Spectra
+    fn radiant_intensity(&self, _apex: Vector) -> RadiantIntensity
     where
         Self: Sized,
     {
-        return 1. / (4. * _π) * self.radiant_flux.clone();
+        return (1. / (4. * _π) * self.radiant_flux.clone().0).into();
     }
 }
 
@@ -76,6 +64,40 @@ impl Entity for PointLight {
     }
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct RadiantFlux(Spectra);
+
+impl From<Spectra> for RadiantFlux {
+    fn from(value: Spectra) -> RadiantFlux {
+        RadiantFlux(value)
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct RadiantIntensity(pub(crate) Spectra);
+impl From<Spectra> for RadiantIntensity {
+    fn from(value: Spectra) -> RadiantIntensity {
+        RadiantIntensity(value)
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct RadiantExitance(pub(crate) Spectra);
+impl From<Spectra> for RadiantExitance {
+    fn from(value: Spectra) -> RadiantExitance {
+        RadiantExitance(value)
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Radiance(pub(crate) Spectra);
+impl From<Spectra> for Radiance {
+    fn from(value: Spectra) -> Radiance {
+        Radiance(value)
+    }
+}
+
+
 // associates an unspecified value with 40 different wavelengths
 // 380nm -> 780nm non inclusive at 10nm intervals
 
@@ -84,14 +106,6 @@ impl Entity for PointLight {
 #[derive(Clone, Debug, PartialEq)]
 pub struct Spectra {
     pub spectra: Array1<f32>,
-    pub unit: RadiometricUnit,
-}
-
-impl Spectra {
-    pub fn set_unit(mut self, unit: RadiometricUnit) -> Spectra {
-        self.unit = unit;
-        return self;
-    }
 }
 
 impl std::ops::Div<f32> for Spectra {
@@ -99,7 +113,6 @@ impl std::ops::Div<f32> for Spectra {
     fn div(self, rhs: f32) -> Spectra {
         return Spectra {
             spectra: self.spectra / rhs,
-            unit: self.unit,
         };
     }
 }
@@ -109,7 +122,6 @@ impl std::ops::Mul<Spectra> for f32 {
     fn mul(self, rhs: Spectra) -> Spectra {
         return Spectra {
             spectra: rhs.spectra * self,
-            unit: rhs.unit,
         };
     }
 }
@@ -119,7 +131,6 @@ impl std::ops::Mul<Spectra> for Spectra {
     fn mul(self, rhs: Spectra) -> Spectra {
         return Spectra {
             spectra: rhs.spectra * self.spectra,
-            unit: rhs.unit,
         };
     }
 }
@@ -129,7 +140,6 @@ impl std::ops::Add<Spectra> for Spectra {
     fn add(self, rhs: Spectra) -> Spectra {
         return Spectra {
             spectra: rhs.spectra + self.spectra,
-            unit: rhs.unit,
         };
     }
 }
@@ -154,29 +164,26 @@ impl Spectra {
         return self.spectra.sum();
     }
 }
-pub fn black_spectra(unit: RadiometricUnit) -> Spectra {
+pub fn black_spectra() -> Spectra {
     Spectra {
         spectra: Array::zeros(40),
-        unit: unit,
     }
 }
 
-pub fn white_spectra(unit: RadiometricUnit) -> Spectra {
+pub fn white_spectra() -> Spectra {
     Spectra {
         spectra: Array::ones(40),
-        unit: unit,
     }
 }
 
-pub fn _const_spectra(value: f32, unit: RadiometricUnit) -> Spectra {
+pub fn _const_spectra(value: f32) -> Spectra {
     Spectra {
         spectra: Array::from_elem(40, value),
-        unit: unit,
     }
 }
 
-pub fn monochroma_spectra(λ: f32, value: f32, unit: RadiometricUnit) -> Spectra {
-    let mut spectra = black_spectra(unit);
+pub fn monochroma_spectra(λ: f32, value: f32) -> Spectra {
+    let mut spectra = black_spectra();
 
     spectra.set_from_λ(λ, value);
     spectra
@@ -206,15 +213,15 @@ pub fn _peak_blackbody(temp: f32) -> f32 {
 pub fn norm_black_body(temp: f32) -> Spectra {
     // let λ = peak_blackbody(temp);
     // let value_at_peak = plancks_law(&λ, &temp);
-    let total_power = black_body(temp, RadiometricUnit::Flux).spectra.sum();
+    let total_power = black_body(temp).spectra.sum();
     let factor = 1. / total_power;
-    let normalized: Spectra = factor * black_body(temp, RadiometricUnit::Flux);
+    let normalized: Spectra = factor * black_body(temp);
     normalized
 }
 
 // blackbody radiation spectra at a given temperature in Kelvin
 // the spectra is in terms of watts/meter**2/steradian, radiance
-pub fn black_body(temp: f32, unit: RadiometricUnit) -> Spectra {
+pub fn black_body(temp: f32) -> Spectra {
     let mut spectra = Array::zeros(40);
 
     for i in 0..40 {
@@ -222,10 +229,7 @@ pub fn black_body(temp: f32, unit: RadiometricUnit) -> Spectra {
         // println!("{:?}", λ);
         spectra[i] = plancks_law(&λ, &temp)
     }
-    return Spectra {
-        spectra: spectra,
-        unit,
-    };
+    return Spectra { spectra: spectra };
 }
 
 // takes wavelength in nanometers
@@ -241,13 +245,13 @@ pub fn plancks_law(λ: &f32, temp: &f32) -> f32 {
 
 #[cfg(test)]
 mod tests {
-    use crate::lighting::{black_body, black_spectra, RadiometricUnit, Spectra};
+    use crate::lighting::{black_body, black_spectra, Spectra};
 
     use super::plancks_law;
 
     #[test]
     fn test_index_by_wavelength() {
-        let mut spectra = black_spectra(RadiometricUnit::Flux);
+        let mut spectra = black_spectra();
         spectra.spectra[39] = 1.;
         spectra.spectra[26] = 2.7;
 
@@ -271,7 +275,7 @@ mod tests {
     #[test]
     fn test_blackbody() {
         // incandescent lightbulb
-        let radiance_spectra: Spectra = black_body(2700., RadiometricUnit::Flux);
+        let radiance_spectra: Spectra = black_body(2700.);
         // 780nm
         let peak = radiance_spectra.from_λ(770.);
         assert_eq!(peak, 434_868.25); //

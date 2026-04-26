@@ -77,7 +77,7 @@ pub fn simple_scene<'b>() -> Scene {
     // let light = PointLight::new(Vector::new(-3.0, 3.0, -3.0), RIGHT, norm_black_body(1500.));
     // lights.push(Arc::new(light));
 
-    let lightb = PointLight::new(Vector::new(-3.0, 1.0, -3.0), RIGHT, norm_black_body(3000.));
+    let lightb = PointLight::new(Vector::new(-3.0, 1.0, -3.0), RIGHT, norm_black_body(3000.).into());
     lights.push(Arc::new(lightb));
 
     // let lightc = PointLight::new(Vector::new(0.0, 5.0, -3.0), RIGHT, norm_black_body(6000.));
@@ -126,7 +126,7 @@ pub fn simple_scene<'b>() -> Scene {
     // };
     // objects.push(object);
 
-    let background = black_spectra(crate::lighting::RadiometricUnit::Flux);
+    let background = black_spectra();
     let scene = Scene {
         camera,
         lights,
