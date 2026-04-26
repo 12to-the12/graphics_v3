@@ -89,6 +89,7 @@ pub fn sRGB_to_display(sRGB: (f32, f32, f32)) -> Rgb<u8> {
     let sB = sRGB.2;
 
     if sR < 0. || sG < 0. || sB < 0. {
+        // not visible light!
         return Rgb([255, 0, 255]);
     }
     // println!("{x} {y}");

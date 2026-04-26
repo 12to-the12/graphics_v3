@@ -4,10 +4,12 @@ use crate::camera::{Camera, Lens, Sensor};
 use crate::geometry::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
 use crate::geometry::primitives::{Mesh, Vector};
-use crate::material::PBR;
+use crate::material::Diffuse;
 use crate::object::Object;
 // use crate::primitives::Object;
-use crate::lighting::{black_spectra, norm_black_body, Light, PointLight, Spectra};
+use crate::lighting::{
+    black_spectra, incandescent_spectra, norm_black_body, Light, PointLight, Spectra,
+};
 use crate::load_object_file::load_wavefront_obj;
 
 #[derive(Clone)]
@@ -55,21 +57,21 @@ pub struct Scene {
 pub fn simple_scene<'b>() -> Scene {
     let lens = Lens {
         _aperture: 50.0,
-        focal_length: 50.0, // 120.
+        focal_length: 50.0 / 1000., // 120.
         _focus_distance: 2.0,
     };
     let sensor = Sensor {
-        width: 36.0, // 36 mm
+        width: 36.0 / 1000., // 36 mm
         // height: 24.0,
-        horizontal_res: 210,
-        vertical_res: 160,
+        horizontal_res: 210 * 2,
+        vertical_res: 160 * 2,
     };
     let camera = Camera {
         position: Vector::new(0.0, 0.0, 10.0),
         // orientation: Polar
         lens,
         sensor,
-        exposure_time: 2_000_000.,
+        exposure_time: 2e12,
         ..Camera::default()
     };
     let mut lights: Vec<Arc<dyn Light>> = vec![];
@@ -77,8 +79,8 @@ pub fn simple_scene<'b>() -> Scene {
     // let light = PointLight::new(Vector::new(-3.0, 3.0, -3.0), RIGHT, norm_black_body(1500.));
     // lights.push(Arc::new(light));
 
-    let lightb = PointLight::new(Vector::new(-3.0, 1.0, -3.0), RIGHT, norm_black_body(3000.).into());
-    lights.push(Arc::new(lightb));
+    let light = PointLight::new(Vector::new(0.0, 5.0, -3.0), RIGHT, incandescent_spectra());
+    lights.push(Arc::new(light));
 
     // let lightc = PointLight::new(Vector::new(0.0, 5.0, -3.0), RIGHT, norm_black_body(6000.));
     // lights.push(Arc::new(lightc));
@@ -87,7 +89,7 @@ pub fn simple_scene<'b>() -> Scene {
     let mut objects = Vec::new();
     let cube = load_wavefront_obj("models/cube.obj".to_string());
     let sphere: Mesh = load_wavefront_obj("models/sphere.obj".to_string());
-    let _plane: Mesh = load_wavefront_obj("models/plane.obj".to_string());
+    let plane: Mesh = load_wavefront_obj("models/plane.obj".to_string());
     let _wall: Mesh = load_wavefront_obj("models/wall.obj".to_string());
     let object = Object {
         position: Vector::new(-3.0, 0.0, -10.0),
@@ -107,17 +109,17 @@ pub fn simple_scene<'b>() -> Scene {
     let object = Object {
         position: Vector::new(0., 0., -5.0),
         meshes: vec![sphere],
-        material: Arc::new(PBR::default()),
+        material: Arc::new(Diffuse::default()),
         ..Object::default()
     };
     objects.push(object);
 
-    // let object = Object {
-    //     position: Vector::new(0., -2., 0.0),
-    //     meshes: vec![plane],
-    //     ..Object::default()
-    // };
-    // objects.push(object);
+    let object = Object {
+        position: Vector::new(0., -2., 0.0),
+        meshes: vec![plane],
+        ..Object::default()
+    };
+    objects.push(object);
 
     // let object = Object {
     //     position: Vector::new(10., 0., 0.0),
@@ -137,7 +139,7 @@ pub fn simple_scene<'b>() -> Scene {
         shadermode: ShaderMode::Lit,
         logging: 0,
         objects,
-        spatial_acceleration_structures: false,
+        spatial_acceleration_structures: true,
         _recursive_raycasting: true,
         threads: 42,
         samples: 1,

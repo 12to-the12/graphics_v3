@@ -5,7 +5,7 @@ use crate::{
         orientation::{Orientation, _UP},
         primitives::{Mesh, Ray, Vector, ORIGIN},
     },
-    material::{BRDF, PBR},
+    material::{Diffuse, BRDF},
     ray_tracing::ray_sphere_intersection::ray_sphere_intersection,
 };
 
@@ -64,7 +64,7 @@ impl Default for Object {
             _orientation: _UP,
             _scale: 1.,
             _children: Vec::new(),
-            material: Arc::new(PBR::default()),
+            material: Arc::new(Diffuse::default()),
             meshes: Vec::new(),
         }
     }

@@ -37,7 +37,11 @@ pub struct PointLight {
 }
 
 impl PointLight {
-    pub fn new(position: Vector, orientation: Orientation, radiant_flux: RadiantFlux) -> PointLight {
+    pub fn new(
+        position: Vector,
+        orientation: Orientation,
+        radiant_flux: RadiantFlux,
+    ) -> PointLight {
         PointLight {
             position,
             _orientation: orientation,
@@ -65,7 +69,7 @@ impl Entity for PointLight {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct RadiantFlux(Spectra);
+pub struct RadiantFlux(pub(crate) Spectra);
 
 impl From<Spectra> for RadiantFlux {
     fn from(value: Spectra) -> RadiantFlux {
@@ -96,7 +100,6 @@ impl From<Spectra> for Radiance {
         Radiance(value)
     }
 }
-
 
 // associates an unspecified value with 40 different wavelengths
 // 380nm -> 780nm non inclusive at 10nm intervals
@@ -160,7 +163,7 @@ impl Spectra {
     pub fn luminance(&self) -> f32 {
         return luminous_efficacy(self.clone());
     }
-    pub fn total(&self) -> f32 {
+    pub fn integrated(&self) -> f32 {
         return self.spectra.sum();
     }
 }
@@ -170,12 +173,16 @@ pub fn black_spectra() -> Spectra {
     }
 }
 
+pub fn void_spectra() -> Spectra {
+    monochroma_spectra(500., 1e-8)
+    // white_spectra()
+}
+
 pub fn white_spectra() -> Spectra {
     Spectra {
         spectra: Array::ones(40),
     }
 }
-
 pub fn _const_spectra(value: f32) -> Spectra {
     Spectra {
         spectra: Array::from_elem(40, value),
@@ -213,15 +220,15 @@ pub fn _peak_blackbody(temp: f32) -> f32 {
 pub fn norm_black_body(temp: f32) -> Spectra {
     // let λ = peak_blackbody(temp);
     // let value_at_peak = plancks_law(&λ, &temp);
-    let total_power = black_body(temp).spectra.sum();
+    let total_power = black_body(temp).0.integrated();
     let factor = 1. / total_power;
-    let normalized: Spectra = factor * black_body(temp);
+    let normalized: Spectra = factor * black_body(temp).0;
     normalized
 }
 
 // blackbody radiation spectra at a given temperature in Kelvin
 // the spectra is in terms of watts/meter**2/steradian, radiance
-pub fn black_body(temp: f32) -> Spectra {
+pub fn black_body(temp: f32) -> Radiance {
     let mut spectra = Array::zeros(40);
 
     for i in 0..40 {
@@ -229,7 +236,14 @@ pub fn black_body(temp: f32) -> Spectra {
         // println!("{:?}", λ);
         spectra[i] = plancks_law(&λ, &temp)
     }
-    return Spectra { spectra: spectra };
+    return Spectra { spectra: spectra }.into();
+}
+
+/// 2200 Kelvin blackbody emitting 60W of radiation
+/// RadiantFlux from Radiance is obtained by ignoring the area
+pub fn incandescent_spectra() -> RadiantFlux {
+    let spectra = 60. * norm_black_body(2200.) / (4. * PI);
+    return spectra.into();
 }
 
 // takes wavelength in nanometers
@@ -245,7 +259,7 @@ pub fn plancks_law(λ: &f32, temp: &f32) -> f32 {
 
 #[cfg(test)]
 mod tests {
-    use crate::lighting::{black_body, black_spectra, Spectra};
+    use crate::lighting::{black_body, black_spectra, Radiance, Spectra};
 
     use super::plancks_law;
 
@@ -275,9 +289,9 @@ mod tests {
     #[test]
     fn test_blackbody() {
         // incandescent lightbulb
-        let radiance_spectra: Spectra = black_body(2700.);
+        let radiance_spectra: Radiance = black_body(2700.);
         // 780nm
-        let peak = radiance_spectra.from_λ(770.);
+        let peak = radiance_spectra.0.from_λ(770.);
         assert_eq!(peak, 434_868.25); //
     }
 }

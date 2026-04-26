@@ -118,7 +118,7 @@ impl Entity for Camera {
 pub struct Lens {
     /// ƒ-stop is focal length / aperture pupil diameter https://www.wikiwand.com/en/F-number
     pub _aperture: f32,
-    /// the field of view, defined in millimeters, degrees is an alternative method
+    /// the field of view, defined in meters, degrees is an alternative method
     pub focal_length: f32,
     /// how far from camera plane the focus is, in meters
     /// currently unused
@@ -139,7 +139,7 @@ impl Default for Lens {
     fn default() -> Self {
         Lens {
             _aperture: 12.0,
-            focal_length: 50.0,
+            focal_length: 50.0 / 1000.,
             _focus_distance: 20.0,
         }
     }
@@ -158,7 +158,7 @@ pub struct Sensor {
 }
 
 impl Sensor {
-    /// get height in mm
+    /// get height in meters
     pub fn height(&self) -> f32 {
         ((self.vertical_res as f32) / (self.horizontal_res as f32)) * self.width
     }
@@ -171,11 +171,11 @@ impl Sensor {
     pub fn _pixels(&self) -> u32 {
         self.horizontal_res * self.vertical_res
     }
-    /// the area of the sensor in square millimeters
+    /// the area of the sensor in square meters
     pub fn _sensor_area(&self) -> f32 {
         self.width * self.height()
     }
-    /// the area of a pixel in square millimeters
+    /// the area of a pixel in square meters
     pub fn _pixel_area(&self) -> f32 {
         let pixel_count = self.horizontal_res * self.vertical_res;
         self._sensor_area() / pixel_count as f32
@@ -192,7 +192,7 @@ impl Sensor {
 impl Default for Sensor {
     fn default() -> Self {
         Sensor {
-            width: 36.0, // mm
+            width: 36.0 / 1000., // mm
             // height: 24.0,
             horizontal_res: 1500,
             vertical_res: 1000,
@@ -214,8 +214,8 @@ mod tests {
         // a camera with infinitesimal focal length
         let cam = Camera::_new(
             Vector::new(0.0, 0.0, 0.0),
-            Lens::_new(1e-6),
-            Sensor::_new(1., 10, 10),
+            Lens::_new(1e-6 / 1000.),
+            Sensor::_new(1. / 1000., 10, 10),
         );
         // subtends a hemisphere
         assert_relative_eq!(cam._frustrum_solid_angle(), 2. * PI);
@@ -236,19 +236,20 @@ mod tests {
         assert_eq!(camera.horizontal_field_of_view().round(), 40.0); // 39.59775
         assert_eq!(camera._vertical_field_of_view().round(), 27.0); //
 
-        camera.lens.focal_length = 30.0;
+        camera.lens.focal_length = 30.0 / 1000.;
 
         assert_eq!(camera.horizontal_field_of_view().round(), 62.0); //
         assert_eq!(camera._vertical_field_of_view().round(), 44.0); //
 
-        camera.lens.focal_length = 18.0;
+        camera.lens.focal_length = 18.0 / 1000.;
 
         assert_eq!(camera.horizontal_field_of_view().round(), 90.0); //
         assert_eq!(camera._vertical_field_of_view().round(), 67.0); //
     }
     #[test]
     fn pixel_size() {
-        assert_eq!(Sensor::default()._sensor_area(), 864.0);
-        assert_eq!(Sensor::default()._pixel_area(), 0.000576);
+        let sensor = Sensor::default();
+        assert_eq!((sensor._sensor_area() * 1_000_000.).round(), 864.);
+        assert_eq!((sensor._pixel_area() * 1e12).round(), 575.99997);
     }
 }

@@ -61,8 +61,8 @@ pub fn coloring_book(canvas: &mut RgbImage) {
     // }
 
     for temp in 1_000..100_000 {
-        let spectra = black_body(temp as f32);
-        let xyY = CIEXYZ_to_xyY(spectra_to_CIEXYZ(&spectra));
+        let radiance = black_body(temp as f32);
+        let xyY = CIEXYZ_to_xyY(spectra_to_CIEXYZ(&radiance.0));
 
         canvas.put_pixel(
             (xyY.0 * (canvas.width() as f32)) as u32,
