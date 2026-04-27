@@ -25,7 +25,9 @@ use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
 use std::{thread, time::Duration};
 use stopwatch::Stopwatch;
 
+use crate::color::colorspace_conversion::{_spectra_to_sRGB, spectra_to_display};
 use crate::geometry_pipeline::geometry_pipeline;
+use crate::lighting::{black_spectra, void_spectra};
 use crate::scene::simple_scene;
 
 fn sleep(ms: Duration) {
@@ -105,9 +107,11 @@ fn draw_colors() {
 }
 fn main() {
     check_debug();
-
     draw_colors();
-    // render_animation();
     main_loop();
+
     // single(0)
+
+    // println!("{:?}", spectra_to_display(&black_spectra()));
+    // println!("{:?}", _spectra_to_sRGB(&void_spectra()));
 }

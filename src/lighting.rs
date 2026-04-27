@@ -167,14 +167,19 @@ impl Spectra {
         return self.spectra.sum();
     }
 }
+
+/// fuck this shit many
 pub fn black_spectra() -> Spectra {
-    Spectra {
-        spectra: Array::zeros(40),
-    }
+    const_spectra(1e-12)
+    // Spectra {
+    //     spectra: Array::zeros(40),
+    // }
 }
 
 pub fn void_spectra() -> Spectra {
-    monochroma_spectra(500., 1e-8)
+    // monochroma_spectra(550., 1e-8)
+    black_spectra()
+    // monochroma_spectra(550., 1e-20)
     // white_spectra()
 }
 
@@ -183,7 +188,7 @@ pub fn white_spectra() -> Spectra {
         spectra: Array::ones(40),
     }
 }
-pub fn _const_spectra(value: f32) -> Spectra {
+pub fn const_spectra(value: f32) -> Spectra {
     Spectra {
         spectra: Array::from_elem(40, value),
     }

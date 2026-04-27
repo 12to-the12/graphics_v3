@@ -157,7 +157,8 @@ pub fn compute_direct_illumination(
     normal: Vector,
     _depth: u32,
 ) -> RadiantExitance {
-    let mut output: RadiantExitance = black_spectra().into();
+    let mut output: RadiantExitance = void_spectra().into(); // REMOVE THIS HACK
+                                                             // let mut output: RadiantExitance = black_spectra().into();
     'lights: for light in &scene.lights {
         // our job here is to find the amount of energy transmitted to the pixel from the light
         let to_light = &intersection_point.clone().to(light.get_position());

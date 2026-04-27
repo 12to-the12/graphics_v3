@@ -41,6 +41,7 @@ pub fn spectra_to_CIEXYZ(spectra: &Spectra) -> (f32, f32, f32) {
     (X, Y, Z)
 }
 
+/// CANNOT HANDLE ZEROES
 pub fn CIEXYZ_to_xyY(XYZ: (f32, f32, f32)) -> (f32, f32, f32) {
     let X = XYZ.0;
     let Y = XYZ.1;
@@ -71,7 +72,8 @@ pub fn xyY_to_sRGB(xyY: (f32, f32, f32)) -> (f32, f32, f32) {
     // NOTE: THIS DEVIATES FROM AN ACCURATE COLOR MODEL
     // I think this will desaturate?
     // let factor = 1.2;
-    let factor = 1.04;
+    let factor = 1. + 1e-12;
+    // let factor = 1.04;
     let sR_linear = (sR_linear + (factor - 1.)) / factor;
     let sG_linear = (sG_linear + (factor - 1.)) / factor;
     let sB_linear = (sB_linear + (factor - 1.)) / factor;
