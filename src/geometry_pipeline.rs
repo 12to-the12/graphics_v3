@@ -13,7 +13,9 @@ use crate::geometry::transformations::{
 };
 use crate::rasterization::line_plotting::plot_triangle;
 use crate::rasterization::rasterization::rasterize_triangle;
-use crate::ray_tracing::pixel_shader::{_solid_shader, bvh_shader, lit_shader, shade_pixels};
+use crate::ray_tracing::pixel_shader::{
+    _solid_shader, bvh_shader, lit_shader, shade_pixels, z_shader,
+};
 use image::{ImageBuffer, Rgb, RgbImage};
 use stopwatch::Stopwatch;
 
@@ -59,19 +61,37 @@ fn vertex_shader(scene: &mut Scene) {
     // --> clip coordinates
     let mut uniform_view_transforms: Vec<Transform> = Vec::new();
 
-    uniform_view_transforms.push(build_camera_space_transform(&scene.camera));
+    // uniform_view_transforms.push(build_camera_space_transform(&scene.camera));
     uniform_view_transforms.push(build_to_projection_transform(scene));
     uniform_view_transforms.push(build_to_display_transform(scene));
 
     let uniform_view_transform = compile_transforms(&uniform_view_transforms);
     for object in &mut scene.objects {
         for mesh in &mut object.meshes {
-            let transform = build_translation_transform(object.position.clone());
-            mesh.add_transform(transform);
+            let to_world_space = build_translation_transform(object.position.clone());
+            mesh.add_transform(to_world_space);
+            let to_camera_space = build_camera_space_transform(&scene.camera);
+            mesh.add_transform(to_camera_space);
             mesh.add_transform(uniform_view_transform.clone());
         }
     }
 }
+
+// fn apply_transforms(scene: &mut Scene) {
+//     for object in &mut scene.objects {
+//         for mesh in &mut object.meshes {
+//             // for mesh in scene.meshes.iter_mut() {
+//             let to_world_space = build_translation_transform(object.position.clone());
+//             mesh.add_transform(to_world_space);
+//             if scene.rendermode == Rendermode::_Rasterize {
+//                 let to_camera_space = build_camera_space_transform(&scene.camera);
+//                 mesh.add_transform(to_camera_space);
+//             }
+
+//             mesh.apply_transformations();
+//         }
+//     }
+// }
 
 fn _wire_frame(canvas: &mut RgbImage, scene: Scene) {
     let color = Rgb([0, 255, 0]);
@@ -151,6 +171,7 @@ fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
         ShaderMode::Lit => lit_shader,
         ShaderMode::_BVH => bvh_shader,
         ShaderMode::_Solid => _solid_shader,
+        ShaderMode::_ZDepth => z_shader,
     };
 
     shade_pixels(
@@ -173,6 +194,7 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
         ShaderMode::Lit => lit_shader,
         ShaderMode::_BVH => bvh_shader,
         ShaderMode::_Solid => _solid_shader,
+        ShaderMode::_ZDepth => z_shader,
     };
     let data = Arc::new(scene); // necessary for borrowing in threads
 

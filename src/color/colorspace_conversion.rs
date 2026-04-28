@@ -38,7 +38,11 @@ pub fn spectra_to_CIEXYZ(spectra: &Spectra) -> (f32, f32, f32) {
     let X = integrated_x_response(&spectra);
     let Y = integrated_y_response(&spectra);
     let Z = integrated_z_response(&spectra);
-    (X, Y, Z)
+    if X + Y + Z == 0. {
+        (1e-10, 1e-10, 1e-10)
+    } else {
+        (X, Y, Z)
+    }
 }
 
 /// CANNOT HANDLE ZEROES

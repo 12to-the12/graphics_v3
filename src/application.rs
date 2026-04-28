@@ -16,35 +16,35 @@ pub fn application(scene: &mut Scene) -> &Scene {
     let _lights = &mut scene.lights;
     // lights.index_mut(0).set_position();
 
-    objects
-        .index_mut(0)
-        .meshes
-        .index_mut(0)
-        .add_transform(build_arbitrary_rotation_transform(
-            tick.to_radians(),
-            Vector::new(0., 0., -1.),
-        ));
+    // objects
+    //     .index_mut(0)
+    //     .meshes
+    //     .index_mut(0)
+    //     .add_transform(build_arbitrary_rotation_transform(
+    //         tick.to_radians(),
+    //         Vector::new(0., 0., -1.),
+    //     ));
 
-    objects
-        .index_mut(0)
-        .meshes
-        .index_mut(0)
-        .add_transform(build_arbitrary_rotation_transform(
-            tick.to_radians(),
-            Vector::new(1., 1., 1.),
-        ));
+    // objects
+    //     .index_mut(0)
+    //     .meshes
+    //     .index_mut(0)
+    //     .add_transform(build_arbitrary_rotation_transform(
+    //         tick.to_radians(),
+    //         Vector::new(1., 1., 1.),
+    //     ));
 
-    objects
-        .index_mut(1)
-        .meshes
-        .index_mut(0)
-        .add_transform(build_y_rotation_transform(tick.to_radians() * -3.));
+    // objects
+    //     .index_mut(1)
+    //     .meshes
+    //     .index_mut(0)
+    //     .add_transform(build_y_rotation_transform(tick.to_radians() * -3.));
 
-    objects
-        .index_mut(2)
-        .meshes
-        .index_mut(0)
-        .add_transform(build_y_rotation_transform(tick.to_radians() * 2.));
+    // objects
+    //     .index_mut(2)
+    //     .meshes
+    //     .index_mut(0)
+    //     .add_transform(build_y_rotation_transform(tick.to_radians() * 2.));
 
     return scene;
 }

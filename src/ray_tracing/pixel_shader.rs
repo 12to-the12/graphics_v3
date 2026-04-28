@@ -1,6 +1,6 @@
 use crate::camera::Camera;
-use crate::color::colorspace_conversion::spectra_to_display;
-use crate::geometry::primitives::{Polygon, Ray, Vector};
+use crate::color::colorspace_conversion::{sRGB_to_display, spectra_to_display};
+use crate::geometry::primitives::{_even_over_hemisphere, Polygon, Ray, Vector};
 use crate::lighting::{black_spectra, void_spectra, RadiantExitance, RadiantIntensity, Spectra};
 use crate::object::Object;
 use crate::ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection;
@@ -112,13 +112,27 @@ pub fn bvh_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     }
 }
 
+/// render depth
+pub fn z_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
+    let ray = Camera::pixel_to_ray(&scene.camera, x, y);
+    let intersection = shoot_ray(ray, scene, scene.max_trace_depth);
+    if intersection.is_none() {
+        return Rgb([0, 0, 0]);
+    } else {
+        let (_, _, ω_o, _) = intersection.unwrap();
+        let dist = ω_o.magnitude();
+        let fractional_z = 1. - (dist / scene.max_render_dist);
+        return sRGB_to_display((fractional_z, fractional_z, fractional_z));
+    }
+}
+
 /// fully lit shading mode
 /// this lambda is executed once per pixel
 pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = Camera::pixel_to_ray(&scene.camera, x, y);
     let mut output: RadiantExitance = black_spectra().into();
     for _ in 0..scene.samples {
-        output.0 = output.0 + dispatch_light_ray(ray.clone(), &scene, scene.max_depth).0;
+        output.0 = output.0 + dispatch_light_ray(ray.clone(), &scene, scene.max_trace_depth).0;
     }
     let sample_average = output.0 / scene.samples as f32;
     let output = scene.camera.exposure_time * scene.camera.sensor._pixel_area() * sample_average;
@@ -126,36 +140,46 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     spectra_to_display(&output)
 }
 
-pub fn dispatch_light_ray(ray: Ray, scene: &Scene, _depth: u32) -> RadiantExitance {
-    let intersection = shoot_ray(ray, scene, scene.max_depth);
+/// this is what is recursed
+/// the ray is given
+pub fn dispatch_light_ray(ray: Ray, scene: &Scene, _trace_depth: u32) -> RadiantExitance {
+    let intersection = shoot_ray(ray, scene, scene.max_trace_depth);
     if intersection.is_none() {
         return void_spectra().into();
         // return black_spectra().into();
     }
-    let (object, x, ω_o, normal) = intersection.unwrap();
+    let (object, intersection_point, ω_o, normal) = intersection.unwrap();
 
     // direct illumination
     let direct_illumination: RadiantExitance =
-        compute_direct_illumination(scene, object, x, ω_o, normal, _depth);
+        compute_direct_illumination(scene, object, intersection_point, ω_o, normal, _trace_depth);
+    // direct_illumination
 
-    return direct_illumination;
-    // if depth > 0 {
-    //     // we're assuming perfectly diffuse for right now
-    //     let new_ray: Ray = Ray::new(x, even_over_hemisphere(normal));
-    //     let indirect_illumination = dispatch_light_ray(new_ray, scene, depth - 1);
-    //     return direct_illumination + indirect_illumination;
-    // } else {
-    //     return direct_illumination;
-    // }
+    if scene._recursive_raycasting && _trace_depth > 0 {
+        // return Some((
+        //     closest_object.clone(),
+        //     intersection_point,
+        //     to_camera,
+        //     surface_normal,
+        // ));
+
+        let ray = Ray::new(intersection_point, _even_over_hemisphere(normal));
+        let indirect_illumination = dispatch_light_ray(ray, scene, scene.max_trace_depth - 1);
+        (direct_illumination.0 + indirect_illumination.0).into()
+    } else {
+        direct_illumination
+    }
 }
 
+/// shoots a ray to every light from our point to compute illumination
+/// not proper recursive ray tracing
 pub fn compute_direct_illumination(
     scene: &Scene,
     closest_object: Object,
     intersection_point: Vector,
     direction: Vector,
     normal: Vector,
-    _depth: u32,
+    _trace_depth: u32,
 ) -> RadiantExitance {
     let mut output: RadiantExitance = void_spectra().into(); // REMOVE THIS HACK
                                                              // let mut output: RadiantExitance = black_spectra().into();
@@ -165,7 +189,7 @@ pub fn compute_direct_illumination(
 
         let occlusion_ray = Ray::new(intersection_point, to_light.clone());
 
-        let occlusion = shoot_ray(occlusion_ray.clone(), &scene, _depth);
+        let occlusion = shoot_ray(occlusion_ray.clone(), &scene, _trace_depth);
         if occlusion.is_some() {
             // this is where a recursive ray would begin
             continue 'lights;
@@ -192,6 +216,7 @@ pub fn compute_direct_illumination(
     output
 }
 
+/// given a ray in the scene, see what it hits if anything
 pub fn shoot_ray(ray: Ray, scene: &Scene, _depth: u32) -> Option<(Object, Vector, Vector, Vector)> {
     let mut hit = false;
     let mut closest_dist: f32 = 1e6;

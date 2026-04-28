@@ -38,3 +38,5 @@ lights need to be rotated!
 lights are currently isotrophic
 material calculations are done in watts/steridian with distance taken into account
 if a camera ray hits a light, 
+
+it needs to be triangulated!

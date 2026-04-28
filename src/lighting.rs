@@ -168,12 +168,11 @@ impl Spectra {
     }
 }
 
-/// fuck this shit many
 pub fn black_spectra() -> Spectra {
-    const_spectra(1e-12)
-    // Spectra {
-    //     spectra: Array::zeros(40),
-    // }
+    // const_spectra(1e-12)
+    Spectra {
+        spectra: Array::zeros(40),
+    }
 }
 
 pub fn void_spectra() -> Spectra {
@@ -187,6 +186,14 @@ pub fn white_spectra() -> Spectra {
     Spectra {
         spectra: Array::ones(40),
     }
+}
+
+pub fn green_spectra() -> Spectra {
+    let mut spectra = const_spectra(0.1);
+    for λ in 400..450 {
+        spectra.set_from_λ(λ as f32, 0.3);
+    }
+    return spectra;
 }
 pub fn const_spectra(value: f32) -> Spectra {
     Spectra {
@@ -246,8 +253,8 @@ pub fn black_body(temp: f32) -> Radiance {
 
 /// 2200 Kelvin blackbody emitting 60W of radiation
 /// RadiantFlux from Radiance is obtained by ignoring the area
-pub fn incandescent_spectra() -> RadiantFlux {
-    let spectra = 60. * norm_black_body(2200.) / (4. * PI);
+pub fn incandescent_spectra(temp: f32, power: f32) -> RadiantFlux {
+    let spectra = power * norm_black_body(temp) / (4. * PI);
     return spectra.into();
 }
 

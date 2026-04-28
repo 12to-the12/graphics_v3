@@ -22,12 +22,15 @@ extern crate stopwatch;
 
 use color::draw_chromaticity_diagram::coloring_book;
 use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
+use ndarray::Array;
 use std::{thread, time::Duration};
 use stopwatch::Stopwatch;
 
-use crate::color::colorspace_conversion::{_spectra_to_sRGB, spectra_to_display};
+use crate::color::colorspace_conversion::{
+    _spectra_to_sRGB, spectra_to_CIEXYZ, spectra_to_display,
+};
 use crate::geometry_pipeline::geometry_pipeline;
-use crate::lighting::{black_spectra, void_spectra};
+use crate::lighting::{black_spectra, void_spectra, white_spectra, Spectra};
 use crate::scene::simple_scene;
 
 fn sleep(ms: Duration) {
@@ -111,7 +114,4 @@ fn main() {
     main_loop();
 
     // single(0)
-
-    // println!("{:?}", spectra_to_display(&black_spectra()));
-    // println!("{:?}", _spectra_to_sRGB(&void_spectra()));
 }

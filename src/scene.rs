@@ -8,7 +8,8 @@ use crate::material::Diffuse;
 use crate::object::Object;
 // use crate::primitives::Object;
 use crate::lighting::{
-    black_spectra, incandescent_spectra, norm_black_body, Light, PointLight, Spectra,
+    black_spectra, const_spectra, green_spectra, incandescent_spectra, norm_black_body, Light,
+    PointLight, Spectra,
 };
 use crate::load_object_file::load_wavefront_obj;
 
@@ -17,6 +18,7 @@ pub enum ShaderMode {
     _BVH,
     _Solid,
     Lit,
+    _ZDepth,
 }
 
 #[derive(Clone, PartialEq)]
@@ -51,7 +53,8 @@ pub struct Scene {
     pub _recursive_raycasting: bool,
     pub threads: u32,
     pub samples: u32,
-    pub max_depth: u32,
+    pub max_trace_depth: u32,
+    pub max_render_dist: f32,
 }
 
 pub fn simple_scene<'b>() -> Scene {
@@ -71,62 +74,32 @@ pub fn simple_scene<'b>() -> Scene {
         // orientation: Polar
         lens,
         sensor,
-        exposure_time: 2e12,
+        exposure_time: 3e10,
         ..Camera::default()
     };
     let mut lights: Vec<Arc<dyn Light>> = vec![];
 
-    // let light = PointLight::new(Vector::new(-3.0, 3.0, -3.0), RIGHT, norm_black_body(1500.));
-    // lights.push(Arc::new(light));
-
-    let light = PointLight::new(Vector::new(0.0, 5.0, -3.0), RIGHT, incandescent_spectra());
+    let light = PointLight::new(
+        Vector::new(0.0, 0.0, 10.0),
+        RIGHT,
+        const_spectra(1000.).into(),
+    );
     lights.push(Arc::new(light));
-
-    // let lightc = PointLight::new(Vector::new(0.0, 5.0, -3.0), RIGHT, norm_black_body(6000.));
-    // lights.push(Arc::new(lightc));
 
     let meshes = Vec::new();
     let mut objects = Vec::new();
     let cube = load_wavefront_obj("models/cube.obj".to_string());
     let sphere: Mesh = load_wavefront_obj("models/sphere.obj".to_string());
     let plane: Mesh = load_wavefront_obj("models/plane.obj".to_string());
-    let _wall: Mesh = load_wavefront_obj("models/wall.obj".to_string());
-    let object = Object {
-        position: Vector::new(-3.0, 0.0, -10.0),
-        meshes: vec![cube.clone()],
-        ..Object::default()
-    };
-
-    objects.push(object);
+    let wall: Mesh = load_wavefront_obj("models/wall.obj".to_string());
+    let cornell: Mesh = load_wavefront_obj("models/cornell.obj".to_string());
 
     let object = Object {
-        position: Vector::new(3.0, 0.0, -10.0),
+        position: Vector::new(0.0, 0.0, 5.34),
         meshes: vec![cube.clone()],
         ..Object::default()
     };
     objects.push(object);
-
-    let object = Object {
-        position: Vector::new(0., 0., -5.0),
-        meshes: vec![sphere],
-        material: Arc::new(Diffuse::default()),
-        ..Object::default()
-    };
-    objects.push(object);
-
-    let object = Object {
-        position: Vector::new(0., -2., 0.0),
-        meshes: vec![plane],
-        ..Object::default()
-    };
-    objects.push(object);
-
-    // let object = Object {
-    //     position: Vector::new(10., 0., 0.0),
-    //     meshes: vec![wall],
-    //     ..Object::default()
-    // };
-    // objects.push(object);
 
     let background = black_spectra();
     let scene = Scene {
@@ -142,8 +115,9 @@ pub fn simple_scene<'b>() -> Scene {
         spatial_acceleration_structures: true,
         _recursive_raycasting: true,
         threads: 42,
-        samples: 1,
-        max_depth: 4,
+        samples: 8,
+        max_trace_depth: 0,
+        max_render_dist: 20.,
     };
     return scene;
 }
