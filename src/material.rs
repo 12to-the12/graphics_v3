@@ -1,8 +1,6 @@
 use crate::{
     geometry::primitives::Vector,
-    lighting::{
-        _Spectral, const_spectra, white_spectra, RadiantExitance, RadiantIntensity, Spectra,
-    },
+    lighting::{const_spectra, RadiantExitance, RadiantIntensity, Spectra},
 };
 use std::{f32::consts::PI, fmt::Debug};
 
@@ -22,7 +20,7 @@ pub trait BRDF: Debug + Sync + Send {
 pub fn cosθ(ω: &Vector, normal: &Vector) -> f32 {
     let divisor: f32 = ω.magnitude() * normal.magnitude();
 
-    return ω.dot(normal) / divisor;
+    ω.dot(normal) / divisor
 }
 
 /// physical object in space with associated data
@@ -60,9 +58,9 @@ impl BRDF for Diffuse {
         let r = ω_i.magnitude(); // dist to light source
 
         let r_o = ω_o.magnitude(); // dist to observer
-        let incident_factor = cosθ(&ω_i, &normal); // per unit solid angle (area)
-        let outgoing_incident_factor = cosθ(&ω_o, &normal); // per unit solid angle (area
-                                                            // let incoming: Spectra = incoming_radiant_intensity.s;
+        let incident_factor = cosθ(ω_i, normal); // per unit solid angle (area)
+        let outgoing_incident_factor = cosθ(ω_o, normal); // per unit solid angle (area
+                                                          // let incoming: Spectra = incoming_radiant_intensity.s;
         let surface_irradiance: RadiantExitance = ((1. / (r * r))
             * (incident_factor * incoming_radiant_intensity.0)
             * self.albedo.clone())
@@ -75,7 +73,7 @@ impl BRDF for Diffuse {
 
         let observer_radiantexitance: RadiantExitance =
             ((1. / (r_o * r_o)) * isotrophic_surface_radiance).into();
-        return observer_radiantexitance;
+        observer_radiantexitance
     }
 }
 

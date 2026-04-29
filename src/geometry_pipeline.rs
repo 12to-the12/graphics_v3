@@ -11,23 +11,22 @@ use crate::geometry::transformations::{
     build_projection_transform, build_scale_transform, build_translation_transform,
     compile_transforms, Transform,
 };
-use crate::rasterization::line_plotting::plot_triangle;
 use crate::rasterization::rasterization::rasterize_triangle;
 use crate::ray_tracing::pixel_shader::{
     _solid_shader, bvh_shader, lit_shader, shade_pixels, z_shader,
 };
-use image::{ImageBuffer, Rgb, RgbImage};
+use image::{ImageBuffer, RgbImage};
 use stopwatch::Stopwatch;
 
 /// transforms from world space to camera space
 fn build_camera_space_transform(camera: &Camera) -> Transform {
-    return build_translation_transform(camera.position.inv());
+    build_translation_transform(camera.position.inv())
 
     // the camera rotation needs to be added
 }
 
 fn build_to_projection_transform(scene: &Scene) -> Transform {
-    return build_projection_transform(&scene.camera);
+    build_projection_transform(&scene.camera)
 }
 
 fn build_to_display_transform(scene: &Scene) -> Transform {
@@ -73,7 +72,7 @@ fn apply_transforms(scene: &mut Scene) {
     }
     let uniform_view_transform = compile_transforms(&uniform_view_transforms);
     for object in &mut scene.objects {
-        let to_world_space = build_translation_transform(object.position.clone());
+        let to_world_space = build_translation_transform(object.position);
         for mesh in &mut object.meshes {
             // for mesh in scene.meshes.iter_mut() {
             mesh.add_transform(to_world_space.clone());

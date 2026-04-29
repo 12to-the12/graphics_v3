@@ -55,7 +55,7 @@ impl Light for PointLight {
     where
         Self: Sized,
     {
-        return (1. / (4. * _π) * self.radiant_flux.clone().0).into();
+        (1. / (4. * _π) * self.radiant_flux.clone().0).into()
     }
 }
 
@@ -114,43 +114,43 @@ pub struct Spectra {
 impl std::ops::Div<f32> for Spectra {
     type Output = Spectra;
     fn div(self, rhs: f32) -> Spectra {
-        return Spectra {
+        Spectra {
             spectra: self.spectra / rhs,
-        };
+        }
     }
 }
 
 impl std::ops::Mul<Spectra> for f32 {
     type Output = Spectra;
     fn mul(self, rhs: Spectra) -> Spectra {
-        return Spectra {
+        Spectra {
             spectra: rhs.spectra * self,
-        };
+        }
     }
 }
 
 impl std::ops::Mul<Spectra> for Spectra {
     type Output = Spectra;
     fn mul(self, rhs: Spectra) -> Spectra {
-        return Spectra {
+        Spectra {
             spectra: rhs.spectra * self.spectra,
-        };
+        }
     }
 }
 
 impl std::ops::Add<Spectra> for Spectra {
     type Output = Spectra;
     fn add(self, rhs: Spectra) -> Spectra {
-        return Spectra {
+        Spectra {
             spectra: rhs.spectra + self.spectra,
-        };
+        }
     }
 }
 
 impl Spectra {
     pub fn from_λ(&self, λ: f32) -> f32 {
         let index: usize = (λ as usize - 380) / 10;
-        return self.spectra[index];
+        self.spectra[index]
     }
     pub fn set_from_λ(&mut self, λ: f32, value: f32) {
         let index: usize = (λ as usize - 380) / 10;
@@ -158,13 +158,13 @@ impl Spectra {
     }
     /// the band of wavelengths that a single sample covers
     pub fn get_sample_width(&self) -> f32 {
-        return 10.;
+        10.
     }
     pub fn luminance(&self) -> f32 {
-        return luminous_efficacy(self.clone());
+        luminous_efficacy(self.clone())
     }
     pub fn integrated(&self) -> f32 {
-        return self.spectra.sum();
+        self.spectra.sum()
     }
 }
 
@@ -193,7 +193,7 @@ pub fn green_spectra() -> Spectra {
     for λ in 400..450 {
         spectra.set_from_λ(λ as f32, 0.3);
     }
-    return spectra;
+    spectra
 }
 pub fn const_spectra(value: f32) -> Spectra {
     Spectra {
@@ -214,19 +214,19 @@ const k_B: f32 = 1.380649e-23;
 
 // Planck constant
 // joule second
-const h: f32 = 6.62607015e-34;
+const h: f32 = 6.626_07e-34;
 
 // speed of light in a vacuum
 const c: f32 = 299_792_458.;
 
 // Wien's displacement constant
-const _b: f32 = 2.897771955e-3;
+const _b: f32 = 2.897_772e-3;
 
 /// get the peak wavelength of a blackbody in nanometers
 pub fn _peak_blackbody(temp: f32) -> f32 {
     let peak_in_meters = _b / temp;
-    let peak_in_nm = peak_in_meters * 1e9;
-    peak_in_nm
+
+    peak_in_meters * 1e9
 }
 
 pub fn norm_black_body(temp: f32) -> Spectra {
@@ -246,16 +246,16 @@ pub fn black_body(temp: f32) -> Radiance {
     for i in 0..40 {
         let λ = i as f32 * 10. + 380.;
         // println!("{:?}", λ);
-        spectra[i] = plancks_law(&λ, &temp)
+        spectra[i] = plancks_law(&λ, &temp);
     }
-    return Spectra { spectra: spectra }.into();
+    Spectra { spectra }.into()
 }
 
 /// 2200 Kelvin blackbody emitting 60W of radiation
-/// RadiantFlux from Radiance is obtained by ignoring the area
+/// `RadiantFlux` from Radiance is obtained by ignoring the area
 pub fn incandescent_spectra(temp: f32, power: f32) -> RadiantFlux {
     let spectra = power * norm_black_body(temp) / (4. * PI);
-    return spectra.into();
+    spectra.into()
 }
 
 // takes wavelength in nanometers
@@ -264,9 +264,7 @@ pub fn plancks_law(λ: &f32, temp: &f32) -> f32 {
     // convert nanometers to meters
     let λ: f32 = λ * 1e-9;
     // Planck's law over a million to get the units we want
-    return (2. * h * c.powi(2)) / (λ.powi(5))
-        * (1. / (E.powf((h * c) / (λ * k_B * temp)) - 1.))
-        * 1e-6;
+    (2. * h * c.powi(2)) / (λ.powi(5)) * (1. / (E.powf((h * c) / (λ * k_B * temp)) - 1.)) * 1e-6
 }
 
 #[cfg(test)]

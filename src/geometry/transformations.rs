@@ -11,7 +11,7 @@ pub struct Transform {
 impl Transform {
     pub fn process(&self, vertices: Vec<Vertex>) -> Vec<Vertex> {
         let mut out = Vec::new();
-        for vertex in vertices.into_iter() {
+        for vertex in vertices {
             // processes vertex by vertex
             let vertex = vertex.as_homogenous_array();
             let vertex = arr1(&vertex);
@@ -19,7 +19,7 @@ impl Transform {
             let out_vertex = transform.dot(&vertex); // the resulting vertex
             out.push(vertex_from_array(out_vertex)); // output a vertex
         }
-        return out;
+        out
     }
 }
 

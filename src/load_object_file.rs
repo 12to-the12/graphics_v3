@@ -7,9 +7,9 @@ pub fn load_wavefront_obj(path: String) -> Mesh {
     let mut polygons = Vec::new();
 
     // println!("{}", data);
-    for line in data.split("\n") {
+    for line in data.split('\n') {
         // discards if it's a comment
-        if line.starts_with("#") {
+        if line.starts_with('#') {
         }
         // adds a vertex
         else if line.starts_with("v ") {
@@ -32,10 +32,10 @@ pub fn load_wavefront_obj(path: String) -> Mesh {
                 .split_ascii_whitespace();
             let mut polygon: Vec<usize> = Vec::new();
             for number in numbers {
-                let number: &str = number.split("/").next().unwrap();
+                let number: &str = number.split('/').next().unwrap();
                 let mut number: usize = number.parse().unwrap();
                 number -= 1; // because obj starts at 1 which is stupid
-                polygon.push(number)
+                polygon.push(number);
             }
             polygons.push(polygon);
         }

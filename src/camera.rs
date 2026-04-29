@@ -23,15 +23,15 @@ pub struct Camera {
 impl Camera {
     /// get the horizontal field of view in degrees
     pub fn horizontal_field_of_view(&self) -> f32 {
-        return ((self.sensor.width / (2.0 * self.lens.focal_length)).atan() * 2.0).to_degrees();
+        ((self.sensor.width / (2.0 * self.lens.focal_length)).atan() * 2.0).to_degrees()
     }
     /// get the vertical field of view in degrees
     pub fn _vertical_field_of_view(&self) -> f32 {
-        return ((self.sensor.height() / (2.0 * self.lens.focal_length)).atan() * 2.0).to_degrees();
+        ((self.sensor.height() / (2.0 * self.lens.focal_length)).atan() * 2.0).to_degrees()
     }
     /// foreshortening
     pub fn foreshortening(&self) -> f32 {
-        return self.sensor.width / (2. * self.lens.focal_length);
+        self.sensor.width / (2. * self.lens.focal_length)
     }
     /// get the solid angle captured by the lens in steradians
     #[allow(non_snake_case)]
@@ -39,13 +39,13 @@ impl Camera {
         let a = self.sensor.width;
         let b = self.sensor.height();
         let h = self.lens.focal_length;
-        let Ω = 4. * f32::asin((a * b) / (a.powi(2) + h.powi(2) * (b.powi(2) + h.powi(2))));
-        return Ω;
+
+        4. * f32::asin((a * b) / (a.powi(2) + h.powi(2) * (b.powi(2) + h.powi(2))))
     }
     /// the solid angle covered by the average pixel in the view frustrum in steradians
     /// THIS IS AN APPROXIMATION BECAUSE I AM LAZY, in reality pixels on the edges would subtend a smaller solid angle being more oblique
     pub fn _pixel_solid_angle(&self) -> f32 {
-        return self._frustrum_solid_angle() / self.sensor._pixels() as f32;
+        self._frustrum_solid_angle() / self.sensor._pixels() as f32
     }
 
     pub fn _new(position: Vector, lens: Lens, sensor: Sensor) -> Camera {
@@ -75,7 +75,7 @@ impl Camera {
         let direction = Vector {
             x: horizontal_fraction,
             y: vertical_fraction,
-            z: camera.lens.focal_length / camera.sensor.width * -1.0,
+            z: -(camera.lens.focal_length / camera.sensor.width),
             // z is negative, and if the ray placement is scaled to one from the sensor width,
             // the focal length needs to be proportional
         };
@@ -120,7 +120,7 @@ impl Entity for Camera {
 /// defines the field of view
 #[derive(Clone, Debug)]
 pub struct Lens {
-    /// ƒ-stop is focal length / aperture pupil diameter https://www.wikiwand.com/en/F-number
+    /// ƒ-stop is focal length / aperture pupil diameter <https://www.wikiwand.com/en/F-number>
     pub _aperture: f32,
     /// the field of view, defined in meters, degrees is an alternative method
     pub focal_length: f32,

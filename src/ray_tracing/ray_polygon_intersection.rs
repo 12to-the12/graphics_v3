@@ -94,7 +94,7 @@ pub fn probe_ray_polygon_intersection(ray: &Ray, polygon: &Polygon) -> (bool, Ve
 }
 
 fn project_vector(a: &Vector, b: &Vector) -> Vector {
-    a.times(a.dot(&b) / a.dot(&a))
+    a.times(a.dot(b) / a.dot(a))
 }
 
 #[allow(non_snake_case)]
@@ -119,7 +119,7 @@ fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Option<(Vector, f32)>
     let V = &ray;
 
     // W = C - ray_origin
-    let W = C.minus(&ray_origin);
+    let W = C.minus(ray_origin);
     let k: f32 = W.dot(&N) / V.dot(&N);
     // k is the multiplier with the ray to reach I from the ray_origin
     // if the ray is a unit vector it is the distance from ray_origin to the intersection
@@ -134,7 +134,7 @@ fn ray_plane_intersection(ray: &Ray, polygon: &Polygon) -> Option<(Vector, f32)>
     if k == 0. {
         return None;
     }
-    return Some((I, k));
+    Some((I, k))
     // returns the intersection point
 }
 

@@ -1,17 +1,11 @@
-use std::ops::IndexMut;
-
-use crate::geometry::primitives::Vector;
-use crate::geometry::transformations::{
-    build_arbitrary_rotation_transform, build_y_rotation_transform,
-};
 use crate::object::Object;
 use crate::scene::Scene;
 
 /// all of the stuff that should happen to run the scene,
 /// note: this is recomputed every frame. Not a major performance bottleneck
 pub fn application(scene: &mut Scene) -> &Scene {
-    let tick = scene.tick as f32;
-    let objects: &mut Vec<Object> = &mut scene.objects;
+    let _tick = scene.tick as f32;
+    let _objects: &mut Vec<Object> = &mut scene.objects;
 
     let _lights = &mut scene.lights;
     // lights.index_mut(0).set_position();
@@ -46,5 +40,5 @@ pub fn application(scene: &mut Scene) -> &Scene {
     //     .index_mut(0)
     //     .add_transform(build_y_rotation_transform(tick.to_radians() * 2.));
 
-    return scene;
+    scene
 }

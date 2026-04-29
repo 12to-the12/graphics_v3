@@ -1,7 +1,7 @@
 use crate::camera::Camera;
 use crate::color::colorspace_conversion::{sRGB_to_display, spectra_to_display};
 use crate::geometry::primitives::{_even_over_hemisphere, Polygon, Ray, Vector};
-use crate::lighting::{black_spectra, void_spectra, RadiantExitance, RadiantIntensity, Spectra};
+use crate::lighting::{black_spectra, void_spectra, RadiantExitance};
 use crate::object::Object;
 use crate::ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection;
 
@@ -26,7 +26,7 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
     for y in y_start..y_end {
         for x in x_start..x_end {
             let color = closure(x, y, scene);
-            mini_canvas.put_pixel(x - x_start as u32, y - y_start as u32, color);
+            mini_canvas.put_pixel(x - x_start, y - y_start, color);
         }
     }
 
@@ -52,13 +52,13 @@ pub fn _color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
         return Rgb([r2 as u8, g2 as u8, b2 as u8]);
     }
     if y < 0.5 {
-        let r3 = ((r1 + r2) / 2.) as u8;
-        let g3 = ((g1 + g2) / 2.) as u8;
-        let b3 = ((b1 + b2) / 2.) as u8;
+        let r3 = f32::midpoint(r1, r2) as u8;
+        let g3 = f32::midpoint(g1, g2) as u8;
+        let b3 = f64::midpoint(b1, b2) as u8;
         return Rgb([r3, g3, b3]);
     }
 
-    return Rgb([r1 as u8, g1 as u8, b1 as u8]);
+    Rgb([r1 as u8, g1 as u8, b1 as u8])
 }
 
 /// shades all objects as solid
@@ -87,9 +87,9 @@ pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
         }
     }
     if hit {
-        return Rgb([255, 255, 255]);
+        Rgb([255, 255, 255])
     } else {
-        return spectra_to_display(&scene.background);
+        spectra_to_display(&scene.background)
     }
 }
 
@@ -106,9 +106,9 @@ pub fn bvh_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
         }
     }
     if hit {
-        return Rgb([255, 255, 255]);
+        Rgb([255, 255, 255])
     } else {
-        return spectra_to_display(&scene.background);
+        spectra_to_display(&scene.background)
     }
 }
 
@@ -117,12 +117,12 @@ pub fn z_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = Camera::pixel_to_ray(&scene.camera, x, y);
     let intersection = shoot_ray(ray, scene, scene.max_trace_depth);
     if intersection.is_none() {
-        return Rgb([0, 0, 0]);
+        Rgb([0, 0, 0])
     } else {
         let (_, _, ω_o, _) = intersection.unwrap();
         let dist = ω_o.magnitude();
         let fractional_z = 1. - (dist / scene.max_render_dist);
-        return sRGB_to_display((fractional_z, fractional_z, fractional_z));
+        sRGB_to_display((fractional_z, fractional_z, fractional_z))
     }
 }
 
@@ -132,7 +132,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let ray = Camera::pixel_to_ray(&scene.camera, x, y);
     let mut output: RadiantExitance = black_spectra().into();
     for _ in 0..scene.samples {
-        output.0 = output.0 + dispatch_light_ray(ray.clone(), &scene, scene.max_trace_depth).0;
+        output.0 = output.0 + dispatch_light_ray(ray.clone(), scene, scene.max_trace_depth).0;
     }
     let sample_average = output.0 / scene.samples as f32;
     let output = scene.camera.exposure_time * scene.camera.sensor._pixel_area() * sample_average;
@@ -187,9 +187,9 @@ pub fn compute_direct_illumination(
         // our job here is to find the amount of energy transmitted to the pixel from the light
         let to_light = &intersection_point.clone().to(light.get_position());
 
-        let occlusion_ray = Ray::new(intersection_point, to_light.clone());
+        let occlusion_ray = Ray::new(intersection_point, *to_light);
 
-        let occlusion = shoot_ray(occlusion_ray.clone(), &scene, _trace_depth);
+        let occlusion = shoot_ray(occlusion_ray.clone(), scene, _trace_depth);
         if occlusion.is_some() {
             // this is where a recursive ray would begin
             continue 'lights;
@@ -208,7 +208,7 @@ pub fn compute_direct_illumination(
             &direction,
             &normal,
             //  light.radiant_intensity(intersection_point),
-            light.radiant_intensity(intersection_point).into(),
+            light.radiant_intensity(intersection_point),
         );
 
         output.0 = output.0 + radiant_exitance.0;
@@ -254,25 +254,25 @@ pub fn shoot_ray(ray: Ray, scene: &Scene, _depth: u32) -> Option<(Object, Vector
     }
 
     if hit {
-        let mut direction: Vector = ray.direction.clone();
+        let mut direction: Vector = ray.direction;
         direction.unitize();
         direction = closest_dist * direction; // explicitly not a unit vector
-        let mut intersection_point: Vector = (direction.clone()) + ray.position;
+        let mut intersection_point: Vector = direction + ray.position;
         let to_camera = -1. * direction;
         // to prevent shader acne
-        let mut offset = surface_normal.clone();
+        let mut offset = surface_normal;
         offset.unitize();
         offset = 1e-5 * offset;
         intersection_point = intersection_point + offset;
 
-        return Some((
+        Some((
             closest_object.clone(),
             intersection_point,
             to_camera,
             surface_normal,
-        ));
+        ))
     } else {
-        return None;
+        None
     }
 }
 

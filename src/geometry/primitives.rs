@@ -31,9 +31,9 @@ impl Vertex {
         [self.position.x, self.position.y, self.position.z, 1.0]
     }
     pub fn _inv(&self) -> Vector {
-        let x = self.position.x * -1.0;
-        let y = self.position.y * -1.0;
-        let z = self.position.z * -1.0;
+        let x = -self.position.x;
+        let y = -self.position.y;
+        let z = -self.position.z;
         Vector { x, y, z }
     }
     pub fn as_vector(&self) -> Vector {
@@ -43,10 +43,10 @@ impl Vertex {
         Vector { x, y, z }
     }
     pub fn new(x: f32, y: f32, z: f32) -> Vertex {
-        return Vertex {
+        Vertex {
             position: Vector::new(x, y, z),
             ..Vertex::default()
-        };
+        }
     }
 }
 
@@ -62,10 +62,10 @@ impl Default for Vertex {
 pub fn vertex_from_array(arr: Array1<f32>) -> Vertex {
     let w = arr[3];
     let position_vector = Vector::new(arr[0] / w, arr[1] / w, arr[2] / w);
-    return Vertex {
+    Vertex {
         position: position_vector,
         ..Vertex::default()
-    };
+    }
 }
 
 /// direction and magnitude in 3D space
@@ -148,9 +148,9 @@ impl Vector {
     }
     pub fn unitize(&mut self) {
         let mag = self.magnitude();
-        self.x = self.x / mag;
-        self.y = self.y / mag;
-        self.z = self.z / mag;
+        self.x /= mag;
+        self.y /= mag;
+        self.z /= mag;
     }
 
     pub fn as_array(&self) -> [f32; 3] {
@@ -184,13 +184,13 @@ impl Vector {
         head.minus(self)
     }
     pub fn inv(&self) -> Vector {
-        let x = self.x * -1.0;
-        let y = self.y * -1.0;
-        let z = self.z * -1.0;
+        let x = -self.x;
+        let y = -self.y;
+        let z = -self.z;
         Vector { x, y, z }
     }
     pub fn new(x: f32, y: f32, z: f32) -> Vector {
-        return Vector { x, y, z };
+        Vector { x, y, z }
     }
 }
 
@@ -264,11 +264,11 @@ impl Mesh {
         self.output_vertices = self.vertices.clone();
         self.output_vertices = transform.process(self.output_vertices.clone());
     }
-    pub fn add_transform(&mut self, transform: Transform) -> () {
+    pub fn add_transform(&mut self, transform: Transform) {
         self.transform_log.push(transform);
     }
     pub fn _get_transforms(&self) -> &Vec<Transform> {
-        return &self.transform_log;
+        &self.transform_log
     }
     pub fn new(vertices: Vec<Vertex>, polygons: Vec<Vec<usize>>) -> Mesh {
         Mesh {
@@ -303,13 +303,13 @@ impl Mesh {
             vec![1, 3, 5], // left 1 3 5 7
             vec![5, 3, 7], // left
         ];
-        let mesh = Mesh {
+
+        Mesh {
             vertices: vec![a, b, c, d, e, f, g, h],
             polygons,
             output_vertices: Vec::new(),
             transform_log: Vec::new(),
-        };
-        return mesh;
+        }
     }
 
     pub fn _sample_mesh() -> Mesh {
@@ -320,13 +320,13 @@ impl Mesh {
         let polygons = vec![
             vec![0, 1, 2], // bottom 0123
         ];
-        let mesh = Mesh {
+
+        Mesh {
             vertices: vec![a, b, c],
             polygons,
             output_vertices: Vec::new(),
             transform_log: Vec::new(),
-        };
-        return mesh;
+        }
     }
 }
 
@@ -358,11 +358,11 @@ pub struct Triangle {
 impl Triangle {
     // fn points(&self) ->
     pub fn _get_bounding_box(&self) -> _BoundingBox2D {
-        let x = *vec![self.a.x, self.b.x, self.c.x].iter().min().unwrap();
-        let y = *vec![self.a.y, self.b.y, self.c.y].iter().min().unwrap();
+        let x = *[self.a.x, self.b.x, self.c.x].iter().min().unwrap();
+        let y = *[self.a.y, self.b.y, self.c.y].iter().min().unwrap();
         let min = Point { x, y };
-        let x = *vec![self.a.x, self.b.x, self.c.x].iter().max().unwrap();
-        let y = *vec![self.a.y, self.b.y, self.c.y].iter().max().unwrap();
+        let x = *[self.a.x, self.b.x, self.c.x].iter().max().unwrap();
+        let y = *[self.a.y, self.b.y, self.c.y].iter().max().unwrap();
         let max = Point { x, y };
         _BoundingBox2D { min, max }
     }

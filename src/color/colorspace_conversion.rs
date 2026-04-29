@@ -11,8 +11,8 @@ use crate::{
 pub fn _black_body_xyY(temp: f32) -> (f32, f32, f32) {
     let spectra = norm_black_body(temp);
     let XYZ = spectra_to_CIEXYZ(&spectra);
-    let xyY = CIEXYZ_to_xyY(XYZ);
-    xyY
+
+    CIEXYZ_to_xyY(XYZ)
 }
 
 pub fn _black_body_sRGB(temp: f32) -> (f32, f32, f32) {
@@ -22,22 +22,22 @@ pub fn _black_body_sRGB(temp: f32) -> (f32, f32, f32) {
 pub fn _spectra_to_sRGB(spectra: &Spectra) -> (f32, f32, f32) {
     let XYZ = spectra_to_CIEXYZ(spectra);
     let xyY = CIEXYZ_to_xyY(XYZ);
-    let sRGB = xyY_to_sRGB(xyY);
-    sRGB
+
+    xyY_to_sRGB(xyY)
 }
 
 pub fn spectra_to_display(spectra: &Spectra) -> Rgb<u8> {
     let XYZ = spectra_to_CIEXYZ(spectra);
     let xyY = CIEXYZ_to_xyY(XYZ);
     let sRGB = xyY_to_sRGB(xyY);
-    let display = sRGB_to_display(sRGB);
-    display
+
+    sRGB_to_display(sRGB)
 }
 
 pub fn spectra_to_CIEXYZ(spectra: &Spectra) -> (f32, f32, f32) {
-    let X = integrated_x_response(&spectra);
-    let Y = integrated_y_response(&spectra);
-    let Z = integrated_z_response(&spectra);
+    let X = integrated_x_response(spectra);
+    let Y = integrated_y_response(spectra);
+    let Z = integrated_z_response(spectra);
     if X + Y + Z == 0. {
         (1e-10, 1e-10, 1e-10)
     } else {
@@ -52,7 +52,7 @@ pub fn CIEXYZ_to_xyY(XYZ: (f32, f32, f32)) -> (f32, f32, f32) {
     let Z = XYZ.2;
     let x = X / (X + Y + Z);
     let y = Y / (X + Y + Z);
-    return (x, y, Y);
+    (x, y, Y)
 }
 
 /// I think? it might supposed to be CIEXYZ?
@@ -65,7 +65,7 @@ pub fn xyY_to_sRGB(xyY: (f32, f32, f32)) -> (f32, f32, f32) {
     let z = 1. - x - y;
 
     let mut sR_linear = 3.2404542 * x - 1.5371385 * y - 0.4985314 * z;
-    let mut sG_linear = -0.9692660 * x + 1.8760108 * y + 0.0415560 * z;
+    let mut sG_linear = -0.969_266 * x + 1.8760108 * y + 0.0415560 * z;
     let mut sB_linear = 0.0556434 * x - 0.2040259 * y + 1.0572252 * z;
 
     // I pray this is the correct way to do things
@@ -103,14 +103,14 @@ pub fn sRGB_to_display(sRGB: (f32, f32, f32)) -> Rgb<u8> {
     let sG = pixel_ready(sG);
     let sB = pixel_ready(sB);
 
-    return Rgb([sR, sG, sB]);
+    Rgb([sR, sG, sB])
 }
 
 pub fn sRGB_apply_gamma(V: f32) -> f32 {
     if V <= 0.0031308 {
-        return V * 12.92;
+        V * 12.92
     } else {
-        return 1.055 * V.powf(1. / 2.4) - 0.055;
+        1.055 * V.powf(1. / 2.4) - 0.055
     }
 }
 pub fn pixel_ready(x: f32) -> u8 {

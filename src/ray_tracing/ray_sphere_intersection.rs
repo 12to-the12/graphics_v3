@@ -11,9 +11,9 @@ pub fn ray_sphere_intersection(ray: &Ray, position: &Vector, radius: &f32) -> bo
     let O = ray.position;
     let D = ray.direction;
     let b = (2. * D).dot(&(O - *C));
-    let c = &(O - *C).magnitude().powi(2) - R.powi(2);
+    let c = (O - *C).magnitude().powi(2) - R.powi(2);
 
-    let L = position.clone() - ray.position;
+    let L = *position - ray.position;
     let tca = L.dot(&ray.direction);
     if tca < 0. {
         return false;
@@ -28,7 +28,7 @@ pub fn ray_sphere_intersection(ray: &Ray, position: &Vector, radius: &f32) -> bo
         return true;
     }
 
-    return false;
+    false
 }
 
 #[cfg(test)]

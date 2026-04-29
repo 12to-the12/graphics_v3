@@ -22,24 +22,18 @@ extern crate stopwatch;
 
 use color::draw_chromaticity_diagram::coloring_book;
 use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
-use ndarray::Array;
 use std::{thread, time::Duration};
 use stopwatch::Stopwatch;
-use uom::si::electrical_conductivity::siemens_per_centimeter;
 
-use crate::color::colorspace_conversion::{
-    _spectra_to_sRGB, spectra_to_CIEXYZ, spectra_to_display,
-};
 use crate::geometry_pipeline::geometry_pipeline;
-use crate::lighting::{black_spectra, void_spectra, white_spectra, Spectra};
-use crate::scene::{calibration_scene, cornell_scene, simple_scene};
+use crate::scene::{calibration_scene, cornell_scene};
 
 fn sleep(ms: Duration) {
     thread::sleep(ms);
 }
 
 #[inline]
-pub fn save_image(canvas: ImageBuffer<Rgb<u8>, Vec<u8>>) -> () {
+pub fn save_image(canvas: ImageBuffer<Rgb<u8>, Vec<u8>>) {
     canvas
         .save_with_format("rust-output.png", ImageFormat::Png)
         .unwrap();
@@ -76,12 +70,12 @@ fn main_loop() {
     loop {
         let mut frame = Stopwatch::start_new();
 
-        println!("");
+        println!();
         single(counter);
         frame.stop();
         println!("frame: {:?}", frame.elapsed());
         if REST > frame.elapsed() {
-            let wait = REST - frame.elapsed(); // accounts for time already elapsed
+            let wait = REST.checked_sub(frame.elapsed()).unwrap(); // accounts for time already elapsed
             sleep(wait);
         }
 

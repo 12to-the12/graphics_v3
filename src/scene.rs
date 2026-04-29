@@ -4,12 +4,10 @@ use crate::camera::{Camera, Lens, Sensor};
 use crate::geometry::orientation::RIGHT;
 // use crate::coordinate_space::Polar;
 use crate::geometry::primitives::{Mesh, Vector};
-use crate::material::Diffuse;
 use crate::object::Object;
 // use crate::primitives::Object;
 use crate::lighting::{
-    black_spectra, const_spectra, green_spectra, incandescent_spectra, norm_black_body, Light,
-    PointLight, Spectra,
+    black_spectra, const_spectra, incandescent_spectra, Light, PointLight, Spectra,
 };
 use crate::load_object_file::load_wavefront_obj;
 
@@ -96,7 +94,8 @@ pub fn calibration_scene<'b>() -> Scene {
     objects.push(object);
 
     let background = black_spectra();
-    let scene = Scene {
+
+    Scene {
         camera,
         lights,
         _meshes: meshes,
@@ -112,8 +111,7 @@ pub fn calibration_scene<'b>() -> Scene {
         samples: 1,
         max_trace_depth: 0,
         max_render_dist: 20.,
-    };
-    return scene;
+    }
 }
 
 pub fn simple_scene<'b>() -> Scene {
@@ -140,19 +138,19 @@ pub fn simple_scene<'b>() -> Scene {
     let light = PointLight::new(
         Vector::new(-5.0, 5.0, 3.0),
         RIGHT,
-        incandescent_spectra(2000., 1000.).into(),
+        incandescent_spectra(2000., 1000.),
     );
     lights.push(Arc::new(light));
     let light = PointLight::new(
         Vector::new(0.0, 5.0, 3.0),
         RIGHT,
-        incandescent_spectra(3000., 1000.).into(),
+        incandescent_spectra(3000., 1000.),
     );
     lights.push(Arc::new(light));
     let light = PointLight::new(
         Vector::new(5.0, 5.0, 3.0),
         RIGHT,
-        incandescent_spectra(4000., 1000.).into(),
+        incandescent_spectra(4000., 1000.),
     );
     lights.push(Arc::new(light));
 
@@ -161,8 +159,8 @@ pub fn simple_scene<'b>() -> Scene {
     let cube = load_wavefront_obj("models/cube.obj".to_string());
     let sphere: Mesh = load_wavefront_obj("models/sphere.obj".to_string());
     let plane: Mesh = load_wavefront_obj("models/plane.obj".to_string());
-    let wall: Mesh = load_wavefront_obj("models/wall.obj".to_string());
-    let cornell: Mesh = load_wavefront_obj("models/cornell.obj".to_string());
+    let _wall: Mesh = load_wavefront_obj("models/wall.obj".to_string());
+    let _cornell: Mesh = load_wavefront_obj("models/cornell.obj".to_string());
 
     let object = Object {
         position: Vector::new(3.0, 0.0, 0.),
@@ -190,7 +188,8 @@ pub fn simple_scene<'b>() -> Scene {
     objects.push(object);
 
     let background = black_spectra();
-    let scene = Scene {
+
+    Scene {
         camera,
         lights,
         _meshes: meshes,
@@ -206,8 +205,7 @@ pub fn simple_scene<'b>() -> Scene {
         samples: 8,
         max_trace_depth: 0,
         max_render_dist: 20.,
-    };
-    return scene;
+    }
 }
 
 pub fn cornell_scene<'b>() -> Scene {
@@ -235,7 +233,7 @@ pub fn cornell_scene<'b>() -> Scene {
         Vector::new(0.0, 5.0, -0.),
         // Vector::new(0.0, 3.0, -0.5),
         RIGHT,
-        incandescent_spectra(2000., 1000.).into(),
+        incandescent_spectra(2000., 1000.),
     );
     lights.push(Arc::new(light));
 
@@ -258,7 +256,8 @@ pub fn cornell_scene<'b>() -> Scene {
     // objects.push(object);
 
     let background = black_spectra();
-    let scene = Scene {
+
+    Scene {
         camera,
         lights,
         _meshes: meshes,
@@ -274,6 +273,5 @@ pub fn cornell_scene<'b>() -> Scene {
         samples: 1,
         max_trace_depth: 0,
         max_render_dist: 20.,
-    };
-    return scene;
+    }
 }

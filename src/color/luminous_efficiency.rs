@@ -29,16 +29,16 @@ const LUMINOUS_EFFICACY: [f32; 40] = [
 pub fn _photopic_conversion(spectra: Spectra) -> f32 {
     let watts = Array::from_vec(_PHOTOPIC_CONVERSION.to_vec());
     let lumens_spectra = watts * spectra.spectra; // watts* (lumens/watt)
-    let lumens = Array::sum(&lumens_spectra);
-    return lumens;
+
+    Array::sum(&lumens_spectra)
 }
 
 // neither of these are valid, they need to average or something, not sum
 pub fn luminous_efficacy(spectra: Spectra) -> f32 {
     let efficacy = Array::from_vec(LUMINOUS_EFFICACY.to_vec());
     let lumens_spectra = efficacy * spectra.spectra;
-    let result = Array::sum(&lumens_spectra);
-    return result;
+
+    Array::sum(&lumens_spectra)
 }
 
 #[cfg(test)]

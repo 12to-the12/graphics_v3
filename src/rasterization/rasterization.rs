@@ -20,33 +20,27 @@ fn _sort_points(triangle: &Triangle) -> Vec<&Point> {
 
     // 3 input naive sorting network
     // first and last
-    if p2.y == p0.y {
-        if p2.x < p0.x {
-            points.swap(0, 1)
-        }
+    if p2.y == p0.y && p2.x < p0.x {
+        points.swap(0, 1);
     }
     if p2.y > p0.y {
-        points.swap(0, 1)
+        points.swap(0, 1);
     }
 
     // first two
-    if p1.y == p0.y {
-        if p1.x < p0.x {
-            points.swap(0, 1)
-        }
+    if p1.y == p0.y && p1.x < p0.x {
+        points.swap(0, 1);
     }
     if p1.y > p0.y {
-        points.swap(0, 1)
+        points.swap(0, 1);
     }
 
     // last two
-    if p2.y == p1.y {
-        if p2.x < p1.x {
-            points.swap(0, 1)
-        }
+    if p2.y == p1.y && p2.x < p1.x {
+        points.swap(0, 1);
     }
     if p2.y > p1.y {
-        points.swap(0, 1)
+        points.swap(0, 1);
     }
-    return points;
+    points
 }

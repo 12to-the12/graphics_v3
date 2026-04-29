@@ -8,7 +8,7 @@ pub fn integrated_x_response(spectra: &Spectra) -> f32 {
         // println!("{}", λ);
         sum += λx_response(λ as f32) * spectra.from_λ(λ as f32);
     }
-    return sum * spectra.get_sample_width();
+    sum * spectra.get_sample_width()
 }
 
 pub fn integrated_y_response(spectra: &Spectra) -> f32 {
@@ -16,7 +16,7 @@ pub fn integrated_y_response(spectra: &Spectra) -> f32 {
     for λ in (380..780).step_by(10) {
         sum += λy_response(λ as f32) * spectra.from_λ(λ as f32);
     }
-    return sum * spectra.get_sample_width();
+    sum * spectra.get_sample_width()
 }
 
 pub fn integrated_z_response(spectra: &Spectra) -> f32 {
@@ -24,36 +24,36 @@ pub fn integrated_z_response(spectra: &Spectra) -> f32 {
     for λ in (380..780).step_by(10) {
         sum += λz_response(λ as f32) * spectra.from_λ(λ as f32);
     }
-    return sum * spectra.get_sample_width();
+    sum * spectra.get_sample_width()
 }
 
 // contribution at given wavelength
 // NOT NORMALIZED
 pub fn λx_response(λ: f32) -> f32 {
-    if (λ < 380.) || (λ > 830.) {
+    if !(380. ..=830.).contains(&λ) {
         return 0.;
     }
 
-    return X[(λ as usize - 380) / 5];
+    X[(λ as usize - 380) / 5]
 }
 
 // contribution at given wavelength
 // NOT NORMALIZED
 // divide green by 1.3791 to normalize
 pub fn λy_response(λ: f32) -> f32 {
-    if (λ < 380.) || (λ > 830.) {
+    if !(380. ..=830.).contains(&λ) {
         return 0.;
     }
-    return Y[(λ as usize - 380) / 5];
+    Y[(λ as usize - 380) / 5]
 }
 
 // contribution at given wavelength
 // NOT NORMALIZED
 pub fn λz_response(λ: f32) -> f32 {
-    if (λ < 380.) || (λ > 830.) {
+    if !(380. ..=830.).contains(&λ) {
         return 0.;
     }
-    return Z[(λ as usize - 380) / 5];
+    Z[(λ as usize - 380) / 5]
 }
 
 /// 380-830 5nm increments

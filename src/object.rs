@@ -43,15 +43,15 @@ impl Object {
                 }
             }
         }
-        return furthest;
+        furthest
     }
     pub fn ray_intercept(&self, ray: &Ray) -> bool {
         let position = self.position;
         let radius = self.get_radius();
-        return ray_sphere_intersection(ray, &position, &radius);
+        ray_sphere_intersection(ray, &position, &radius)
     }
 
-    pub fn _add_child(mut self, child: Arc<dyn Entity>) -> () {
+    pub fn _add_child(mut self, child: Arc<dyn Entity>) {
         self._children.push(child.clone());
     }
 }
