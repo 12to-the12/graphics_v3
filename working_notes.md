@@ -40,3 +40,7 @@ material calculations are done in watts/steridian with distance taken into accou
 if a camera ray hits a light, 
 
 it needs to be triangulated!
+
+
+
+an exhaustive exploration of the discrepancy between the rasterization and ray tracing projections shows that the raster projection is inaccurate

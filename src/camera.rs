@@ -29,6 +29,10 @@ impl Camera {
     pub fn _vertical_field_of_view(&self) -> f32 {
         return ((self.sensor.height() / (2.0 * self.lens.focal_length)).atan() * 2.0).to_degrees();
     }
+    /// foreshortening
+    pub fn foreshortening(&self) -> f32 {
+        return self.sensor.width / (2. * self.lens.focal_length);
+    }
     /// get the solid angle captured by the lens in steradians
     #[allow(non_snake_case)]
     pub fn _frustrum_solid_angle(&self) -> f32 {

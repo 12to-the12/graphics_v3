@@ -25,13 +25,14 @@ use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
 use ndarray::Array;
 use std::{thread, time::Duration};
 use stopwatch::Stopwatch;
+use uom::si::electrical_conductivity::siemens_per_centimeter;
 
 use crate::color::colorspace_conversion::{
     _spectra_to_sRGB, spectra_to_CIEXYZ, spectra_to_display,
 };
 use crate::geometry_pipeline::geometry_pipeline;
 use crate::lighting::{black_spectra, void_spectra, white_spectra, Spectra};
-use crate::scene::simple_scene;
+use crate::scene::{calibration_scene, simple_scene};
 
 fn sleep(ms: Duration) {
     thread::sleep(ms);
@@ -57,7 +58,7 @@ fn _render_animation() {
         let mut frame = Stopwatch::start_new();
 
         let mut scene;
-        scene = simple_scene();
+        scene = calibration_scene();
         scene.tick = counter;
         let canvas = geometry_pipeline(scene);
         canvas
@@ -87,9 +88,26 @@ fn main_loop() {
         counter += 1;
     }
 }
+fn raster_vs_raytrace() {
+    let mut scene = calibration_scene();
+    scene.rendermode = scene::Rendermode::ThreadedRayTrace;
+    scene.tick = 0;
+    let render = geometry_pipeline(scene);
+    render
+        .save_with_format("raytraced.png", ImageFormat::Png)
+        .unwrap();
+
+    let mut scene = calibration_scene();
+    scene.rendermode = scene::Rendermode::_Rasterize;
+    scene.tick = 0;
+    let render = geometry_pipeline(scene);
+    render
+        .save_with_format("rasterized.png", ImageFormat::Png)
+        .unwrap();
+}
 fn single(i: usize) {
     let mut scene;
-    scene = simple_scene();
+    scene = calibration_scene();
     scene.tick = i;
     let render = geometry_pipeline(scene);
     save_image(render);
@@ -111,7 +129,7 @@ fn draw_colors() {
 fn main() {
     check_debug();
     draw_colors();
-    main_loop();
+    // main_loop();
 
-    // single(0)
+    single(0)
 }

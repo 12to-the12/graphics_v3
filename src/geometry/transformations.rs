@@ -60,9 +60,11 @@ pub fn build_scale_transform(scale: Vector) -> Transform {
 
 /// still trying to figure this one out
 pub fn build_projection_transform(camera: &Camera) -> Transform {
-    let hfov = camera.horizontal_field_of_view();
-    let hfactor = hfov / 90.0; // for every meter away
-    let _vfactor = hfactor / camera.sensor.aspect_ratio(); // for every meter away
+    // let hfov = camera.horizontal_field_of_view();
+    // println!("hfov: {}", hfov);
+    // let hfactor = hfov / 90.0; // for every meter away
+    let hfactor = camera.foreshortening();
+    // let _vfactor = hfactor / camera.sensor.aspect_ratio(); // for every meter away
 
     let matrix = arr2(&[
         //*x + *y + *z + *1
@@ -314,7 +316,6 @@ mod tests {
         let vertex = transform.process(vertex_list).into_iter().nth(0).unwrap();
         let myvertex_p = arr1(&vertex._as_array());
         let myvertex_p = myvertex_p.map(_round_6);
-        println!("{:?}", myvertex_p);
         assert_eq!(arr1(&[0., 0., 1.]), myvertex_p);
     }
 

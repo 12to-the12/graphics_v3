@@ -57,20 +57,80 @@ pub struct Scene {
     pub max_render_dist: f32,
 }
 
-pub fn simple_scene<'b>() -> Scene {
+pub fn calibration_scene<'b>() -> Scene {
     let lens = Lens {
         _aperture: 50.0,
-        focal_length: 50.0 / 1000., // 120.
+        focal_length: 1.0 / 1000., // 120.
         _focus_distance: 2.0,
     };
     let sensor = Sensor {
-        width: 36.0 / 1000., // 36 mm
-        // height: 24.0,
-        horizontal_res: 210 * 2,
-        vertical_res: 160 * 2,
+        width: 4.0 / 1000., // 36 mm
+        horizontal_res: 100,
+        vertical_res: 100,
     };
     let camera = Camera {
-        position: Vector::new(0.0, 0.0, 10.0),
+        position: Vector::new(0.0, 0.0, 0.8),
+        // orientation: Polar
+        lens,
+        sensor,
+        exposure_time: 3e10,
+        ..Camera::default()
+    };
+    let mut lights: Vec<Arc<dyn Light>> = vec![];
+
+    let light = PointLight::new(
+        Vector::new(0.0, 0.0, 10.0),
+        RIGHT,
+        const_spectra(1000.).into(),
+    );
+    lights.push(Arc::new(light));
+
+    let meshes = Vec::new();
+    let mut objects = Vec::new();
+    let cube = load_wavefront_obj("models/cube.obj".to_string());
+    let object = Object {
+        position: Vector::new(0.0, 0.0, -1.),
+        meshes: vec![cube.clone()],
+        ..Object::default()
+    };
+    objects.push(object);
+
+    let background = black_spectra();
+    let scene = Scene {
+        camera,
+        lights,
+        _meshes: meshes,
+        background,
+        tick: 0,
+        rendermode: Rendermode::ThreadedRayTrace,
+        shadermode: ShaderMode::Lit,
+        logging: 0,
+        objects,
+        spatial_acceleration_structures: true,
+        _recursive_raycasting: true,
+        threads: 1,
+        samples: 1,
+        max_trace_depth: 0,
+        max_render_dist: 20.,
+    };
+    return scene;
+}
+
+pub fn simple_scene<'b>() -> Scene {
+    let lens = Lens {
+        _aperture: 50.0,
+        focal_length: 100.0 / 1000., // 120.
+        // focal_length: 50.0 / 1000., // 120.
+        _focus_distance: 2.0,
+    };
+    let sensor = Sensor {
+        width: 100.0 / 1000., // 36 mm
+        // width: 36.0 / 1000., // 36 mm
+        horizontal_res: 100,
+        vertical_res: 100,
+    };
+    let camera = Camera {
+        position: Vector::new(0.0, 0.0, 8.5),
         // orientation: Polar
         lens,
         sensor,
@@ -114,7 +174,7 @@ pub fn simple_scene<'b>() -> Scene {
         objects,
         spatial_acceleration_structures: true,
         _recursive_raycasting: true,
-        threads: 42,
+        threads: 100,
         samples: 8,
         max_trace_depth: 0,
         max_render_dist: 20.,
