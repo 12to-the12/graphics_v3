@@ -132,8 +132,8 @@ fn draw_colors() {
 fn main() {
     check_debug();
     draw_colors();
-    main_loop();
-    // raster_vs_raytrace();
+    // main_loop();
+    raster_vs_raytrace();
 
     // single(0)
 }

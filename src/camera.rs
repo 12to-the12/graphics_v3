@@ -79,6 +79,7 @@ impl Camera {
             // z is negative, and if the ray placement is scaled to one from the sensor width,
             // the focal length needs to be proportional
         };
+        // let position = ORIGIN;
         let position = camera.position;
         let ray = Ray::new(position, direction);
         ray.direction.unitized();

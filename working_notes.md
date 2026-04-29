@@ -49,3 +49,15 @@ an exhaustive exploration of the discrepancy between the rasterization and ray t
 hard problems to solve:
 pbrt
 rotations
+
+
+objects need their positions changed for bounding volume hierarchies to work
+trying to sort out how transforms play with the scene graph
+
+
+transform system:
+the root has the camera transform applied to it
+everything needs to hold it's position in camera space as well as original values
+camera space values are never propagated down!
+view space stuff is not applied to the scene
+the object/light buffer are rebuilt each time transforms are traversed

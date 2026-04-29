@@ -26,11 +26,11 @@ fn build_camera_space_transform(camera: &Camera) -> Transform {
 }
 
 fn build_to_projection_transform(scene: &Scene) -> Transform {
-    build_projection_transform(&scene.camera)
+    build_projection_transform(&scene.active_camera)
 }
 
 fn build_to_display_transform(scene: &Scene) -> Transform {
-    let camera = &scene.camera;
+    let camera = &scene.active_camera;
     let aspect_ratio = camera.sensor.aspect_ratio();
     let hres = camera.sensor.horizontal_res as f32;
     let vres = camera.sensor.vertical_res as f32;
@@ -66,7 +66,7 @@ fn apply_transforms(scene: &mut Scene) {
     let mut uniform_view_transforms: Vec<Transform> = Vec::new();
     // let to_camera_space = build_camera_space_transform(&scene.camera);
     if scene.rendermode == Rendermode::Rasterize {
-        uniform_view_transforms.push(build_camera_space_transform(&scene.camera));
+        uniform_view_transforms.push(build_camera_space_transform(&scene.active_camera));
         uniform_view_transforms.push(build_to_projection_transform(scene));
         uniform_view_transforms.push(build_to_display_transform(scene));
     }
@@ -77,14 +77,16 @@ fn apply_transforms(scene: &mut Scene) {
             // for mesh in scene.meshes.iter_mut() {
             mesh.add_transform(to_world_space.clone());
 
-            if scene.rendermode == Rendermode::Rasterize {
-                // mesh.add_transform(to_camera_space.clone());
-                mesh.add_transform(uniform_view_transform.clone());
-            }
+            // if scene.rendermode == Rendermode::Rasterize {
+            //     // mesh.add_transform(to_camera_space.clone());
+            // }
+            mesh.add_transform(uniform_view_transform.clone());
 
             mesh.apply_transformations();
         }
     }
+    // scene.root.cascade_transforms();
+    // scene.apply_transformations();
 }
 
 fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
@@ -160,17 +162,17 @@ fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
         &scene,
         shadermode,
         0,
-        scene.camera.sensor.horizontal_res,
+        scene.active_camera.sensor.horizontal_res,
         0,
-        scene.camera.sensor.vertical_res,
+        scene.active_camera.sensor.vertical_res,
     ); // lit_shader solid_shader solid_shader
 }
 fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     apply_transforms(&mut scene);
     let threadcount = scene.threads;
 
-    let width = scene.camera.sensor.horizontal_res / scene.threads;
-    let height = scene.camera.sensor.vertical_res;
+    let width = scene.active_camera.sensor.horizontal_res / scene.threads;
+    let height = scene.active_camera.sensor.vertical_res;
     let shadermode = match scene.shadermode {
         ShaderMode::Lit => lit_shader,
         ShaderMode::_BVH => bvh_shader,
@@ -253,8 +255,8 @@ fn render(canvas: &mut RgbImage, scene: Scene) {
 pub fn geometry_pipeline(mut scene: Scene) -> RgbImage {
     application(&mut scene); // arrives at the geometry to render
 
-    let horizontal_res = scene.camera.sensor.horizontal_res;
-    let vertical_res = scene.camera.sensor.vertical_res;
+    let horizontal_res = scene.active_camera.sensor.horizontal_res;
+    let vertical_res = scene.active_camera.sensor.vertical_res;
     let mut canvas: RgbImage = ImageBuffer::new(horizontal_res, vertical_res);
 
     render(&mut canvas, scene);

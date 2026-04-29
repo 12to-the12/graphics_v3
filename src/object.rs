@@ -24,7 +24,8 @@ pub trait Entity: Debug + Sync + Send {
 #[derive(Debug, Clone)]
 pub struct Object {
     pub _parent: Option<Arc<dyn Entity>>,
-    pub position: Vector,
+    pub position: Vector, // this is relative to it's parent
+    // pub camera_space_position: Vector, // this exists in camera space
     pub _orientation: Orientation,
     pub _scale: f32,
     pub _children: Vec<Arc<dyn Entity>>,
@@ -55,7 +56,34 @@ impl Object {
         self._children.push(child.clone());
     }
 }
+#[derive(Debug, Clone)]
+pub struct Empty {
+    pub _parent: Option<Arc<dyn Entity>>,
+    position: Vector,
+    pub _orientation: Orientation,
+    pub _scale: f32,
+    pub _children: Vec<Arc<dyn Entity>>,
+}
 
+impl Default for Empty {
+    fn default() -> Empty {
+        Empty {
+            _parent: None,
+            position: ORIGIN,
+            _orientation: _UP,
+            _scale: 1.,
+            _children: Vec::new(),
+        }
+    }
+}
+impl Entity for Empty {
+    fn get_position(&self) -> Vector
+    where
+        Self: Sized,
+    {
+        self.position
+    }
+}
 impl Default for Object {
     fn default() -> Object {
         Object {

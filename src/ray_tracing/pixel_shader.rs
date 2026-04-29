@@ -35,7 +35,7 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
 }
 
 pub fn _color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
-    let (hres, vres) = scene.camera.sensor.res();
+    let (hres, vres) = scene.active_camera.sensor.res();
     let x = x as f32 / (hres as f32);
     let y = y as f32 / (vres as f32);
     let r1 = y * 255.;
@@ -63,7 +63,7 @@ pub fn _color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 
 /// shades all objects as solid
 pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
-    let ray = Camera::pixel_to_ray(&scene.camera, x, y);
+    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y);
     let mut hit = false;
     // here we're at once per pixel
     for object in &scene.objects {
@@ -95,7 +95,7 @@ pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 
 /// shows where bounding volume hierarchies are
 pub fn bvh_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
-    let ray = Camera::pixel_to_ray(&scene.camera, x, y);
+    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y);
     let mut hit = false;
     // here we're at once per pixel
     for object in &scene.objects {
@@ -114,7 +114,7 @@ pub fn bvh_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 
 /// render depth
 pub fn z_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
-    let ray = Camera::pixel_to_ray(&scene.camera, x, y);
+    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y);
     let intersection = shoot_ray(ray, scene, scene.max_trace_depth);
     if intersection.is_none() {
         Rgb([0, 0, 0])
@@ -129,13 +129,15 @@ pub fn z_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 /// fully lit shading mode
 /// this lambda is executed once per pixel
 pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
-    let ray = Camera::pixel_to_ray(&scene.camera, x, y);
+    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y);
     let mut output: RadiantExitance = black_spectra().into();
     for _ in 0..scene.samples {
         output.0 = output.0 + dispatch_light_ray(ray.clone(), scene, scene.max_trace_depth).0;
     }
     let sample_average = output.0 / scene.samples as f32;
-    let output = scene.camera.exposure_time * scene.camera.sensor._pixel_area() * sample_average;
+    let output = scene.active_camera.exposure_time
+        * scene.active_camera.sensor._pixel_area()
+        * sample_average;
 
     spectra_to_display(&output)
 }
@@ -288,12 +290,12 @@ mod tests {
         let mut scene = simple_scene();
         let mut ray: Ray;
 
-        scene.camera.lens.focal_length = 18.0;
-        scene.camera.sensor.width = 36.0;
+        scene.active_camera.lens.focal_length = 18.0;
+        scene.active_camera.sensor.width = 36.0;
 
-        scene.camera.sensor.horizontal_res = 3;
-        scene.camera.sensor.vertical_res = 3;
-        ray = Camera::pixel_to_ray(&scene.camera, 0, 2);
+        scene.active_camera.sensor.horizontal_res = 3;
+        scene.active_camera.sensor.vertical_res = 3;
+        ray = Camera::pixel_to_ray(&scene.active_camera, 0, 2);
 
         // println!("direction: {:?}", ray.direction);
 
@@ -303,9 +305,9 @@ mod tests {
         assert_eq!(ray.direction.y, foil.y); //
         assert_eq!(ray.direction.z, foil.z); //
 
-        scene.camera.sensor.horizontal_res = 1;
-        scene.camera.sensor.vertical_res = 1;
-        ray = Camera::pixel_to_ray(&scene.camera, 0, 0);
+        scene.active_camera.sensor.horizontal_res = 1;
+        scene.active_camera.sensor.vertical_res = 1;
+        ray = Camera::pixel_to_ray(&scene.active_camera, 0, 0);
 
         // println!("direction: {:?}", ray.direction);
 

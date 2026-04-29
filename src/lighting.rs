@@ -10,6 +10,7 @@ use crate::{
     object::Entity,
 };
 extern crate ndarray;
+use crate::geometry::orientation::RIGHT;
 use ndarray::prelude::*;
 
 pub trait _Spectral {}
@@ -36,6 +37,15 @@ pub struct PointLight {
     pub radiant_flux: RadiantFlux, // power in each wavelength
 }
 
+impl Default for PointLight {
+    fn default() -> Self {
+        PointLight {
+            position: Vector::new(0.0, 0.0, 0.0),
+            _orientation: RIGHT,
+            radiant_flux: incandescent_spectra(2000., 1000.),
+        }
+    }
+}
 impl PointLight {
     pub fn new(
         position: Vector,
