@@ -2,6 +2,7 @@ use crate::geometry::primitives::{Point, Triangle};
 use crate::rasterization::line_plotting::plot_triangle;
 use image::{Rgb, RgbImage};
 /// solid color rasterization
+/// still working on it!
 pub fn rasterize_triangle(triangle: Triangle, canvas: &mut RgbImage) {
     let color = Rgb([0, 255, 0]);
     plot_triangle(triangle.clone(), canvas, color);

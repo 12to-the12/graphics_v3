@@ -25,7 +25,7 @@ pub enum ShaderMode {
 pub enum Rendermode {
     _RayTrace,
     ThreadedRayTrace,
-    _Rasterize,
+    Rasterize,
 }
 
 /// I am not sure what the responsibilities of this construction should be
@@ -119,30 +119,40 @@ pub fn calibration_scene<'b>() -> Scene {
 pub fn simple_scene<'b>() -> Scene {
     let lens = Lens {
         _aperture: 50.0,
-        focal_length: 100.0 / 1000., // 120.
-        // focal_length: 50.0 / 1000., // 120.
+        focal_length: 80.0 / 1000., // 120.
         _focus_distance: 2.0,
     };
     let sensor = Sensor {
-        width: 100.0 / 1000., // 36 mm
-        // width: 36.0 / 1000., // 36 mm
-        horizontal_res: 100,
-        vertical_res: 100,
+        width: 36.0 / 1000., // 36 mm
+        horizontal_res: 240 * 2,
+        vertical_res: 160 * 2,
     };
     let camera = Camera {
-        position: Vector::new(0.0, 0.0, 8.5),
+        position: Vector::new(0.0, 0.0, 20.),
         // orientation: Polar
         lens,
         sensor,
-        exposure_time: 3e10,
+        exposure_time: 1e11,
         ..Camera::default()
     };
     let mut lights: Vec<Arc<dyn Light>> = vec![];
 
     let light = PointLight::new(
-        Vector::new(0.0, 0.0, 10.0),
+        Vector::new(-5.0, 5.0, 3.0),
         RIGHT,
-        const_spectra(1000.).into(),
+        incandescent_spectra(2000., 1000.).into(),
+    );
+    lights.push(Arc::new(light));
+    let light = PointLight::new(
+        Vector::new(0.0, 5.0, 3.0),
+        RIGHT,
+        incandescent_spectra(3000., 1000.).into(),
+    );
+    lights.push(Arc::new(light));
+    let light = PointLight::new(
+        Vector::new(5.0, 5.0, 3.0),
+        RIGHT,
+        incandescent_spectra(4000., 1000.).into(),
     );
     lights.push(Arc::new(light));
 
@@ -155,8 +165,26 @@ pub fn simple_scene<'b>() -> Scene {
     let cornell: Mesh = load_wavefront_obj("models/cornell.obj".to_string());
 
     let object = Object {
-        position: Vector::new(0.0, 0.0, 5.34),
+        position: Vector::new(3.0, 0.0, 0.),
         meshes: vec![cube.clone()],
+        ..Object::default()
+    };
+    objects.push(object);
+    let object = Object {
+        position: Vector::new(-3.0, 0.0, 0.),
+        meshes: vec![cube.clone()],
+        ..Object::default()
+    };
+    objects.push(object);
+    let object = Object {
+        position: Vector::new(0.0, 0.0, 0.),
+        meshes: vec![sphere.clone()],
+        ..Object::default()
+    };
+    objects.push(object);
+    let object = Object {
+        position: Vector::new(0.0, -2.0, 0.),
+        meshes: vec![plane.clone()],
         ..Object::default()
     };
     objects.push(object);
@@ -174,8 +202,76 @@ pub fn simple_scene<'b>() -> Scene {
         objects,
         spatial_acceleration_structures: true,
         _recursive_raycasting: true,
-        threads: 100,
+        threads: 16,
         samples: 8,
+        max_trace_depth: 0,
+        max_render_dist: 20.,
+    };
+    return scene;
+}
+
+pub fn cornell_scene<'b>() -> Scene {
+    let lens = Lens {
+        _aperture: 50.0,
+        focal_length: 80.0 / 1000., // 120.
+        _focus_distance: 2.0,
+    };
+    let sensor = Sensor {
+        width: 36.0 / 1000., // 36 mm
+        horizontal_res: 240 * 4,
+        vertical_res: 240 * 4,
+    };
+    let camera = Camera {
+        position: Vector::new(0., 2.74, 13.),
+        // orientation: Polar
+        lens,
+        sensor,
+        exposure_time: 1e12,
+        ..Camera::default()
+    };
+    let mut lights: Vec<Arc<dyn Light>> = vec![];
+
+    let light = PointLight::new(
+        Vector::new(0.0, 5.0, -0.),
+        // Vector::new(0.0, 3.0, -0.5),
+        RIGHT,
+        incandescent_spectra(2000., 1000.).into(),
+    );
+    lights.push(Arc::new(light));
+
+    let meshes = Vec::new();
+    let mut objects = Vec::new();
+    let cornell = load_wavefront_obj("models/cornell.obj".to_string());
+
+    let object = Object {
+        position: Vector::new(2.8, 0., 0.),
+        meshes: vec![cornell.clone()],
+        ..Object::default()
+    };
+    objects.push(object);
+
+    // let object = Object {
+    //     position: Vector::new(0.0, 4.5, -3.),
+    //     meshes: vec![cube.clone()],
+    //     ..Object::default()
+    // };
+    // objects.push(object);
+
+    let background = black_spectra();
+    let scene = Scene {
+        camera,
+        lights,
+        _meshes: meshes,
+        background,
+        tick: 0,
+        rendermode: Rendermode::ThreadedRayTrace,
+        shadermode: ShaderMode::Lit,
+        logging: 0,
+        objects,
+        spatial_acceleration_structures: true,
+        _recursive_raycasting: true,
+        threads: 20,
+        samples: 1,
         max_trace_depth: 0,
         max_render_dist: 20.,
     };

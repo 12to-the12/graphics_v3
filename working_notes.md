@@ -44,3 +44,8 @@ it needs to be triangulated!
 
 
 an exhaustive exploration of the discrepancy between the rasterization and ray tracing projections shows that the raster projection is inaccurate
+
+
+hard problems to solve:
+pbrt
+rotations

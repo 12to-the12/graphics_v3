@@ -32,7 +32,7 @@ use crate::color::colorspace_conversion::{
 };
 use crate::geometry_pipeline::geometry_pipeline;
 use crate::lighting::{black_spectra, void_spectra, white_spectra, Spectra};
-use crate::scene::{calibration_scene, simple_scene};
+use crate::scene::{calibration_scene, cornell_scene, simple_scene};
 
 fn sleep(ms: Duration) {
     thread::sleep(ms);
@@ -89,7 +89,8 @@ fn main_loop() {
     }
 }
 fn raster_vs_raytrace() {
-    let mut scene = calibration_scene();
+    let mut ray_tracing = Stopwatch::start_new();
+    let mut scene = cornell_scene();
     scene.rendermode = scene::Rendermode::ThreadedRayTrace;
     scene.tick = 0;
     let render = geometry_pipeline(scene);
@@ -97,17 +98,25 @@ fn raster_vs_raytrace() {
         .save_with_format("raytraced.png", ImageFormat::Png)
         .unwrap();
 
-    let mut scene = calibration_scene();
-    scene.rendermode = scene::Rendermode::_Rasterize;
+    ray_tracing.stop();
+    println!("raytracing: {:?}", ray_tracing.elapsed());
+
+    let mut rasterization = Stopwatch::start_new();
+
+    let mut scene = cornell_scene();
+    scene.rendermode = scene::Rendermode::Rasterize;
     scene.tick = 0;
     let render = geometry_pipeline(scene);
+
+    rasterization.stop();
+    println!("rasterization: {:?}", rasterization.elapsed());
     render
         .save_with_format("rasterized.png", ImageFormat::Png)
         .unwrap();
 }
 fn single(i: usize) {
     let mut scene;
-    scene = calibration_scene();
+    scene = cornell_scene();
     scene.tick = i;
     let render = geometry_pipeline(scene);
     save_image(render);
@@ -130,6 +139,7 @@ fn main() {
     check_debug();
     draw_colors();
     // main_loop();
+    raster_vs_raytrace();
 
-    single(0)
+    // single(0)
 }

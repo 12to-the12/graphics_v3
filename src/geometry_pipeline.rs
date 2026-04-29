@@ -51,6 +51,11 @@ fn build_to_display_transform(scene: &Scene) -> Transform {
 }
 
 fn vertex_shader(scene: &mut Scene) {
+    apply_transforms(scene);
+}
+
+/// currently only used by ray trace
+fn apply_transforms(scene: &mut Scene) {
     // calculate_global_space(scene);
     // view transform that goes from global space to clip space
 
@@ -60,54 +65,45 @@ fn vertex_shader(scene: &mut Scene) {
 
     // --> clip coordinates
     let mut uniform_view_transforms: Vec<Transform> = Vec::new();
-
-    // uniform_view_transforms.push(build_camera_space_transform(&scene.camera));
-    uniform_view_transforms.push(build_to_projection_transform(scene));
-    uniform_view_transforms.push(build_to_display_transform(scene));
-
+    // let to_camera_space = build_camera_space_transform(&scene.camera);
+    if scene.rendermode == Rendermode::Rasterize {
+        uniform_view_transforms.push(build_camera_space_transform(&scene.camera));
+        uniform_view_transforms.push(build_to_projection_transform(scene));
+        uniform_view_transforms.push(build_to_display_transform(scene));
+    }
     let uniform_view_transform = compile_transforms(&uniform_view_transforms);
     for object in &mut scene.objects {
+        let to_world_space = build_translation_transform(object.position.clone());
         for mesh in &mut object.meshes {
-            let to_world_space = build_translation_transform(object.position.clone());
-            mesh.add_transform(to_world_space);
-            let to_camera_space = build_camera_space_transform(&scene.camera);
-            mesh.add_transform(to_camera_space);
-            mesh.add_transform(uniform_view_transform.clone());
+            // for mesh in scene.meshes.iter_mut() {
+            mesh.add_transform(to_world_space.clone());
+
+            if scene.rendermode == Rendermode::Rasterize {
+                // mesh.add_transform(to_camera_space.clone());
+                mesh.add_transform(uniform_view_transform.clone());
+            }
+
+            mesh.apply_transformations();
         }
     }
 }
 
-// fn apply_transforms(scene: &mut Scene) {
-//     for object in &mut scene.objects {
-//         for mesh in &mut object.meshes {
-//             // for mesh in scene.meshes.iter_mut() {
-//             let to_world_space = build_translation_transform(object.position.clone());
-//             mesh.add_transform(to_world_space);
-//             if scene.rendermode == Rendermode::_Rasterize {
-//                 let to_camera_space = build_camera_space_transform(&scene.camera);
-//                 mesh.add_transform(to_camera_space);
-//             }
+fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
+    for object in scene.objects {
+        for mesh in object.meshes {
+            // mesh.apply_transformations();
+            for poly in mesh.polygons {
+                let a = &mesh.output_vertices[poly[0]]; // currently vertexes;
+                let b = &mesh.output_vertices[poly[1]];
+                let c = &mesh.output_vertices[poly[2]];
 
-//             mesh.apply_transformations();
-//         }
-//     }
-// }
-
-fn _wire_frame(canvas: &mut RgbImage, scene: Scene) {
-    let color = Rgb([0, 255, 0]);
-    for mut mesh in scene._meshes {
-        mesh.apply_transformations();
-        for poly in mesh.polygons {
-            let a = &mesh.output_vertices[poly[0]]; // currently vertexes;
-            let b = &mesh.output_vertices[poly[1]];
-            let c = &mesh.output_vertices[poly[2]];
-
-            plot_triangle(Triangle::new(a, b, c), canvas, color)
+                rasterize_triangle(Triangle::new(a, b, c), canvas);
+            }
         }
     }
 }
 
-fn solid(canvas: &mut RgbImage, scene: Scene) {
+fn _solid(canvas: &mut RgbImage, scene: Scene) {
     for object in scene.objects {
         for mut mesh in object.meshes {
             mesh.apply_transformations();
@@ -146,23 +142,7 @@ fn rasterize(canvas: &mut RgbImage, mut scene: Scene) {
         println!("raster_time: {:?}", raster_time.elapsed());
     }
 
-    solid(canvas, scene);
-}
-
-fn apply_transforms(scene: &mut Scene) {
-    for object in &mut scene.objects {
-        for mesh in &mut object.meshes {
-            // for mesh in scene.meshes.iter_mut() {
-            let to_world_space = build_translation_transform(object.position.clone());
-            mesh.add_transform(to_world_space);
-            if scene.rendermode == Rendermode::_Rasterize {
-                let to_camera_space = build_camera_space_transform(&scene.camera);
-                mesh.add_transform(to_camera_space);
-            }
-
-            mesh.apply_transformations();
-        }
-    }
+    wire_frame(canvas, scene);
 }
 
 fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
@@ -256,7 +236,7 @@ fn render(canvas: &mut RgbImage, scene: Scene) {
 
         Rendermode::_RayTrace => ray_trace(canvas, scene),
 
-        Rendermode::_Rasterize => rasterize(canvas, scene),
+        Rendermode::Rasterize => rasterize(canvas, scene),
     }
 }
 
