@@ -382,6 +382,13 @@ impl Triangle {
 
         Triangle { a, b, c }
     }
+    /// true if CCW
+    /// source: <https://jtsorlinis.github.io/rendering-tutorial>/
+    pub fn get_sign(&self) -> bool {
+        (self.b.x - self.a.x) * (self.c.y - self.a.y)
+            - (self.b.y - self.a.y) * (self.c.x - self.a.x)
+            < 0
+    }
 }
 
 #[derive(Clone, Debug)]

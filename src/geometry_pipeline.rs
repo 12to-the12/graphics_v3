@@ -15,7 +15,7 @@ use crate::rasterization::rasterization::rasterize_triangle;
 use crate::ray_tracing::pixel_shader::{
     _solid_shader, bvh_shader, lit_shader, shade_pixels, z_shader,
 };
-use image::{ImageBuffer, RgbImage};
+use image::{ImageBuffer, Rgb, RgbImage};
 use stopwatch::Stopwatch;
 
 /// transforms from world space to camera space
@@ -95,8 +95,10 @@ fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
                 let a = &mesh.output_vertices[poly[0]]; // currently vertexes;
                 let b = &mesh.output_vertices[poly[1]];
                 let c = &mesh.output_vertices[poly[2]];
-
-                rasterize_triangle(Triangle::new(a, b, c), canvas);
+                let triangle = Triangle::new(a, b, c);
+                if triangle.get_sign() {
+                    rasterize_triangle(triangle, canvas, Rgb([0, 255, 0]));
+                }
             }
         }
     }
@@ -111,7 +113,7 @@ fn _solid(canvas: &mut RgbImage, scene: Scene) {
                 let b = &mesh.output_vertices[poly[1]];
                 let c = &mesh.output_vertices[poly[2]];
 
-                rasterize_triangle(Triangle::new(a, b, c), canvas);
+                rasterize_triangle(Triangle::new(a, b, c), canvas, Rgb([0, 255, 0]));
             }
         }
     }

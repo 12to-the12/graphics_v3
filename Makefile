@@ -1,12 +1,12 @@
 default: run
 all:run
 
-build: format
+build: format fix
 	cargo build --release
-run: format
+run: format fix
 	cargo run --release
 
-test: format
+test: format fix
 	cargo test
 
 
@@ -14,6 +14,8 @@ format:
 	cargo fmt
 check: format
 	cargo check
+fix:
+	cargo clippy --allow-dirty --fix -- -Dclippy::pedantic
 
 open: open_pictures run
 

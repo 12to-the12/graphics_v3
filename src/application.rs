@@ -1,14 +1,13 @@
-use crate::object::Object;
 use crate::scene::Scene;
 
 /// all of the stuff that should happen to run the scene,
 /// note: this is recomputed every frame. Not a major performance bottleneck
 pub fn application(scene: &mut Scene) -> &Scene {
-    let _tick = scene.tick as f32;
-    let _objects: &mut Vec<Object> = &mut scene.objects;
+    // let tick = scene.tick as f32;
+    // let objects: &mut Vec<Object> = &mut scene.objects;
 
-    let _lights = &mut scene.lights;
-    // lights.index_mut(0).set_position();
+    // let _lights = &mut scene.lights;
+    // // lights.index_mut(0).se();
 
     // objects
     //     .index_mut(0)

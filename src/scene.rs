@@ -117,7 +117,7 @@ pub fn calibration_scene<'b>() -> Scene {
 pub fn simple_scene<'b>() -> Scene {
     let lens = Lens {
         _aperture: 50.0,
-        focal_length: 80.0 / 1000., // 120.
+        focal_length: 20.0 / 1000., // 120.
         _focus_distance: 2.0,
     };
     let sensor = Sensor {
@@ -126,7 +126,7 @@ pub fn simple_scene<'b>() -> Scene {
         vertical_res: 160 * 2,
     };
     let camera = Camera {
-        position: Vector::new(0.0, 0.0, 20.),
+        position: Vector::new(0.0, 0.0, 7.),
         // orientation: Polar
         lens,
         sensor,
@@ -180,12 +180,12 @@ pub fn simple_scene<'b>() -> Scene {
         ..Object::default()
     };
     objects.push(object);
-    let object = Object {
+    let _object = Object {
         position: Vector::new(0.0, -2.0, 0.),
         meshes: vec![plane.clone()],
         ..Object::default()
     };
-    objects.push(object);
+    // objects.push(object);
 
     let background = black_spectra();
 
@@ -195,7 +195,7 @@ pub fn simple_scene<'b>() -> Scene {
         _meshes: meshes,
         background,
         tick: 0,
-        rendermode: Rendermode::ThreadedRayTrace,
+        rendermode: Rendermode::Rasterize,
         shadermode: ShaderMode::Lit,
         logging: 0,
         objects,
@@ -263,7 +263,7 @@ pub fn cornell_scene<'b>() -> Scene {
         _meshes: meshes,
         background,
         tick: 0,
-        rendermode: Rendermode::ThreadedRayTrace,
+        rendermode: Rendermode::Rasterize,
         shadermode: ShaderMode::Lit,
         logging: 0,
         objects,
