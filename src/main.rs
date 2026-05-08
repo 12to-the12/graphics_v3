@@ -84,7 +84,7 @@ fn main_loop() {
 }
 fn raster_vs_raytrace() {
     let mut ray_tracing = Stopwatch::start_new();
-    let mut scene = cornell_scene();
+    let mut scene = simple_scene();
     scene.rendermode = scene::Rendermode::ThreadedRayTrace;
     scene.tick = 0;
     let render = geometry_pipeline(scene);

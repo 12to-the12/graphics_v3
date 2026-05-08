@@ -131,10 +131,10 @@ pub fn z_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
 /// fully lit shading mode
 /// this lambda is executed once per pixel
 pub fn lit_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
-    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y, rng);
     let mut output: RadiantExitance = black_spectra().into();
     for _ in 0..scene.samples {
-        output.0 = output.0 + dispatch_light_ray(ray.clone(), scene, scene.max_trace_depth, rng).0;
+        let ray = Camera::pixel_to_ray(&scene.active_camera, x, y, rng);
+        output.0 = output.0 + dispatch_light_ray(ray, scene, scene.max_trace_depth, rng).0;
     }
     let sample_average = output.0 / scene.samples as f32;
 

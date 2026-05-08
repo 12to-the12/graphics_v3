@@ -210,7 +210,7 @@ pub fn simple_scene<'b>() -> Scene {
 
     scene.rendermode = Rendermode::Rasterize;
     scene.threads = 48;
-    scene.samples = 1;
+    scene.samples = 8;
     scene.max_trace_depth = 0;
     scene.max_render_dist = 20.;
     scene
