@@ -7,10 +7,11 @@ use crate::ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection
 
 use crate::scene::Scene;
 use image::{Rgb, RgbImage};
+use rand::{prelude::ThreadRng, thread_rng};
 use stopwatch::Stopwatch;
 
 /// applies rendering mode to scene and yields a canvas
-pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
+pub fn shade_pixels<F: Fn(u32, u32, &Scene, &mut ThreadRng) -> Rgb<u8>>(
     mini_canvas: &mut RgbImage,
     scene: &Scene,
     closure: F,
@@ -19,13 +20,14 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
     y_start: u32,
     y_end: u32,
 ) {
+    let mut rng: rand::prelude::ThreadRng = thread_rng();
     let mut shading = Stopwatch::start_new();
     // let (width, height) = canvas.dimensions();
     let _width = y_end - y_start;
     let _height = x_end - x_start;
     for y in y_start..y_end {
         for x in x_start..x_end {
-            let color = closure(x, y, scene);
+            let color = closure(x, y, scene, &mut rng);
             mini_canvas.put_pixel(x - x_start, y - y_start, color);
         }
     }
@@ -34,7 +36,7 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene) -> Rgb<u8>>(
     if scene.logging > 1 {}
 }
 
-pub fn _color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
+pub fn _color_shader(x: u32, y: u32, scene: &Scene, _rng: &mut ThreadRng) -> Rgb<u8> {
     let (hres, vres) = scene.active_camera.sensor.res();
     let x = x as f32 / (hres as f32);
     let y = y as f32 / (vres as f32);
@@ -62,8 +64,8 @@ pub fn _color_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 }
 
 /// shades all objects as solid
-pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
-    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y);
+pub fn _solid_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
+    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y, rng);
     let mut hit = false;
     // here we're at once per pixel
     for object in &scene.objects {
@@ -94,8 +96,8 @@ pub fn _solid_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 }
 
 /// shows where bounding volume hierarchies are
-pub fn bvh_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
-    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y);
+pub fn bvh_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
+    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y, rng);
     let mut hit = false;
     // here we're at once per pixel
     for object in &scene.objects {
@@ -113,8 +115,8 @@ pub fn bvh_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 }
 
 /// render depth
-pub fn z_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
-    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y);
+pub fn z_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
+    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y, rng);
     let intersection = shoot_ray(ray, scene, scene.max_trace_depth);
     if intersection.is_none() {
         Rgb([0, 0, 0])
@@ -128,24 +130,31 @@ pub fn z_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
 
 /// fully lit shading mode
 /// this lambda is executed once per pixel
-pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
-    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y);
+pub fn lit_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
+    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y, rng);
     let mut output: RadiantExitance = black_spectra().into();
     for _ in 0..scene.samples {
-        output.0 = output.0 + dispatch_light_ray(ray.clone(), scene, scene.max_trace_depth).0;
+        output.0 = output.0 + dispatch_light_ray(ray.clone(), scene, scene.max_trace_depth, rng).0;
     }
     let sample_average = output.0 / scene.samples as f32;
-    let output = scene.active_camera.exposure_time
+
+    // we should take a value parameterized in radiance, not radiant exitance
+    let joules = scene.active_camera.exposure_time
         * scene.active_camera.sensor._pixel_area()
         * scene.active_camera._pixel_solid_angle()
         * sample_average;
 
-    spectra_to_display(&output)
+    spectra_to_display(&joules)
 }
 
 /// this is what is recursed
 /// the ray is given
-pub fn dispatch_light_ray(ray: Ray, scene: &Scene, _trace_depth: u32) -> RadiantExitance {
+pub fn dispatch_light_ray(
+    ray: Ray,
+    scene: &Scene,
+    _trace_depth: u32,
+    rng: &mut ThreadRng,
+) -> RadiantExitance {
     let intersection = shoot_ray(ray, scene, scene.max_trace_depth);
     if intersection.is_none() {
         return void_spectra().into();
@@ -154,6 +163,8 @@ pub fn dispatch_light_ray(ray: Ray, scene: &Scene, _trace_depth: u32) -> Radiant
     let (object, intersection_point, ω_o, normal) = intersection.unwrap();
 
     // direct illumination
+    // this is basically integrating incoming light to our point
+    // we know the area subtended by this light source already, so we don't need multiple samples
     let direct_illumination: RadiantExitance =
         compute_direct_illumination(scene, object, intersection_point, ω_o, normal, _trace_depth);
     // direct_illumination
@@ -166,8 +177,8 @@ pub fn dispatch_light_ray(ray: Ray, scene: &Scene, _trace_depth: u32) -> Radiant
         //     surface_normal,
         // ));
 
-        let ray = Ray::new(intersection_point, _even_over_hemisphere(normal));
-        let indirect_illumination = dispatch_light_ray(ray, scene, scene.max_trace_depth - 1);
+        let ray = Ray::new(intersection_point, _even_over_hemisphere(normal, rng));
+        let indirect_illumination = dispatch_light_ray(ray, scene, scene.max_trace_depth - 1, rng);
         (direct_illumination.0 + indirect_illumination.0).into()
     } else {
         direct_illumination
@@ -296,13 +307,14 @@ mod tests {
     fn pixel_rays() {
         let mut scene = simple_scene();
         let mut ray: Ray;
+        let mut rng = thread_rng();
 
         scene.active_camera.lens.focal_length = 18.0;
         scene.active_camera.sensor.width = 36.0;
 
         scene.active_camera.sensor.horizontal_res = 3;
         scene.active_camera.sensor.vertical_res = 3;
-        ray = Camera::pixel_to_ray(&scene.active_camera, 0, 2);
+        ray = Camera::pixel_to_ray(&scene.active_camera, 0, 2, &mut rng);
 
         // println!("direction: {:?}", ray.direction);
 
@@ -314,7 +326,7 @@ mod tests {
 
         scene.active_camera.sensor.horizontal_res = 1;
         scene.active_camera.sensor.vertical_res = 1;
-        ray = Camera::pixel_to_ray(&scene.active_camera, 0, 0);
+        ray = Camera::pixel_to_ray(&scene.active_camera, 0, 0, &mut rng);
 
         // println!("direction: {:?}", ray.direction);
 

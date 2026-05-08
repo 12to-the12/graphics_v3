@@ -1,6 +1,8 @@
 #![allow(nonstandard_style)]
 use std::sync::Arc;
 
+use rand::{rngs::ThreadRng, Rng};
+
 // use crate::coordinate_space::Orientation;
 use crate::{
     geometry::primitives::{Ray, Vector},
@@ -58,9 +60,13 @@ impl Camera {
     }
 
     /// yeah, the math was hard for me too 2023-11-20
-    pub fn pixel_to_ray(camera: &Self, x: u32, y: u32) -> Ray {
-        let x = (x as f32) + 0.5; // centers the pixels
-        let y = (y as f32) + 0.5;
+    pub fn pixel_to_ray(camera: &Self, x: u32, y: u32, rng: &mut ThreadRng) -> Ray {
+        let x_jitter: f32 = rng.gen();
+        let y_jitter: f32 = rng.gen();
+        let x: f32 = (x as f32) + x_jitter; // centers the pixels
+        let y: f32 = (y as f32) + y_jitter;
+        // let x = (x as f32) + 0.5; // centers the pixels
+        // let y = (y as f32) + 0.5;
         let camera = camera;
         let (hres, vres) = camera.sensor.res();
         let mut horizontal_fraction: f32 = x / (hres as f32);

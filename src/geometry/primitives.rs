@@ -2,7 +2,7 @@
 use crate::geometry::transformations::{compile_transforms, Transform};
 use image::{Rgb, RgbImage};
 use ndarray::Array1;
-use rand::Rng;
+use rand::{prelude::ThreadRng, Rng};
 // use crate::ray_tracing::rendering_equation::BRDF;
 
 /// geometry defining spatial surface
@@ -195,9 +195,8 @@ impl Vector {
 }
 
 /// actually even in a cube
-pub fn _even_over_sphere() -> Vector {
+pub fn _even_over_sphere(rng: &mut ThreadRng) -> Vector {
     loop {
-        let mut rng = rand::thread_rng();
         let vector = Vector::new(rng.gen(), rng.gen(), rng.gen());
         if vector.magnitude() <= 1.0 {
             return vector.unitized();
@@ -206,8 +205,8 @@ pub fn _even_over_sphere() -> Vector {
 }
 
 /// just an approximation
-pub fn _even_over_hemisphere(normal: Vector) -> Vector {
-    let output = _even_over_sphere();
+pub fn _even_over_hemisphere(normal: Vector, rng: &mut ThreadRng) -> Vector {
+    let output = _even_over_sphere(rng);
     if output.dot(&normal) < 0. {
         return -1. * output;
     }
