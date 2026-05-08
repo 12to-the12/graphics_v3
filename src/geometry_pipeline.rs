@@ -1,5 +1,6 @@
 use std::cmp::min;
-use std::sync::Arc;
+use std::sync::{mpsc, Arc};
+use std::thread;
 
 use crate::application::application;
 use crate::camera::Camera;
@@ -16,6 +17,8 @@ use crate::ray_tracing::pixel_shader::{
     _solid_shader, bvh_shader, lit_shader, shade_pixels, z_shader,
 };
 use image::{GenericImage, ImageBuffer, Rgb, RgbImage};
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 use rayon::prelude::*;
 use stopwatch::Stopwatch;
 
@@ -188,7 +191,6 @@ fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
 }
 fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     apply_transforms(&mut scene);
-    let _threadcount = scene.threads;
 
     // let width = scene.active_camera.sensor.horizontal_res / scene.threads;
     let width = scene.active_camera.sensor.horizontal_res;
@@ -205,6 +207,7 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
         ShaderMode::_ZDepth => z_shader,
     };
     let data = Arc::new(scene); // necessary for borrowing in threads
+    let (sender, receiver) = mpsc::channel::<Tile>();
 
     let mut thread_timer = Stopwatch::start_new();
     // let mut handles = Vec::new();
@@ -233,14 +236,14 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
             ));
         }
     }
+    tiles.shuffle(&mut thread_rng());
 
-    let tiles: Vec<Tile> = tiles
-        .into_par_iter()
-        .map(move |mut tile| {
+    let handle = thread::spawn(move || {
+        tiles.into_par_iter().for_each(move |mut tile| {
             shade_pixels(&mut tile, &Arc::clone(&data), shadermode);
-            tile
-        })
-        .collect();
+            sender.clone().send(tile).unwrap();
+        });
+    });
 
     // for i in 0..threadcount {
     //     // sliced vertically
@@ -264,18 +267,26 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     // }
 
     thread_timer.stop();
+
+    println!("parallel rendering: {:?}", thread_timer.elapsed());
     // if scene.logging > 0 {
     //     println!("parallel rendering: {:?}", thread_timer.elapsed());
     // }
     let mut reassembly = Stopwatch::start_new();
-    tiles.into_iter().for_each(|tile| {
-        let _ = canvas.copy_from(&tile.canvas, tile.x_start, tile.y_start);
-    });
-    // for tile in &tiles {
+    // tiles.into_iter().for_each(|tile| {
     //     let _ = canvas.copy_from(&tile.canvas, tile.x_start, tile.y_start);
-    // }
+    // });
+    for tile in receiver {
+        print!(".");
+        canvas
+            .copy_from(&tile.canvas, tile.x_start, tile.y_start)
+            .unwrap();
+        canvas.save("partial.png").unwrap();
+    }
+    handle.join().unwrap();
 
     reassembly.stop();
+    println!("reassembly: {:?}", reassembly.elapsed());
     // if data.logging > 0 {
     //     println!("reassembly: {:?}", reassembly.elapsed());
     // }
