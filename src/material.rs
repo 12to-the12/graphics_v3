@@ -1,6 +1,6 @@
 use crate::{
     geometry::primitives::Vector,
-    lighting::{const_spectra, RadiantExitance, RadiantIntensity, Spectra},
+    lighting::{const_spectra, Radiance, RadiantIntensity, Spectra},
 };
 use std::{f32::consts::PI, fmt::Debug};
 
@@ -13,7 +13,7 @@ pub trait BRDF: Debug + Sync + Send {
         normal: &Vector, // surface normal
         // incoming_radiant_intensity: Spectra, // the radiant flux of the lightsource encoded as a spectrum
         incoming_radiant_intensity: RadiantIntensity, // the radiant flux of the lightsource encoded as a spectrum
-    ) -> RadiantExitance;
+    ) -> Radiance;
 }
 
 /// Lambert's law of cosines
@@ -52,12 +52,10 @@ impl BRDF for Diffuse {
         normal: &Vector, // surface normal
         // incoming_radiant_intensity: Spectra, // the radiant flux of the lightsource encoded as a spectrum
         incoming_radiant_intensity: RadiantIntensity,
-    ) -> RadiantExitance {
+    ) -> Radiance {
         // radiant intensity W/sr obeys cosine law
         // radiance W/sr/m^2 is the same in all directions
-        let _r = ω_i.magnitude(); // dist to light source
 
-        let r_o = ω_o.magnitude(); // dist to observer
         let _incident_factor = cosθ(ω_i, normal); // per unit solid angle (area)
         let _outgoing_incident_factor = cosθ(ω_o, normal); // per unit solid angle (area
                                                            // let incoming: Spectra = incoming_radiant_intensity.s;
@@ -74,9 +72,7 @@ impl BRDF for Diffuse {
         // let observer_radiantexitance: RadiantExitance =
         // ((1. / (r_o * r_o)) * isotrophic_surface_radiance).into();
         // observer_radiantexitance
-        let lambertian: RadiantExitance =
-            ((1. / PI) * (1. / (r_o * r_o)) * (1. / (r_o * r_o)) * incoming_radiant_intensity.0)
-                .into();
+        let lambertian: Radiance = ((1. / PI) * incoming_radiant_intensity.0).into();
         lambertian
     }
 }

@@ -205,7 +205,7 @@ pub fn compute_direct_illumination(
             continue;
         }
 
-        let radiant_exitance = closest_object.material.rendering_equation(
+        let radiance = closest_object.material.rendering_equation(
             &intersection_point,
             to_light,
             &direction,
@@ -213,6 +213,12 @@ pub fn compute_direct_illumination(
             //  light.radiant_intensity(intersection_point),
             light.radiant_intensity(intersection_point),
         );
+
+        let r_i = to_light.magnitude(); // dist to light source
+        let r_o = direction.magnitude(); // dist to observer
+
+        let radiant_exitance: RadiantExitance =
+            ((1. / (r_i * r_i)) * (1. / (r_o * r_o)) * radiance.0).into();
 
         output.0 = output.0 + radiant_exitance.0;
     }
