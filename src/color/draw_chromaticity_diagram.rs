@@ -18,6 +18,7 @@ pub fn _draw_colors_in_xyz(canvas: &mut RgbImage) {
         }
     }
 
+    // white point
     canvas.put_pixel(
         (0.333 * (canvas.width() as f32)) as u32,
         (0.666 * (canvas.height() as f32)) as u32,
@@ -35,7 +36,7 @@ pub fn coloring_book(canvas: &mut RgbImage) {
         }
     }
 
-    for λ in 380..700 {
+    for λ in 380..780 {
         let spectra = monochroma_spectra((λ as f32) / 1., 1.);
         let xyY = CIEXYZ_to_xyY(spectra_to_CIEXYZ(&spectra));
         canvas.put_pixel(

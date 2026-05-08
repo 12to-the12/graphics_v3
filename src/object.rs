@@ -10,13 +10,9 @@ use crate::{
 };
 
 pub trait Entity: Debug + Sync + Send {
-    fn get_position(&self) -> Vector {
-        ORIGIN
-    }
-
-    fn _get_parent(&self) -> Option<Arc<dyn Entity>> {
-        None
-    }
+    fn get_position(&self) -> Vector;
+    // fn _get_parent(&self) -> Option<Arc<dyn Entity>>;
+    // fn add_child(&mut self, child: Arc<dyn Entity>) -> ();
     // fn get_transforms(&self) -> &Vec<Transform>;
     // fn append_transforms(&self) -> &Vec<Transform>; // add position and scale and shit to log
 }
@@ -83,6 +79,12 @@ impl Entity for Empty {
     {
         self.position
     }
+    // fn _get_parent(&self) -> Option<Arc<dyn Entity>> {
+    //     self._parent.clone()
+    // }
+    // fn add_child(&mut self, child: Arc<dyn Entity>) -> () {
+    //     self._children.push(child);
+    // }
 }
 impl Default for Object {
     fn default() -> Object {
@@ -106,6 +108,12 @@ impl Entity for Object {
     {
         self.position
     }
+    // fn _get_parent(&self) -> Option<Arc<dyn Entity>> {
+    //     self._parent.clone()
+    // }
+    // fn add_child(&mut self, child: Arc<dyn Entity>) -> () {
+    //     self._children.push(child);
+    // }
 }
 
 #[cfg(test)]

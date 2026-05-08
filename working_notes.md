@@ -56,8 +56,12 @@ trying to sort out how transforms play with the scene graph
 
 
 transform system:
-the root has the camera transform applied to it
+the root has the camera transform applied to it to get stuff into camera space
 everything needs to hold it's position in camera space as well as original values
 camera space values are never propagated down!
 view space stuff is not applied to the scene
 the object/light buffer are rebuilt each time transforms are traversed
+
+
+integration basically multiplies by whatever is the subject of integration
+remember that the samples are used to approximate integration via monte carlo, the idea is that we treat *all* directions and points on surfaces as receiving whatever our rays receive

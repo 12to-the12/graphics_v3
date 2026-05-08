@@ -14,3 +14,7 @@ shaders tied to objects
 actual image textures
 
 lights need to be rotated!
+
+- better transform hierarchy
+- accurate ray trace sampling
+- solid triangle shading (multithreaded)

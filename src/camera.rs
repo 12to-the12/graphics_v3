@@ -112,9 +112,9 @@ impl Entity for Camera {
     {
         self.position
     }
-    fn _get_parent(&self) -> Option<Arc<dyn Entity>> {
-        self._parent.clone()
-    }
+    // fn _get_parent(&self) -> Option<Arc<dyn Entity>> {
+    //     self._parent.clone()
+    // }
 }
 
 /// models a camera lens

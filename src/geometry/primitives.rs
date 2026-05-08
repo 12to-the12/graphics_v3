@@ -196,8 +196,13 @@ impl Vector {
 
 /// actually even in a cube
 pub fn _even_over_sphere() -> Vector {
-    let mut rng = rand::thread_rng();
-    Vector::new(rng.gen(), rng.gen(), rng.gen()).unitized()
+    loop {
+        let mut rng = rand::thread_rng();
+        let vector = Vector::new(rng.gen(), rng.gen(), rng.gen());
+        if vector.magnitude() <= 1.0 {
+            return vector.unitized();
+        }
+    }
 }
 
 /// just an approximation
@@ -404,6 +409,21 @@ impl Ray {
             position,
             direction,
         }
+    }
+}
+
+/// 2D
+#[derive(Clone, Debug)]
+pub struct SphericalCoordinates {
+    pub φ: f32,
+    pub θ: f32,
+    pub r: f32,
+}
+pub fn spherical_to_euclidean(x: SphericalCoordinates) -> Vector {
+    Vector {
+        x: x.φ.cos() * x.θ.sin(),
+        y: x.φ.sin() * x.θ.sin(),
+        z: x.θ.cos(),
     }
 }
 

@@ -137,6 +137,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene) -> Rgb<u8> {
     let sample_average = output.0 / scene.samples as f32;
     let output = scene.active_camera.exposure_time
         * scene.active_camera.sensor._pixel_area()
+        * scene.active_camera._pixel_solid_angle()
         * sample_average;
 
     spectra_to_display(&output)

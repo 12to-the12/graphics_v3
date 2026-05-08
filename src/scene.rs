@@ -58,7 +58,7 @@ pub struct Scene {
 }
 impl Default for Scene {
     fn default() -> Self {
-        Scene {
+        let scene = Scene {
             scene_root: Empty::default(),
             active_camera: Camera::default(),
             lights: Vec::new(),
@@ -75,8 +75,18 @@ impl Default for Scene {
             samples: 1,
             max_trace_depth: 1,
             max_render_dist: 1e6,
-        }
+        };
+        // scene.build_light_vector();
+        scene
     }
+}
+impl Scene {
+    // fn build_light_vector(&mut self) -> () {
+
+    // }
+    // fn add_light<T: Light + 'static>(&mut self, light: T) -> () {
+    //     self.scene_root.add_child(Arc::new(light));
+    // }
 }
 
 pub fn calibration_scene<'b>() -> Scene {
@@ -141,17 +151,17 @@ pub fn calibration_scene<'b>() -> Scene {
 
 pub fn simple_scene<'b>() -> Scene {
     let mut scene = Scene::default();
+    scene.active_camera.exposure_time = 5e16;
     scene.active_camera.lens._aperture = 50.;
     scene.active_camera.lens.focal_length = 20.0 / 1000.; // 120.
     scene.active_camera.lens._focus_distance = 2.; // 120.
 
     scene.active_camera.lens._aperture = 50.;
     scene.active_camera.sensor.width = 36.0 / 1000.; // 36 mm
-    scene.active_camera.sensor.horizontal_res = 240 * 2;
-    scene.active_camera.sensor.vertical_res = 160 * 2;
+    scene.active_camera.sensor.horizontal_res = 240 * 4;
+    scene.active_camera.sensor.vertical_res = 160 * 4;
 
     scene.active_camera.position = Vector::new(0.0, 0.0, 7.);
-    scene.active_camera.exposure_time = 1e11;
     let mut light = PointLight::default();
     light.position = Vector::new(-5.0, 5.0, 3.0);
     light.radiant_flux = incandescent_spectra(2000., 1000.);
@@ -222,7 +232,7 @@ pub fn cornell_scene<'b>() -> Scene {
         // orientation: Polar
         lens,
         sensor,
-        exposure_time: 1e12,
+        exposure_time: 1e17,
         ..Camera::default()
     };
     let mut lights: Vec<Arc<dyn Light>> = vec![];
@@ -268,8 +278,8 @@ pub fn cornell_scene<'b>() -> Scene {
         spatial_acceleration_structures: true,
         _recursive_raycasting: true,
         threads: 20,
-        samples: 1,
-        max_trace_depth: 0,
+        samples: 8,
+        max_trace_depth: 1,
         max_render_dist: 20.,
         ..Default::default()
     }

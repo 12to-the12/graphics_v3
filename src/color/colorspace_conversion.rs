@@ -74,6 +74,7 @@ pub fn xyY_to_sRGB(xyY: (f32, f32, f32)) -> (f32, f32, f32) {
     sB_linear *= Y;
 
     // NOTE: THIS DEVIATES FROM AN ACCURATE COLOR MODEL
+    // HAS TO BE GREATER THAN ONE FOR BLACKS TO WORK
     // I think this will desaturate?
     // let factor = 1.2;
     let factor = 1. + 1e-12;
