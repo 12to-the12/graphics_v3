@@ -11,5 +11,4 @@ target/
 animations/
 *.avi
 *.mp4
-color_gamut.png
-rust-output.png
+/*.png
