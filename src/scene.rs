@@ -151,7 +151,7 @@ pub fn calibration_scene<'b>() -> Scene {
 
 pub fn simple_scene<'b>() -> Scene {
     let mut scene = Scene::default();
-    scene.active_camera.exposure_time = 5e16;
+    scene.active_camera.exposure_time = 1e16;
     scene.active_camera.lens._aperture = 50.;
     scene.active_camera.lens.focal_length = 20.0 / 1000.; // 120.
     scene.active_camera.lens._focus_distance = 2.; // 120.
@@ -201,17 +201,17 @@ pub fn simple_scene<'b>() -> Scene {
         ..Object::default()
     };
     scene.objects.push(object);
-    let _object = Object {
+    let object = Object {
         position: Vector::new(0.0, -2.0, 0.),
         meshes: vec![plane.clone()],
         ..Object::default()
     };
-    // scene.objects.push(object);
+    scene.objects.push(object);
 
     scene.rendermode = Rendermode::Rasterize;
     scene.threads = 48;
-    scene.samples = 8;
-    scene.max_trace_depth = 0;
+    scene.samples = 32;
+    scene.max_trace_depth = 1;
     scene.max_render_dist = 20.;
     scene
 }
@@ -224,15 +224,15 @@ pub fn cornell_scene<'b>() -> Scene {
     };
     let sensor = Sensor {
         width: 36.0 / 1000., // 36 mm
-        horizontal_res: 240 * 4,
-        vertical_res: 240 * 4,
+        horizontal_res: 240 * 2,
+        vertical_res: 240 * 2,
     };
     let camera = Camera {
         position: Vector::new(0., 2.74, 13.),
         // orientation: Polar
         lens,
         sensor,
-        exposure_time: 1e17,
+        exposure_time: 1e14,
         ..Camera::default()
     };
     let mut lights: Vec<Arc<dyn Light>> = vec![];
@@ -241,7 +241,7 @@ pub fn cornell_scene<'b>() -> Scene {
         Vector::new(0.0, 5.0, -0.),
         // Vector::new(0.0, 3.0, -0.5),
         RIGHT,
-        incandescent_spectra(2000., 1000.),
+        incandescent_spectra(2500., 1000.),
     );
     lights.push(Arc::new(light));
 
@@ -271,14 +271,14 @@ pub fn cornell_scene<'b>() -> Scene {
         _meshes: meshes,
         background,
         tick: 0,
-        rendermode: Rendermode::Rasterize,
+        rendermode: Rendermode::ThreadedRayTrace,
         shadermode: ShaderMode::Lit,
         logging: 0,
         objects,
         spatial_acceleration_structures: true,
         _recursive_raycasting: true,
-        threads: 20,
-        samples: 8,
+        threads: 48,
+        samples: 16,
         max_trace_depth: 1,
         max_render_dist: 20.,
         ..Default::default()

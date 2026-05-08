@@ -18,3 +18,5 @@ lights need to be rotated!
 - better transform hierarchy
 - accurate ray trace sampling
 - solid triangle shading (multithreaded)
+- n-gon tesselation
+- viewport clipping

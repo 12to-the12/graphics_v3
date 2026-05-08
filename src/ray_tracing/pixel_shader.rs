@@ -1,7 +1,9 @@
+use std::f32::consts::PI;
+
 use crate::camera::Camera;
 use crate::color::colorspace_conversion::{sRGB_to_display, spectra_to_display};
-use crate::geometry::primitives::{_even_over_hemisphere, Polygon, Ray, Vector};
-use crate::lighting::{black_spectra, void_spectra, RadiantExitance};
+use crate::geometry::primitives::{even_over_hemisphere, Polygon, Ray, Vector};
+use crate::lighting::{black_spectra, void_spectra, Radiance};
 use crate::object::Object;
 use crate::ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection;
 
@@ -131,20 +133,37 @@ pub fn z_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
 /// fully lit shading mode
 /// this lambda is executed once per pixel
 pub fn lit_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
-    let mut output: RadiantExitance = black_spectra().into();
-    for _ in 0..scene.samples {
-        let ray = Camera::pixel_to_ray(&scene.active_camera, x, y, rng);
-        output.0 = output.0 + dispatch_light_ray(ray, scene, scene.max_trace_depth, rng).0;
-    }
-    let sample_average = output.0 / scene.samples as f32;
-
-    // we should take a value parameterized in radiance, not radiant exitance
+    let sample_average = integrate_pixel_radiance(x, y, scene, rng);
+    // we should take a value parameterized in radiance, not radiant exitance!
     let joules = scene.active_camera.exposure_time
         * scene.active_camera.sensor._pixel_area()
         * scene.active_camera._pixel_solid_angle()
-        * sample_average;
+        * sample_average.0;
 
     spectra_to_display(&joules)
+}
+pub fn integrate_pixel_radiance(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Radiance {
+    let mut radiance: Radiance = black_spectra().into();
+    for _ in 0..scene.samples {
+        let ray = Camera::pixel_to_ray(&scene.active_camera, x, y, rng);
+        radiance.0 = radiance.0 + dispatch_light_ray(ray, scene, scene.max_trace_depth, rng).0;
+    }
+
+    (radiance.0 / scene.samples as f32).into()
+}
+pub fn integrate_indirect_surface_radiance(
+    intersection_point: Vector,
+    normal: Vector,
+    scene: &Scene,
+    trace_depth: u32,
+    rng: &mut ThreadRng,
+) -> Radiance {
+    let mut radiance: Radiance = black_spectra().into();
+    for _ in 0..1 {
+        let ray = Ray::new(intersection_point, even_over_hemisphere(normal, rng));
+        radiance.0 = radiance.0 + dispatch_light_ray(ray, scene, trace_depth, rng).0;
+    }
+    radiance
 }
 
 /// this is what is recursed
@@ -152,9 +171,9 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8>
 pub fn dispatch_light_ray(
     ray: Ray,
     scene: &Scene,
-    _trace_depth: u32,
+    trace_depth: u32,
     rng: &mut ThreadRng,
-) -> RadiantExitance {
+) -> Radiance {
     let intersection = shoot_ray(ray, scene, scene.max_trace_depth);
     if intersection.is_none() {
         return void_spectra().into();
@@ -165,11 +184,17 @@ pub fn dispatch_light_ray(
     // direct illumination
     // this is basically integrating incoming light to our point
     // we know the area subtended by this light source already, so we don't need multiple samples
-    let direct_illumination: RadiantExitance =
-        compute_direct_illumination(scene, object, intersection_point, ω_o, normal, _trace_depth);
+    let direct_illumination: Radiance = integrate_direct_surface_radiance(
+        scene,
+        object,
+        intersection_point,
+        ω_o,
+        normal,
+        trace_depth,
+    );
     // direct_illumination
 
-    if scene._recursive_raycasting && _trace_depth > 0 {
+    if scene._recursive_raycasting && trace_depth > 0 {
         // return Some((
         //     closest_object.clone(),
         //     intersection_point,
@@ -177,26 +202,32 @@ pub fn dispatch_light_ray(
         //     surface_normal,
         // ));
 
-        let ray = Ray::new(intersection_point, _even_over_hemisphere(normal, rng));
-        let indirect_illumination = dispatch_light_ray(ray, scene, scene.max_trace_depth - 1, rng);
+        let indirect_illumination = integrate_indirect_surface_radiance(
+            intersection_point,
+            normal,
+            scene,
+            trace_depth - 1,
+            rng,
+        );
         (direct_illumination.0 + indirect_illumination.0).into()
     } else {
-        direct_illumination
+        direct_illumination.0.into()
     }
 }
 
 /// shoots a ray to every light from our point to compute illumination
+/// the reason this returns radiant exitance is because we know the size of the light sources
 /// not proper recursive ray tracing
-pub fn compute_direct_illumination(
+pub fn integrate_direct_surface_radiance(
     scene: &Scene,
-    closest_object: Object,
+    object: Object,
     intersection_point: Vector,
     direction: Vector,
     normal: Vector,
     _trace_depth: u32,
-) -> RadiantExitance {
-    let mut output: RadiantExitance = void_spectra().into(); // REMOVE THIS HACK
-                                                             // let mut output: RadiantExitance = black_spectra().into();
+) -> Radiance {
+    let mut output: Radiance = void_spectra().into();
+    // let mut output: RadiantExitance = black_spectra().into();
     'lights: for light in &scene.lights {
         // our job here is to find the amount of energy transmitted to the pixel from the light
         let to_light = &intersection_point.clone().to(light.get_position());
@@ -216,7 +247,7 @@ pub fn compute_direct_illumination(
             continue;
         }
 
-        let radiance = closest_object.material.rendering_equation(
+        let radiance = object.material.rendering_equation(
             &intersection_point,
             to_light,
             &direction,
@@ -224,14 +255,17 @@ pub fn compute_direct_illumination(
             //  light.radiant_intensity(intersection_point),
             light.radiant_intensity(intersection_point),
         );
-
+        // SHIT STILL NEEDS TO BE DIVIDED BY DISTANCE!!!
         let r_i = to_light.magnitude(); // dist to light source
-        let r_o = direction.magnitude(); // dist to observer
+        let _r_o = direction.magnitude(); // dist to observer
 
-        let radiant_exitance: RadiantExitance =
-            ((1. / (r_i * r_i)) * (1. / (r_o * r_o)) * radiance.0).into();
+        // this does not change the units
+        // it simply makes it so that the one sample that we have
+        // is treated like it's a 1 meter sphere instead of the entire hemisphere
+        let area_subtended = 1. / (2. * PI * r_i * r_i);
+        let radiance: Radiance = (area_subtended * radiance.0).into();
 
-        output.0 = output.0 + radiant_exitance.0;
+        output.0 = output.0 + radiance.0;
     }
     output
 }

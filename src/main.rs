@@ -84,7 +84,7 @@ fn main_loop() {
 }
 fn raster_vs_raytrace() {
     let mut ray_tracing = Stopwatch::start_new();
-    let mut scene = simple_scene();
+    let mut scene = cornell_scene();
     scene.rendermode = scene::Rendermode::ThreadedRayTrace;
     scene.tick = 0;
     let render = geometry_pipeline(scene);
@@ -112,7 +112,13 @@ fn single(i: usize) {
     let mut scene;
     scene = cornell_scene();
     scene.tick = i;
+
+    let mut frame = Stopwatch::start_new();
+
     let render = geometry_pipeline(scene);
+    frame.stop();
+    println!("frame: {:?}", frame.elapsed());
+
     save_image(render);
 }
 // REST is ms per frame
@@ -133,7 +139,7 @@ fn main() {
     check_debug();
     draw_colors();
     // main_loop();
-    raster_vs_raytrace();
+    // raster_vs_raytrace();
 
-    // single(0)
+    single(0);
 }

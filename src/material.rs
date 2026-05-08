@@ -72,7 +72,8 @@ impl BRDF for Diffuse {
         // let observer_radiantexitance: RadiantExitance =
         // ((1. / (r_o * r_o)) * isotrophic_surface_radiance).into();
         // observer_radiantexitance
-        let lambertian: Radiance = ((1. / PI) * incoming_radiant_intensity.0).into();
+        let lambertian: Radiance =
+            ((1. / PI) * incoming_radiant_intensity.0 * self.albedo.clone()).into();
         lambertian
     }
 }

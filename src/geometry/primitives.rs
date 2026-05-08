@@ -205,7 +205,7 @@ pub fn _even_over_sphere(rng: &mut ThreadRng) -> Vector {
 }
 
 /// just an approximation
-pub fn _even_over_hemisphere(normal: Vector, rng: &mut ThreadRng) -> Vector {
+pub fn even_over_hemisphere(normal: Vector, rng: &mut ThreadRng) -> Vector {
     let output = _even_over_sphere(rng);
     if output.dot(&normal) < 0. {
         return -1. * output;
