@@ -45,16 +45,17 @@ pub struct Scene {
     pub objects: Vec<Object>,
     pub _meshes: Vec<Mesh>,
     pub background: Spectra,
-    pub tick: usize,
+    pub tick: u32,
     pub rendermode: Rendermode,
     pub shadermode: ShaderMode,
     pub logging: u8,
     pub spatial_acceleration_structures: bool,
-    pub _recursive_raycasting: bool,
+    pub recursive_raycasting: bool,
     pub threads: u32,
     pub samples: u32,
     pub max_trace_depth: u32,
     pub max_render_dist: f32,
+    pub tilesize: u32,
 }
 impl Default for Scene {
     fn default() -> Self {
@@ -70,11 +71,12 @@ impl Default for Scene {
             shadermode: ShaderMode::Lit,
             logging: 0,
             spatial_acceleration_structures: true,
-            _recursive_raycasting: true,
+            recursive_raycasting: true,
             threads: 1,
             samples: 1,
             max_trace_depth: 1,
             max_render_dist: 1e6,
+            tilesize: 128,
         };
         // scene.build_light_vector();
         scene
@@ -140,7 +142,7 @@ pub fn calibration_scene<'b>() -> Scene {
         logging: 0,
         objects,
         spatial_acceleration_structures: true,
-        _recursive_raycasting: true,
+        recursive_raycasting: true,
         threads: 1,
         samples: 1,
         max_trace_depth: 0,
@@ -273,14 +275,16 @@ pub fn cornell_scene<'b>() -> Scene {
         tick: 0,
         rendermode: Rendermode::ThreadedRayTrace,
         shadermode: ShaderMode::Lit,
-        logging: 0,
+        logging: 1,
         objects,
         spatial_acceleration_structures: true,
-        _recursive_raycasting: true,
+        recursive_raycasting: true,
         threads: 48,
+        // samples: 1,
         samples: 16,
-        max_trace_depth: 1,
+        max_trace_depth: 4,
         max_render_dist: 20.,
+        tilesize: 80,
         ..Default::default()
     }
 }

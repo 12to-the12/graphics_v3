@@ -66,7 +66,7 @@ fn _render_animation() {
 // builds a scene and renders it over and over
 fn main_loop() {
     // let mut scene;
-    let mut counter: usize = 0;
+    let mut counter: u32 = 0;
     loop {
         let mut frame = Stopwatch::start_new();
 
@@ -108,7 +108,7 @@ fn raster_vs_raytrace() {
         .save_with_format("rasterized.png", ImageFormat::Png)
         .unwrap();
 }
-fn single(i: usize) {
+fn single(i: u32) {
     let mut scene;
     scene = cornell_scene();
     scene.tick = i;

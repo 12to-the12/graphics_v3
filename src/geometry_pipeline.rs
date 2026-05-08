@@ -1,5 +1,5 @@
+use std::cmp::min;
 use std::sync::Arc;
-use std::thread::{self};
 
 use crate::application::application;
 use crate::camera::Camera;
@@ -15,7 +15,8 @@ use crate::rasterization::rasterization::rasterize_triangle;
 use crate::ray_tracing::pixel_shader::{
     _solid_shader, bvh_shader, lit_shader, shade_pixels, z_shader,
 };
-use image::{ImageBuffer, Rgb, RgbImage};
+use image::{GenericImage, ImageBuffer, Rgb, RgbImage};
+use rayon::prelude::*;
 use stopwatch::Stopwatch;
 
 /// transforms from world space to camera space
@@ -148,6 +149,24 @@ fn rasterize(canvas: &mut RgbImage, mut scene: Scene) {
     wire_frame(canvas, scene);
 }
 
+pub struct Tile {
+    pub canvas: RgbImage,
+    pub x_start: u32,
+    pub y_start: u32,
+    pub width: u32,
+    pub height: u32,
+}
+impl Tile {
+    pub fn new(x_start: u32, y_start: u32, width: u32, height: u32) -> Tile {
+        Tile {
+            canvas: ImageBuffer::new(width, height),
+            x_start,
+            y_start,
+            width,
+            height,
+        }
+    }
+}
 fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     apply_transforms(&mut scene);
     let shadermode = match scene.shadermode {
@@ -156,23 +175,29 @@ fn ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
         ShaderMode::_Solid => _solid_shader,
         ShaderMode::_ZDepth => z_shader,
     };
-
-    shade_pixels(
-        canvas,
-        &scene,
-        shadermode,
+    let mut tile: Tile = Tile::new(
+        0,
         0,
         scene.active_camera.sensor.horizontal_res,
-        0,
         scene.active_camera.sensor.vertical_res,
-    ); // lit_shader solid_shader solid_shader
+    );
+
+    shade_pixels(&mut tile, &scene, shadermode);
+
+    let _ = canvas.copy_from(&tile.canvas, 0, 0);
 }
 fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     apply_transforms(&mut scene);
-    let threadcount = scene.threads;
+    let _threadcount = scene.threads;
 
-    let width = scene.active_camera.sensor.horizontal_res / scene.threads;
+    // let width = scene.active_camera.sensor.horizontal_res / scene.threads;
+    let width = scene.active_camera.sensor.horizontal_res;
     let height = scene.active_camera.sensor.vertical_res;
+
+    let x_tiles =
+        (scene.active_camera.sensor.horizontal_res as f32 / scene.tilesize as f32).ceil() as u32;
+    let y_tiles =
+        (scene.active_camera.sensor.horizontal_res as f32 / scene.tilesize as f32).ceil() as u32;
     let shadermode = match scene.shadermode {
         ShaderMode::Lit => lit_shader,
         ShaderMode::_BVH => bvh_shader,
@@ -181,50 +206,77 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     };
     let data = Arc::new(scene); // necessary for borrowing in threads
 
-    let mut threads = Stopwatch::start_new();
-    let mut handles = Vec::new();
-    let mut canvases: Vec<RgbImage> = Vec::new();
+    let mut thread_timer = Stopwatch::start_new();
+    // let mut handles = Vec::new();
 
-    for i in 0..threadcount {
-        // sliced vertically
+    let mut tiles: Vec<Tile> = Vec::new();
 
-        let data_clone = Arc::clone(&data);
-
-        let mut mini_canvas: RgbImage = ImageBuffer::new(width, height);
-
-        let handle = thread::spawn(move || {
-            shade_pixels(
-                &mut mini_canvas,
-                &data_clone,
-                shadermode,
-                i * width,
-                i * width + width,
-                0,
-                height,
-            );
-            mini_canvas
-        });
-        handles.push(handle);
-    }
-
-    threads.stop();
-    // if scene.logging > 0 {
-    //     println!("threads: {:?}", threads.elapsed());
+    // for i in 0..data.threads {
+    //     tiles.push(Tile::new(
+    //         i * (width / data.threads),
+    //         0,
+    //         width / data.threads,
+    //         height,
+    //     ));
+    //     pixel_checker += (width / data.threads) * height;
     // }
-    let mut reassembly = Stopwatch::start_new();
 
-    // let painted_mini_canvas = handle.join().unwrap();
-    for handle in handles {
-        canvases.push(handle.join().unwrap());
-    }
-    for (i, mini_canvas) in canvases.iter().enumerate() {
-        for (x, y, pixel) in mini_canvas.enumerate_pixels() {
-            canvas.put_pixel(x + (i as u32) * width, y, *pixel);
+    for i in 0..x_tiles {
+        for j in 0..y_tiles {
+            let x_start = i * data.tilesize;
+            let y_start = j * data.tilesize;
+            tiles.push(Tile::new(
+                x_start,
+                y_start,
+                min(data.tilesize, width - x_start),
+                min(data.tilesize, height - y_start),
+            ));
         }
     }
 
-    reassembly.stop();
+    let tiles: Vec<Tile> = tiles
+        .into_par_iter()
+        .map(move |mut tile| {
+            shade_pixels(&mut tile, &Arc::clone(&data), shadermode);
+            tile
+        })
+        .collect();
+
+    // for i in 0..threadcount {
+    //     // sliced vertically
+
+    //     let data_clone = Arc::clone(&data);
+
+    //     // let mut mini_canvas: RgbImage = ImageBuffer::new(width, height);
+    //     let mut tile: Tile = Tile::new(i * width, 0, width, height);
+    //     // let mut tile: Tile = Tile::new(i * width, 0, data.tilesize, data.tilesize);
+
+    //     let handle = thread::spawn(move || {
+    //         shade_pixels(&mut tile, &data_clone, shadermode);
+    //         tile
+    //     });
+    //     handles.push(handle);
+    // }
+
+    // let painted_mini_canvas = handle.join().unwrap();
+    // for handle in handles {
+    //     tiles.push(handle.join().unwrap());
+    // }
+
+    thread_timer.stop();
     // if scene.logging > 0 {
+    //     println!("parallel rendering: {:?}", thread_timer.elapsed());
+    // }
+    let mut reassembly = Stopwatch::start_new();
+    tiles.into_iter().for_each(|tile| {
+        let _ = canvas.copy_from(&tile.canvas, tile.x_start, tile.y_start);
+    });
+    // for tile in &tiles {
+    //     let _ = canvas.copy_from(&tile.canvas, tile.x_start, tile.y_start);
+    // }
+
+    reassembly.stop();
+    // if data.logging > 0 {
     //     println!("reassembly: {:?}", reassembly.elapsed());
     // }
 }

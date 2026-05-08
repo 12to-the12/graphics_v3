@@ -7,21 +7,24 @@ use crate::lighting::{black_spectra, void_spectra, Radiance};
 use crate::object::Object;
 use crate::ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection;
 
+use crate::geometry_pipeline::Tile;
 use crate::scene::Scene;
-use image::{Rgb, RgbImage};
+use image::Rgb;
 use rand::{prelude::ThreadRng, thread_rng};
 use stopwatch::Stopwatch;
 
 /// applies rendering mode to scene and yields a canvas
 pub fn shade_pixels<F: Fn(u32, u32, &Scene, &mut ThreadRng) -> Rgb<u8>>(
-    mini_canvas: &mut RgbImage,
+    tile: &mut Tile,
     scene: &Scene,
     closure: F,
-    x_start: u32,
-    x_end: u32,
-    y_start: u32,
-    y_end: u32,
 ) {
+    let mini_canvas = &mut tile.canvas;
+    let x_start = tile.x_start;
+    let x_end = tile.x_start + tile.width;
+    let y_start = tile.y_start;
+    let y_end = tile.y_start + tile.height;
+
     let mut rng: rand::prelude::ThreadRng = thread_rng();
     let mut shading = Stopwatch::start_new();
     // let (width, height) = canvas.dimensions();
@@ -194,7 +197,7 @@ pub fn dispatch_light_ray(
     );
     // direct_illumination
 
-    if scene._recursive_raycasting && trace_depth > 0 {
+    if scene.recursive_raycasting && trace_depth > 0 {
         // return Some((
         //     closest_object.clone(),
         //     intersection_point,
