@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 approx = "0.5.1"
 image = "0.24.6"
+itertools = "0.14.0"
 ndarray = "0.15.6"
 rand = "0.8.5"
 rayon = "1.12.0"

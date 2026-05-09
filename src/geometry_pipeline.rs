@@ -272,7 +272,7 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     // });
     let mut i = 0;
     for tile in receiver {
-        println!("{i}/{tilecount}");
+        println!("{}/{}", i + 1, tilecount);
         i += 1;
         canvas
             .copy_from(&tile.canvas, tile.x_start, tile.y_start)

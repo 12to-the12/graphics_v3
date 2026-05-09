@@ -3,7 +3,8 @@ use std::sync::Arc;
 use crate::camera::Camera;
 // use crate::coordinate_space::Polar;
 use crate::geometry::primitives::Mesh;
-use crate::object::{Empty, Object};
+use crate::material::BRDF;
+use crate::object::{Empty, Entity, Object};
 // use crate::primitives::Object;
 use crate::lighting::{black_spectra, Light, Spectra};
 
@@ -37,6 +38,9 @@ pub struct Scene {
     // pub struct Scene<T: Entity> {
     pub scene_root: Empty,
     pub active_camera: Camera,
+    pub entities: Vec<Arc<dyn Entity>>,
+    pub materials: Vec<Arc<dyn BRDF>>,
+    // pub lights: Vec<&'static dyn Light>,
     pub lights: Vec<Arc<dyn Light>>,
     pub objects: Vec<Object>,
     pub _meshes: Vec<Mesh>,
@@ -57,6 +61,8 @@ impl Default for Scene {
         let scene = Scene {
             scene_root: Empty::default(),
             active_camera: Camera::default(),
+            entities: Vec::new(),
+            materials: Vec::new(),
             lights: Vec::new(),
             objects: Vec::new(),
             _meshes: Vec::new(),

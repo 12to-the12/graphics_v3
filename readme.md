@@ -12,7 +12,7 @@ I've taken heavy inspiration from the book *Physically Based Rendering: from the
 
 
 # History
-After first starting with graphic programming as a freshman in high school, the field has followed me around ever since. As I write these words in early 2025, I've spent the better part of a decade thinking about how images are created with math.
+After first starting with graphics programming as a freshman in high school, the field has followed me around ever since. As I write these words in early 2025, I've spent the better part of a decade thinking about how images are created with math.
 
 The catalyst for this undertaking was a conversation I had in the summer of 2018 with a friend about how foreshortening worked. I had an on and off relationship with Python by that point, I was doing all my "coding" using MIT's Scratch. I really wanted to draw polygons in space.
 
@@ -23,7 +23,7 @@ That Spring term, at 15 I got a real computer for the first time, and for some r
 
 ![foreshortening](readme_media/foreshortening.png)
 
-Learning modelling software in the Spring of 2019 only intensified this desire, now I was regularly working with computer generated imagery, but was still as a complete loss as to how it all worked.
+Learning modeling software (Blender) in the Spring of 2019 only intensified this desire, now I was regularly working with computer generated imagery, but was still as a complete loss as to how it all worked.
 
 It's all kind of unclear what happened when, but sometime between that first version and Spring 2022 when I started using version control, ray tracing became my goal. I implemented ray sphere intersection, texture mapping, Lambert's law weakening, and recursive ray propagation. That iteration ended with the realization I needed a more robust codebase to implement the features I wanted to, I didn't know what I was doing was called linear algebra at that point, and I was trying to do light propagation in RGB, without any understanding of what that meant.
 
@@ -35,16 +35,23 @@ It's all kind of unclear what happened when, but sometime between that first ver
 There was a distinct moment I remember knowing I needed to switch to using actual tooling. I had spent the day working in the Trinket web IDE, only to open up an outdated version of the page on my pc, and watch the days work be overwritten. I learned firsthand why people use version control systems, and dedicated myself to learning the necessary tooling for the project at hand. I remember how freeing it felt to actually be able to write multiple modules for the first time, rather than putting everything in one script. That was Spring of 2022, and I've been using real tools since.
 
 ## V1
-March of that year I rewrote the codebase into Graphics_V1 to take advantage of the new tooling I was using, splitting everything up into modules for the first time. That small iteration saw me implement an .OBJ loader for the first time, and was the only iteration had the ability to move around. It was limited to wireframe renders, but served as a good proof of concept for what followed. That codebase can be found at [here](https://github.com/12to-the12/graphics-depreciated)
+March of that year I rewrote the codebase into Graphics_V1 to take advantage of the new tooling I was using, splitting everything up into modules for the first time. That small iteration saw me implement an .OBJ loader for the first time, and was the only iteration where the camera had the ability to move around. It was limited to wireframe renders, but served as a good proof of concept for what followed. That codebase can be found at [here](https://github.com/12to-the12/graphics-depreciated)
 
 ## V2
-The second real iteration of this project was a maturation of how I write code. I started using typechecking for the first time, as well as unittesting. Even so, I found myself dissatisfied with the way Python worked, even using JIt compilation, I knew I could write something faster if it was closer to the metal. That codebase can be found at [here](https://github.com/12to-the12/graphics)
+The second real iteration of this project was a maturation of how I write code. I started using typechecking for the first time, as well as unit-testing. Even so, I found myself dissatisfied with the way Python worked, even using JIT compilation, I knew I could write something faster if it was closer to the metal. That codebase can be found at [here](https://github.com/12to-the12/graphics)
 
 ## V3 and here we find ourselves.
-This version find me focused on building a ray tracer that is as physically accurate as possible. I subscribe to the philosophy that you need a solid foundation to build anything of value, and I don't feel it's sufficient to hand wave anything away. This comes at the cost of performance, but by now I've come to the conclusion that that comes second.
+This version finds me focused on building a ray tracer that is as physically accurate as possible. I subscribe to the philosophy that you need a solid foundation to build anything of value, and I don't feel it's sufficient to hand wave anything away. This comes at the cost of performance, but by now I've come to the conclusion that that comes second.
 
 
+# Project Scope
+I've imposed a few constraints on myself in order to make the project interesting to me. It's important to me that this project is entirely my own creation, which means writing all code myself, and minimizing library use. I acknowledge that using a tool like an LLM would increase what I could create, but I think that would reduce the educational value of the project.
 
+The few depencies used include a linear algebra library, a parallelism library, and an image encoding library so that I don't need to learn the PNG spec.
+
+Graphics_V3 includes both a Ray Tracing engine as well as a Rasterization pipeline, because both methods of rendering are of interest to me, and comparisons between them can be enlightening.
+
+The target output is an image saved to the filesystem, no windowing framework is used. This was the simplest output to target, and real time rendering is outside of the project scope.
 
 # Scholastic Value
 This endeavor has been responsible for driving a lot of my personal education. It was the catalyst that originally drove me to learn how to actually program, rather that stick with MIT's Scratch. It's driven me to learn a real systems language as well, now with Rust.
@@ -52,6 +59,7 @@ This endeavor has been responsible for driving a lot of my personal education. I
 ## intersection algorithms and linear algebra
 As soon as ray tracing became my goal, I need to learn how to trace rays! Sphere ray intersection and ray polygon were the first non trivial linear algebra that I had to learn in order to implement the features I wanted to.
 [This](https://www.youtube.com/playlist?list=PLW3Zl3wyJwWN6V7IEb2BojFYOlgpryp1-) is the youtube playlist that taught be these algorithms.
+Ray-Sphere intersection is the algorithm used in a lot of educational guides, but is less useful than Ray-Triangle intersection because arbitrary models can be tesselated into triangles. Ray-Triangle intersection is the algorithm used in Graphics_V3, as well as the real world.
 
 ## rotational composition and transformation matrices
 When I started this journey with just a wireframe rendered using pygame, I was unaware that rotations could not be summed together linearly. I was encoding rotations using polar coordinates, as well as projected points in space using equally spaced angles rather than a viewing frustrum. These techniques caused a lot of issues, and necessitated I learn the fundamentals of linear algebra.
@@ -69,13 +77,15 @@ I also learned about the difference between object space, world space, camera sp
 
 ![xkcd Color Models](readme_media/xkcd_color.png)
 
-The first time I tried implementing specular highlights I failed miserably. Turns out light and color are complicated. I was familiar with the BSDF from Blender, but I didn't know exactly how to implement it.
+The first time I tried implementing specular highlights in V1, I failed miserably. Turns out light and color are complicated. I was familiar with the idea of a BSDF from Blender, but I didn't know exactly how to implement it.
 
 This project motivated me to learn about the ridiculous intricacy of color, I'd recommend [this](https://www.youtube.com/watch?v=gnUYoQ1pwes) amazing explanation about how human vision interprets electromagnetic radiation, how we can represent it using vector spaces, and how we can record and display it using technology.
 
-*Physically Based Rendering: from theory to implementation* has taught me about the necessity of using proper radiometric dimensionality to record light propagation. Dimensional analysis dives me a headache, but I now know what a steradian is and how it relates to Radiant Intensity.
+*Physically Based Rendering: from theory to implementation* has taught me about the necessity of using proper radiometric dimensionality to record light propagation. Dimensional analysis gives me a headache, but I now know what a steradian is and how it relates to Radiant Intensity.
 
-
+![Color Gamut](readme_media/color_gamut.png)
+Light propagation is handled by operating on a spectrum of visible wavelengths, and modeling their absorption and diffusion through the scene to the camera sensor, where they are then converted into the CIEXYZ colorspace, and from their to sRGB.
+[This](https://www.youtube.com/watch?v=uYbdx4I7STg) video is a good starting point for learning about why modeling light propagation in colorspace is a bad idea. While colorspaces are designed to describe any perceptual color, because multiple spectra can appear the same (metamers), it's insufficient.
 
 
 ## Latex and notetaking techniques
@@ -90,6 +100,11 @@ If you're running this yourself, good luck, I've tried to make it as portable as
 ## dependencies
 To run this project you need to have Rust installed and visible on your path
 
+You can install rust with
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
 ## running
 Clone the project with
 ```bash
@@ -98,10 +113,10 @@ git clone https://github.com/12to-the12/graphics_v3.git
 
 cd into the folder and and run the project with
 ```
-make run
+cd graphics_v3 && make run
 ```
 
-the renderer outputs the result as a png in the project root, that was simpler than trying to interface with a windowing system.
+The renderer outputs the result as a png in the project root, that was simpler than trying to interface with a windowing system.
 
 # Roadmap
 - [x] ray/polygon intersection
@@ -112,9 +127,13 @@ the renderer outputs the result as a png in the project root, that was simpler t
 - [x] concurrency
 - [x] blackbody functions
 - [x] bounding volume hierarchy
-- [ ] recursive ray propagation
+- [x] radiometrically rigorous lighting model
+- [x] recursive ray propagation
+- [x] render tile queue with arbitrary threadcount
 - [ ] texture mapping
 - [ ] BSDF for roughness/specular and dielectric/metallic materials
 - [ ] Phong shading
-- [ ] radiometrically rigorous lighting model
+- [ ] rasterizer
+- [ ] n-gon to triangle conversion
+- [ ] scene graph with transform hierarchy
 
