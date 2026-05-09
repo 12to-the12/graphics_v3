@@ -101,7 +101,7 @@ pub fn simple_scene<'b>() -> Scene {
     };
     scene.objects.push(object);
 
-    scene.rendermode = Rendermode::Rasterize;
+    scene.rendermode = Rendermode::ThreadedRayTrace;
     scene.samples = 32;
     scene.max_trace_depth = 1;
     scene.max_render_dist = 20.;

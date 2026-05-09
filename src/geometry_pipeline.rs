@@ -53,11 +53,11 @@ fn build_to_display_transform(scene: &Scene) -> Transform {
     compile_transforms(&display)
 }
 
+/// applies the transforms for the rasterizer
 fn vertex_shader(scene: &mut Scene) {
     apply_transforms(scene);
 }
 
-/// currently only used by ray trace
 fn apply_transforms(scene: &mut Scene) {
     // calculate_global_space(scene);
     // view transform that goes from global space to clip space
@@ -75,6 +75,10 @@ fn apply_transforms(scene: &mut Scene) {
         uniform_view_transforms.push(build_to_display_transform(scene));
     }
     let uniform_view_transform = compile_transforms(&uniform_view_transforms);
+
+    // scene.transform_children
+    // scene.build_camera_space_mesh
+    // this will recursively apply transforms to nodes, then apply them to meshes
     for object in &mut scene.objects {
         let to_world_space = build_translation_transform(object.position);
         for mesh in &mut object.meshes {
@@ -199,7 +203,7 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     let x_tiles =
         (scene.active_camera.sensor.horizontal_res as f32 / scene.tilesize as f32).ceil() as u32;
     let y_tiles =
-        (scene.active_camera.sensor.horizontal_res as f32 / scene.tilesize as f32).ceil() as u32;
+        (scene.active_camera.sensor.vertical_res as f32 / scene.tilesize as f32).ceil() as u32;
     let shadermode = match scene.shadermode {
         ShaderMode::Lit => lit_shader,
         ShaderMode::_BVH => bvh_shader,
@@ -223,7 +227,11 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     //     ));
     //     pixel_checker += (width / data.threads) * height;
     // }
-
+    // println!("x_tiles: {}",x_tiles);
+    // println!("y_tiles: {}",y_tiles);
+    // println!("width: {}",width);
+    // println!("height: {}",height);
+    // println!("tilesize: {}",data.tilesize);
     for i in 0..x_tiles {
         for j in 0..y_tiles {
             let x_start = i * data.tilesize;

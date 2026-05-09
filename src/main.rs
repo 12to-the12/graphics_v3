@@ -110,7 +110,7 @@ fn _raster_vs_raytrace() {
 }
 fn single(i: u32) {
     let mut scene;
-    scene = cornell_scene();
+    scene = simple_scene();
     scene.tick = i;
 
     let mut frame = Stopwatch::start_new();
