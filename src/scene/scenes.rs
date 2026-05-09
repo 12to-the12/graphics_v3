@@ -25,7 +25,7 @@ pub fn cornell_scene<'b>() -> Scene {
         RIGHT,
         incandescent_spectra(2500., 1000.),
     );
-    scene.lights.push(Arc::new(light));
+    scene.simple_lights.push(Arc::new(light));
 
     let cornell = load_wavefront_obj("models/cornell.obj".to_string());
 
@@ -58,17 +58,17 @@ pub fn simple_scene<'b>() -> Scene {
     let mut light = PointLight::default();
     light.position = Vector::new(-5.0, 5.0, 3.0);
     light.radiant_flux = incandescent_spectra(2000., 1000.);
-    scene.lights.push(Arc::new(light));
+    scene.simple_lights.push(Arc::new(light));
 
     let mut light = PointLight::default();
     light.position = Vector::new(0.0, 5.0, 3.0);
     light.radiant_flux = incandescent_spectra(3000., 1000.);
-    scene.lights.push(Arc::new(light));
+    scene.simple_lights.push(Arc::new(light));
 
     let mut light = PointLight::default();
     light.position = Vector::new(5.0, 5.0, 3.0);
     light.radiant_flux = incandescent_spectra(4000., 1000.);
-    scene.lights.push(Arc::new(light));
+    scene.simple_lights.push(Arc::new(light));
 
     let cube = load_wavefront_obj("models/cube.obj".to_string());
     let sphere: Mesh = load_wavefront_obj("models/sphere.obj".to_string());
@@ -150,7 +150,7 @@ pub fn calibration_scene<'b>() -> Scene {
 
     Scene {
         active_camera: camera,
-        lights,
+        simple_lights: lights,
         _meshes: meshes,
         background,
         tick: 0,

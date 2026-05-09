@@ -84,6 +84,8 @@ This project motivated me to learn about the ridiculous intricacy of color, I'd 
 *Physically Based Rendering: from theory to implementation* has taught me about the necessity of using proper radiometric dimensionality to record light propagation. Dimensional analysis gives me a headache, but I now know what a steradian is and how it relates to Radiant Intensity.
 
 ![Color Gamut](readme_media/color_gamut.png)
+This is a graph in xy space, the colors are the sRGB equivalents, I've also plotted the spectral colors, the hues of blackbodies, and pure white.
+
 Light propagation is handled by operating on a spectrum of visible wavelengths, and modeling their absorption and diffusion through the scene to the camera sensor, where they are then converted into the CIEXYZ colorspace, and from their to sRGB.
 [This](https://www.youtube.com/watch?v=uYbdx4I7STg) video is a good starting point for learning about why modeling light propagation in colorspace is a bad idea. While colorspaces are designed to describe any perceptual color, because multiple spectra can appear the same (metamers), it's insufficient.
 

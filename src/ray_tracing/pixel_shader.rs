@@ -231,7 +231,7 @@ pub fn integrate_direct_surface_radiance(
 ) -> Radiance {
     let mut output: Radiance = void_spectra().into();
     // let mut output: RadiantExitance = black_spectra().into();
-    'lights: for light in &scene.lights {
+    'lights: for light in &scene.simple_lights {
         // our job here is to find the amount of energy transmitted to the pixel from the light
         let to_light = &intersection_point.clone().to(light.get_position());
 
