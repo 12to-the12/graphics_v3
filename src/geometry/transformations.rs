@@ -21,6 +21,9 @@ impl Transform {
         }
         out
     }
+    pub fn new() -> Transform {
+        build_identity_transform()
+    }
 }
 
 pub fn build_identity_transform() -> Transform {

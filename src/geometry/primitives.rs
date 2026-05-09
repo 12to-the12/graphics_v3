@@ -1,5 +1,5 @@
 // use image::{ImageBuffer, Rgb, RgbImage};
-use crate::geometry::transformations::{compile_transforms, Transform};
+use crate::geometry::transformations::Transform;
 use image::{Rgb, RgbImage};
 use ndarray::Array1;
 use rand::{prelude::ThreadRng, Rng};
@@ -257,29 +257,24 @@ pub struct Mesh {
     // pub polygons: Vec<Polygon>, // it also owns it's polygon information
     pub polygons: Vec<Vec<usize>>,
     pub output_vertices: Vec<Vertex>,
-    transform_log: Vec<Transform>,
+    transform: Transform,
 }
 impl Mesh {
     /// I need to learn matrix math for this one
     /// transforms are kept as a list of transforms to be done, which is much more efficient
     pub fn apply_transformations(&mut self) {
-        let transform = compile_transforms(&self.transform_log);
-
         self.output_vertices = self.vertices.clone();
-        self.output_vertices = transform.process(self.output_vertices.clone());
+        self.output_vertices = self.transform.process(self.output_vertices.clone());
     }
     pub fn add_transform(&mut self, transform: Transform) {
-        self.transform_log.push(transform);
-    }
-    pub fn _get_transforms(&self) -> &Vec<Transform> {
-        &self.transform_log
+        self.transform.matrix = self.transform.matrix.dot(&transform.matrix);
     }
     pub fn new(vertices: Vec<Vertex>, polygons: Vec<Vec<usize>>) -> Mesh {
         Mesh {
             vertices,
             polygons,
             output_vertices: Vec::new(),
-            transform_log: Vec::new(),
+            transform: Transform::new(),
         }
     }
 
@@ -312,7 +307,7 @@ impl Mesh {
             vertices: vec![a, b, c, d, e, f, g, h],
             polygons,
             output_vertices: Vec::new(),
-            transform_log: Vec::new(),
+            transform: Transform::new(),
         }
     }
 
@@ -329,7 +324,7 @@ impl Mesh {
             vertices: vec![a, b, c],
             polygons,
             output_vertices: Vec::new(),
-            transform_log: Vec::new(),
+            transform: Transform::new(),
         }
     }
 }

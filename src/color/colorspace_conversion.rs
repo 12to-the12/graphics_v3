@@ -57,14 +57,13 @@ pub fn CIEXYZ_to_xyY(XYZ: (f32, f32, f32)) -> (f32, f32, f32) {
     (x, y, Y)
 }
 
-
 pub fn xyY_to_CIEXYZ(xyY: (f32, f32, f32)) -> (f32, f32, f32) {
     let (x, y, Y) = xyY;
-    let sum = Y/y;
-    //X=x*Y/y 
-    let X = x * (Y/y);
+    let sum = Y / y;
+    //X=x*Y/y
+    let X = x * (Y / y);
     let Z = sum - X - Y;
-    (X,Y,Z)
+    (X, Y, Z)
 }
 
 /// I think? it might supposed to be CIEXYZ?
@@ -131,11 +130,10 @@ pub fn sRGB_to_xyY(sRGB: (f32, f32, f32)) -> (f32, f32, f32) {
     // ]);
     let RGB_linear = ndarray::Array::from_vec(vec![sR_linear, sG_linear, sB_linear]);
 
-
-    println!("inversion_matrix: {:?}",inversion_matrix);
-    println!("RGB_linear: {:?}",RGB_linear);
-    let xyz =  inversion_matrix.dot(&RGB_linear);
-    println!("xyz: {:?}",xyz);
+    println!("inversion_matrix: {inversion_matrix:?}");
+    println!("RGB_linear: {RGB_linear:?}");
+    let xyz = inversion_matrix.dot(&RGB_linear);
+    println!("xyz: {xyz:?}");
     let binding = xyz.into_raw_vec();
     let (x, y, _z) = binding.iter().collect_tuple().unwrap();
     (*x, *y, Y)
@@ -186,7 +184,8 @@ mod tests {
 
     use crate::{
         color::colorspace_conversion::{
-            CIEXYZ_to_xyY, sRGB_apply_gamma, sRGB_remove_gamma, sRGB_to_xyY, xyY_to_CIEXYZ, xyY_to_sRGB
+            sRGB_apply_gamma, sRGB_remove_gamma, sRGB_to_xyY, xyY_to_CIEXYZ, xyY_to_sRGB,
+            CIEXYZ_to_xyY,
         },
         geometry::primitives::Vector,
     };
@@ -222,16 +221,16 @@ mod tests {
         let sRGB = xyY_to_sRGB(xyY);
         // println!("{:?}", sRGB);
         let xyY_prime = sRGB_to_xyY(sRGB);
-        println!("xyY_prime: {:?}",xyY_prime);
-        assert_abs_diff_eq!(xyY.0, xyY_prime.0/xyY.2, epsilon = 1e-4);
-        assert_abs_diff_eq!(xyY.1, xyY_prime.1/xyY.2, epsilon = 1e-4);
+        println!("xyY_prime: {:?}", xyY_prime);
+        assert_abs_diff_eq!(xyY.0, xyY_prime.0 / xyY.2, epsilon = 1e-4);
+        assert_abs_diff_eq!(xyY.1, xyY_prime.1 / xyY.2, epsilon = 1e-4);
     }
     #[test]
     fn CIEXYZ_xyY() {
         let xyY = (39.2, 76.8, 55.2);
         let XYZ = xyY_to_CIEXYZ(xyY);
         let xyY_prime = CIEXYZ_to_xyY(XYZ);
-        println!("xyY_prime: {:?}",xyY_prime);
+        println!("xyY_prime: {:?}", xyY_prime);
         assert_abs_diff_eq!(xyY.0, xyY_prime.0, epsilon = 1e-12);
         assert_abs_diff_eq!(xyY.1, xyY_prime.1, epsilon = 1e-12);
         assert_abs_diff_eq!(xyY.2, xyY_prime.2, epsilon = 1e-12);

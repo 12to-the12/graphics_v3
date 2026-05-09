@@ -132,6 +132,8 @@ The renderer outputs the result as a png in the project root, that was simpler t
 - [x] radiometrically rigorous lighting model
 - [x] recursive ray propagation
 - [x] render tile queue with arbitrary threadcount
+- [ ] refraction
+- [ ] depth of field
 - [ ] texture mapping
 - [ ] BSDF for roughness/specular and dielectric/metallic materials
 - [ ] Phong shading
