@@ -8,7 +8,7 @@ use crate::object::Object;
 use crate::ray_tracing::ray_polygon_intersection::probe_ray_polygon_intersection;
 
 use crate::geometry_pipeline::Tile;
-use crate::scene::Scene;
+use crate::scene::scene::Scene;
 use image::Rgb;
 use rand::{prelude::ThreadRng, thread_rng};
 use stopwatch::Stopwatch;
@@ -70,7 +70,7 @@ pub fn _color_shader(x: u32, y: u32, scene: &Scene, _rng: &mut ThreadRng) -> Rgb
 
 /// shades all objects as solid
 pub fn _solid_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
-    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y, rng);
+    let ray = Camera::jittered_pixel_to_ray(&scene.active_camera, x, y, rng);
     let mut hit = false;
     // here we're at once per pixel
     for object in &scene.objects {
@@ -102,7 +102,7 @@ pub fn _solid_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<
 
 /// shows where bounding volume hierarchies are
 pub fn bvh_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
-    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y, rng);
+    let ray = Camera::jittered_pixel_to_ray(&scene.active_camera, x, y, rng);
     let mut hit = false;
     // here we're at once per pixel
     for object in &scene.objects {
@@ -121,7 +121,7 @@ pub fn bvh_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8>
 
 /// render depth
 pub fn z_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
-    let ray = Camera::pixel_to_ray(&scene.active_camera, x, y, rng);
+    let ray = Camera::jittered_pixel_to_ray(&scene.active_camera, x, y, rng);
     let intersection = shoot_ray(ray, scene, scene.max_trace_depth);
     if intersection.is_none() {
         Rgb([0, 0, 0])
@@ -148,7 +148,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8>
 pub fn integrate_pixel_radiance(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Radiance {
     let mut radiance: Radiance = black_spectra().into();
     for _ in 0..scene.samples {
-        let ray = Camera::pixel_to_ray(&scene.active_camera, x, y, rng);
+        let ray = Camera::jittered_pixel_to_ray(&scene.active_camera, x, y, rng);
         radiance.0 = radiance.0 + dispatch_light_ray(ray, scene, scene.max_trace_depth, rng).0;
     }
 
@@ -335,7 +335,9 @@ pub fn shoot_ray(ray: Ray, scene: &Scene, _depth: u32) -> Option<(Object, Vector
 
 #[cfg(test)]
 mod tests {
-    use crate::{camera::Camera, scene::simple_scene};
+    use approx::assert_abs_diff_eq;
+
+    use crate::{camera::Camera, scene::scenes::simple_scene};
 
     use super::*;
 
@@ -351,7 +353,7 @@ mod tests {
 
         scene.active_camera.sensor.horizontal_res = 3;
         scene.active_camera.sensor.vertical_res = 3;
-        ray = Camera::pixel_to_ray(&scene.active_camera, 0, 2, &mut rng);
+        ray = Camera::straight_pixel_to_ray(&scene.active_camera, 0, 2);
 
         // println!("direction: {:?}", ray.direction);
 
@@ -363,14 +365,14 @@ mod tests {
 
         scene.active_camera.sensor.horizontal_res = 1;
         scene.active_camera.sensor.vertical_res = 1;
-        ray = Camera::pixel_to_ray(&scene.active_camera, 0, 0, &mut rng);
+        ray = Camera::straight_pixel_to_ray(&scene.active_camera, 0, 0);
 
         // println!("direction: {:?}", ray.direction);
 
         let mut foil = Vector::new(00.0, 0.0, -0.5);
         foil.unitize();
-        assert_eq!(ray.direction.x, foil.x); //
-        assert_eq!(ray.direction.y, foil.y); //
-        assert_eq!(ray.direction.z, foil.z); //
+        assert_abs_diff_eq!(ray.direction.x, foil.x); //
+        assert_abs_diff_eq!(ray.direction.y, foil.y); //
+        assert_abs_diff_eq!(ray.direction.z, foil.z); //
     }
 }

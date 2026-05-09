@@ -26,7 +26,7 @@ use std::{thread, time::Duration};
 use stopwatch::Stopwatch;
 
 use crate::geometry_pipeline::geometry_pipeline;
-use crate::scene::{calibration_scene, cornell_scene, simple_scene};
+use crate::scene::scenes::{calibration_scene, cornell_scene, simple_scene};
 
 fn sleep(ms: Duration) {
     thread::sleep(ms);
@@ -82,10 +82,10 @@ fn main_loop() {
         counter += 1;
     }
 }
-fn raster_vs_raytrace() {
+fn _raster_vs_raytrace() {
     let mut ray_tracing = Stopwatch::start_new();
     let mut scene = cornell_scene();
-    scene.rendermode = scene::Rendermode::ThreadedRayTrace;
+    scene.rendermode = scene::scene::Rendermode::ThreadedRayTrace;
     scene.tick = 0;
     let render = geometry_pipeline(scene);
     render
@@ -98,7 +98,7 @@ fn raster_vs_raytrace() {
     let mut rasterization = Stopwatch::start_new();
 
     let mut scene = simple_scene();
-    scene.rendermode = scene::Rendermode::Rasterize;
+    scene.rendermode = scene::scene::Rendermode::Rasterize;
     scene.tick = 0;
     let render = geometry_pipeline(scene);
 

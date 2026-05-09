@@ -6,7 +6,7 @@ use crate::application::application;
 use crate::camera::Camera;
 use crate::geometry::primitives::{Triangle, Vector};
 // use crate::primitives::LineCollection;
-use crate::scene::{Rendermode, Scene, ShaderMode};
+use crate::scene::scene::{Rendermode, Scene, ShaderMode};
 // use crate::primitives::PolygonCollection;
 use crate::geometry::transformations::{
     build_projection_transform, build_scale_transform, build_translation_transform,
@@ -237,6 +237,7 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
         }
     }
     tiles.shuffle(&mut thread_rng());
+    let tilecount = tiles.len();
 
     let handle = thread::spawn(move || {
         tiles.into_par_iter().for_each(move |mut tile| {
@@ -266,18 +267,13 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     //     tiles.push(handle.join().unwrap());
     // }
 
-    thread_timer.stop();
-
-    println!("parallel rendering: {:?}", thread_timer.elapsed());
-    // if scene.logging > 0 {
-    //     println!("parallel rendering: {:?}", thread_timer.elapsed());
-    // }
-    let mut reassembly = Stopwatch::start_new();
     // tiles.into_iter().for_each(|tile| {
     //     let _ = canvas.copy_from(&tile.canvas, tile.x_start, tile.y_start);
     // });
+    let mut i = 0;
     for tile in receiver {
-        print!(".");
+        println!("{i}/{tilecount}");
+        i += 1;
         canvas
             .copy_from(&tile.canvas, tile.x_start, tile.y_start)
             .unwrap();
@@ -285,11 +281,8 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     }
     handle.join().unwrap();
 
-    reassembly.stop();
-    println!("reassembly: {:?}", reassembly.elapsed());
-    // if data.logging > 0 {
-    //     println!("reassembly: {:?}", reassembly.elapsed());
-    // }
+    thread_timer.stop();
+    println!("parallel ray tracing: {:?}", thread_timer.elapsed());
 }
 
 /// this serves as an abstraction away from rasterization, so that ray tracing can be dropped into the pipeline

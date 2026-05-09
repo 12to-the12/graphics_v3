@@ -1,4 +1,4 @@
-use crate::scene::Scene;
+use crate::scene::scene::Scene;
 
 /// all of the stuff that should happen to run the scene,
 /// note: this is recomputed every frame. Not a major performance bottleneck
