@@ -213,7 +213,7 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     let data = Arc::new(scene); // necessary for borrowing in threads
     let (sender, receiver) = mpsc::channel::<Tile>();
 
-    let mut thread_timer = Stopwatch::start_new();
+    let mut render_timer = Stopwatch::start_new();
     // let mut handles = Vec::new();
 
     let mut tiles: Vec<Tile> = Vec::new();
@@ -249,7 +249,24 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
 
     let handle = thread::spawn(move || {
         tiles.into_par_iter().for_each(move |mut tile| {
+            let mut thread_timer = Stopwatch::start_new();
             shade_pixels(&mut tile, &Arc::clone(&data), shadermode);
+            thread_timer.stop();
+            let hue = thread_timer.elapsed_ms();
+            if data.hue_timer {
+                print!("thread timer: {thread_timer} - ");
+                for (x, y, _) in tile.canvas.clone().enumerate_pixels().clone() {
+                    tile.canvas.put_pixel(
+                        x,
+                        y,
+                        Rgb([
+                            min(hue, 255) as u8,
+                            min(hue / 8, 255) as u8,
+                            min(hue / 64, 255) as u8,
+                        ]),
+                    );
+                }
+            }
             sender.clone().send(tile).unwrap();
         });
     });
@@ -289,8 +306,8 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     }
     handle.join().unwrap();
 
-    thread_timer.stop();
-    println!("parallel ray tracing: {:?}", thread_timer.elapsed());
+    render_timer.stop();
+    println!("parallel ray tracing: {:?}", render_timer.elapsed());
 }
 
 /// this serves as an abstraction away from rasterization, so that ray tracing can be dropped into the pipeline

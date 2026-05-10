@@ -1,4 +1,5 @@
 #![allow(nonstandard_style)]
+
 use image::Rgb;
 use itertools::Itertools;
 use ndarray::arr2;
@@ -144,11 +145,19 @@ pub fn sRGB_to_display(sRGB: (f32, f32, f32)) -> Rgb<u8> {
     let sR = sRGB.0;
     let sG = sRGB.1;
     let sB = sRGB.2;
+    let sR = f32::max(0., sR); // lies about colorspace
+    let sG = f32::max(0., sG); // lies about colorspace
+    let sB = f32::max(0., sB); // lies about colorspace
 
-    if sR < 0. || sG < 0. || sB < 0. {
-        // not visible light!
-        return Rgb([255, 0, 255]);
-    }
+    // if sR < 0. || sG < 0. || sB < 0. {
+    //     // not visible light!
+    //     return Rgb([
+    //         f32::max(0., sR) as u8,
+    //         f32::max(0., sG) as u8,
+    //         f32::max(0., sB) as u8,
+    //     ]);
+    // }
+
     // println!("{x} {y}");
     let sR = pixel_ready(sR);
     let sG = pixel_ready(sG);

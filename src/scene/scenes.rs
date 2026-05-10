@@ -57,7 +57,7 @@ pub fn simple_scene<'b>() -> Scene {
     scene.active_camera.position = Vector::new(0.0, 0.0, 7.);
     let mut light = PointLight::default();
     light.position = Vector::new(-5.0, 5.0, 3.0);
-    light.radiant_flux = incandescent_spectra(2000., 1000.);
+    light.radiant_flux = incandescent_spectra(1000., 1000.);
     scene.simple_lights.push(Arc::new(light));
 
     let mut light = PointLight::default();
@@ -67,7 +67,7 @@ pub fn simple_scene<'b>() -> Scene {
 
     let mut light = PointLight::default();
     light.position = Vector::new(5.0, 5.0, 3.0);
-    light.radiant_flux = incandescent_spectra(4000., 1000.);
+    light.radiant_flux = incandescent_spectra(5000., 1000.);
     scene.simple_lights.push(Arc::new(light));
 
     let cube = load_wavefront_obj("models/cube.obj".to_string());
@@ -102,9 +102,14 @@ pub fn simple_scene<'b>() -> Scene {
     scene.objects.push(object);
 
     scene.rendermode = Rendermode::ThreadedRayTrace;
-    scene.samples = 10;
-    scene.max_trace_depth = 1;
+    scene.samples = 16;
+    scene.max_trace_depth = 5;
     scene.max_render_dist = 20.;
+    scene.tilesize = 40;
+    // @8 samples  10: 13.0 20: 4.10 40: 3.1 80: 2.87
+    // @32 10: 17.22 20: 12.9 40: 13.5 80: 13.8
+    // @64 samples  10: 29.2 20: 27.6 40: 28.43
+    scene.hue_timer = false;
     scene
 }
 
