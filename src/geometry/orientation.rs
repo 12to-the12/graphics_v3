@@ -1,6 +1,6 @@
 use crate::geometry::primitives::Vector;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Copy)]
 pub struct Orientation {
     _top: Vector,
     _front: Vector,

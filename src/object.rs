@@ -12,6 +12,8 @@ use crate::{
 
 pub trait Entity: Debug + Sync + Send {
     fn get_position(&self) -> Vector;
+    fn get_orientation(&self) -> Orientation;
+    fn get_scale(&self) -> Vector;
     fn get_children(&mut self) -> &mut Vec<Arc<dyn Entity>>;
     fn add_child(&mut self, child: Arc<dyn Entity>) {
         self.get_children().push(child);
@@ -22,11 +24,10 @@ pub trait Entity: Debug + Sync + Send {
 /// physical object in space with associated data
 #[derive(Debug, Clone)]
 pub struct Object {
-    pub owner: Option<Weak<Scene>>,
     pub position: Vector, // this is relative to it's parent
     // pub camera_space_position: Vector, // this exists in camera space
-    pub _orientation: Orientation,
-    pub _scale: f32,
+    pub orientation: Orientation,
+    pub scale: Vector,
     pub children: Vec<Arc<dyn Entity>>,
     pub material: Arc<dyn BRDF>,
     pub meshes: Vec<Mesh>,
@@ -37,7 +38,7 @@ impl Object {
         let mut furthest = 0.;
         for mesh in &self.meshes {
             for vertex in &mesh.vertices {
-                let dist = self._scale * vertex.position.magnitude();
+                let dist = self.scale.max() * vertex.position.magnitude();
                 if dist > furthest {
                     furthest = dist;
                 }
@@ -58,10 +59,9 @@ impl Object {
 impl Default for Object {
     fn default() -> Object {
         Object {
-            owner: None,
             position: ORIGIN,
-            _orientation: UP,
-            _scale: 1.,
+            orientation: UP,
+            scale: Vector::ones(),
             children: Vec::new(),
             material: Arc::new(Diffuse::default()),
             meshes: Vec::new(),
@@ -74,6 +74,12 @@ impl Entity for Object {
     fn get_position(&self) -> Vector {
         self.position
     }
+    fn get_orientation(&self) -> Orientation {
+        self.orientation
+    }
+    fn get_scale(&self) -> Vector {
+        self.scale
+    }
     fn get_children(&mut self) -> &mut Vec<Arc<dyn Entity>> {
         &mut self.children
     }
@@ -81,20 +87,18 @@ impl Entity for Object {
 
 #[derive(Debug, Clone)]
 pub struct Empty {
-    pub owner: Option<Weak<Scene>>,
-    position: Vector,
-    pub _orientation: Orientation,
-    pub _scale: f32,
+    pub position: Vector,
+    pub orientation: Orientation,
+    pub scale: Vector,
     pub children: Vec<Arc<dyn Entity>>,
 }
 
 impl Default for Empty {
     fn default() -> Empty {
         Empty {
-            owner: None,
             position: ORIGIN,
-            _orientation: UP,
-            _scale: 1.,
+            orientation: UP,
+            scale: Vector::ones(),
             children: Vec::new(),
         }
     }
@@ -102,6 +106,12 @@ impl Default for Empty {
 impl Entity for Empty {
     fn get_position(&self) -> Vector {
         self.position
+    }
+    fn get_orientation(&self) -> Orientation {
+        self.orientation
+    }
+    fn get_scale(&self) -> Vector {
+        self.scale
     }
     fn get_children(&mut self) -> &mut Vec<Arc<dyn Entity>> {
         &mut self.children

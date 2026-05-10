@@ -39,18 +39,14 @@ pub struct PointLight {
     pub position: Vector, // as always, this is relative to it's parent
     pub orientation: Orientation,
     pub radiant_flux: RadiantFlux, // power in each wavelength
-    pub owner: Option<Weak<Scene>>,
-    pub scale: f32,
     pub children: Vec<Arc<dyn Entity>>,
 }
 
 impl Default for PointLight {
     fn default() -> Self {
         PointLight {
-            owner: None,
             position: ORIGIN,
             orientation: UP,
-            scale: 1.,
             children: Vec::new(),
 
             radiant_flux: incandescent_spectra(2000., 1000.),
@@ -84,6 +80,12 @@ impl Light for PointLight {
 impl Entity for PointLight {
     fn get_position(&self) -> Vector {
         self.position
+    }
+    fn get_orientation(&self) -> Orientation {
+        self.orientation
+    }
+    fn get_scale(&self) -> Vector {
+        Vector::ones()
     }
     fn get_children(&mut self) -> &mut Vec<Arc<dyn Entity>> {
         &mut self.children

@@ -30,17 +30,17 @@ impl Vertex {
     pub fn as_homogenous_array(&self) -> [f32; 4] {
         [self.position.x, self.position.y, self.position.z, 1.0]
     }
-    pub fn _inv(&self) -> Vector {
-        let x = -self.position.x;
-        let y = -self.position.y;
-        let z = -self.position.z;
-        Vector { x, y, z }
-    }
     pub fn as_vector(&self) -> Vector {
         let x = self.position.x;
         let y = self.position.y;
         let z = self.position.z;
         Vector { x, y, z }
+    }
+    pub fn inv(&self) -> Vertex {
+        Vertex {
+            position: self.position.inv(),
+            uv_coord: self.uv_coord,
+        }
     }
     pub fn new(x: f32, y: f32, z: f32) -> Vertex {
         Vertex {
@@ -188,6 +188,20 @@ impl Vector {
         let y = -self.y;
         let z = -self.z;
         Vector { x, y, z }
+    }
+    /// largest of the three terms
+    pub fn max(&self) -> f32 {
+        f32::max(self.x, f32::max(self.y, self.z))
+    }
+    /// smallest of the three terms
+    pub fn min(&self) -> f32 {
+        f32::min(self.x, f32::min(self.y, self.z))
+    }
+    pub fn ones() -> Vector {
+        Vector::new(1., 1., 1.)
+    }
+    pub fn zeros() -> Vector {
+        Vector::new(0., 0., 0.)
     }
     pub fn new(x: f32, y: f32, z: f32) -> Vector {
         Vector { x, y, z }

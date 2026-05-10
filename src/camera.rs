@@ -16,7 +16,6 @@ use crate::{
 #[derive(Clone, Debug)]
 pub struct Camera {
     pub position: Vector,
-    pub _parent: Option<Arc<dyn Entity>>,
     // orientation: Orientation, // some object that implements get_orientation?
     pub lens: Lens,
     pub sensor: Sensor,
@@ -25,11 +24,41 @@ pub struct Camera {
     /// shutterspeed in seconds
     pub exposure_time: f32,
 
-    pub owner: Option<Weak<Scene>>,
     // pub camera_space_position: Vector, // this exists in camera space
     pub orientation: Orientation,
-    pub scale: f32,
+    pub scale: Vector,
     pub children: Vec<Arc<dyn Entity>>,
+}
+
+impl Default for Camera {
+    fn default() -> Self {
+        Camera {
+            lens: Lens::default(),
+            sensor: Sensor::default(),
+            _near_clipping_plane: 1e-1,
+            _far_clipping_plane: 1e6,
+            exposure_time: 1.,
+            children: Vec::new(),
+            position: ORIGIN,
+            orientation: UP,
+            scale: Vector::ones(),
+        }
+    }
+}
+
+impl Entity for Camera {
+    fn get_position(&self) -> Vector {
+        self.position
+    }
+    fn get_orientation(&self) -> Orientation {
+        self.orientation
+    }
+    fn get_scale(&self) -> Vector {
+        self.scale
+    }
+    fn get_children(&mut self) -> &mut Vec<Arc<dyn Entity>> {
+        &mut self.children
+    }
 }
 
 impl Camera {
@@ -129,33 +158,6 @@ impl Camera {
         let ray = Ray::new(position, direction);
         ray.direction.unitized();
         ray
-    }
-}
-
-impl Default for Camera {
-    fn default() -> Self {
-        Camera {
-            _parent: None,
-            lens: Lens::default(),
-            sensor: Sensor::default(),
-            _near_clipping_plane: 1e-1,
-            _far_clipping_plane: 1e6,
-            exposure_time: 1.,
-            children: Vec::new(),
-            owner: None,
-            position: ORIGIN,
-            orientation: UP,
-            scale: 1.,
-        }
-    }
-}
-
-impl Entity for Camera {
-    fn get_position(&self) -> Vector {
-        self.position
-    }
-    fn get_children(&mut self) -> &mut Vec<Arc<dyn Entity>> {
-        &mut self.children
     }
 }
 
