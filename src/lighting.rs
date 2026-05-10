@@ -2,7 +2,6 @@
 use std::{
     f32::consts::{E, PI},
     fmt::Debug,
-    sync::{Arc, Weak},
 };
 const _π: f32 = PI;
 use crate::{
@@ -11,8 +10,7 @@ use crate::{
         orientation::{Orientation, UP},
         primitives::{Vector, ORIGIN},
     },
-    object::Entity,
-    scene::scene::Scene,
+    object::{Entity, EntityType},
 };
 extern crate ndarray;
 use ndarray::prelude::*;
@@ -39,7 +37,7 @@ pub struct PointLight {
     pub position: Vector, // as always, this is relative to it's parent
     pub orientation: Orientation,
     pub radiant_flux: RadiantFlux, // power in each wavelength
-    pub children: Vec<Arc<dyn Entity>>,
+    pub children: Vec<EntityType>,
 }
 
 impl Default for PointLight {
@@ -87,7 +85,7 @@ impl Entity for PointLight {
     fn get_scale(&self) -> Vector {
         Vector::ones()
     }
-    fn get_children(&mut self) -> &mut Vec<Arc<dyn Entity>> {
+    fn get_children(&mut self) -> &mut Vec<EntityType> {
         &mut self.children
     }
 }

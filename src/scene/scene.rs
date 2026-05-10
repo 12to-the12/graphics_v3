@@ -4,7 +4,7 @@ use crate::camera::Camera;
 // use crate::coordinate_space::Polar;
 use crate::geometry::primitives::Mesh;
 use crate::material::BRDF;
-use crate::object::{Empty, Entity, Object};
+use crate::object::{Empty, Entity, EntityType, Object};
 // use crate::primitives::Object;
 use crate::lighting::{black_spectra, Light, Spectra};
 
@@ -38,7 +38,7 @@ pub struct Scene {
     // pub struct Scene<T: Entity> {
     pub scene_root: Empty,
     pub active_camera: Camera,
-    pub entities: Vec<Arc<dyn Entity>>,
+    pub entities: Vec<EntityType>,
     pub materials: Vec<Arc<dyn BRDF>>,
     // pub lights: Vec<&'static dyn Light>,
     pub simple_lights: Vec<Arc<dyn Light>>,
@@ -85,10 +85,9 @@ impl Default for Scene {
     }
 }
 impl Scene {
-    // fn build_light_vector(&mut self) -> () {
-
-    // }
-    // fn add_light<T: Light + 'static>(&mut self, light: T) -> () {
-    //     self.scene_root.add_child(Arc::new(light));
-    // }
+    fn add_entity(&mut self, parent: EntityType, object: EntityType) {
+        let mut parent = parent.write().unwrap();
+        (*parent).add_child(object.clone());
+        self.entities.push(object);
+    }
 }

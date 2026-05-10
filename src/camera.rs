@@ -1,5 +1,4 @@
 #![allow(nonstandard_style)]
-use std::sync::{Arc, Weak};
 
 use rand::{rngs::ThreadRng, Rng};
 
@@ -9,8 +8,7 @@ use crate::{
         orientation::{Orientation, UP},
         primitives::{Ray, Vector, ORIGIN},
     },
-    object::Entity,
-    scene::scene::Scene,
+    object::{Entity, EntityType},
 };
 
 #[derive(Clone, Debug)]
@@ -27,7 +25,7 @@ pub struct Camera {
     // pub camera_space_position: Vector, // this exists in camera space
     pub orientation: Orientation,
     pub scale: Vector,
-    pub children: Vec<Arc<dyn Entity>>,
+    pub children: Vec<EntityType>,
 }
 
 impl Default for Camera {
@@ -56,7 +54,7 @@ impl Entity for Camera {
     fn get_scale(&self) -> Vector {
         self.scale
     }
-    fn get_children(&mut self) -> &mut Vec<Arc<dyn Entity>> {
+    fn get_children(&mut self) -> &mut Vec<EntityType> {
         &mut self.children
     }
 }
