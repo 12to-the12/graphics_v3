@@ -151,17 +151,11 @@ impl Default for Camera {
 }
 
 impl Entity for Camera {
-    fn get_position(&self) -> Vector
-    where
-        Self: Sized,
-    {
+    fn get_position(&self) -> Vector {
         self.position
     }
-    fn get_scene(&mut self) -> &mut Option<Weak<Scene>> {
-        &mut self.owner
-    }
-    fn add_child(&mut self, child: Arc<dyn Entity>) {
-        self.children.push(child);
+    fn get_children(&mut self) -> &mut Vec<Arc<dyn Entity>> {
+        &mut self.children
     }
 }
 

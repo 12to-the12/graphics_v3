@@ -82,17 +82,11 @@ impl Light for PointLight {
 }
 
 impl Entity for PointLight {
-    fn get_position(&self) -> Vector
-    where
-        Self: Sized,
-    {
+    fn get_position(&self) -> Vector {
         self.position
     }
-    fn get_scene(&mut self) -> &mut Option<Weak<Scene>> {
-        &mut self.owner
-    }
-    fn add_child(&mut self, child: Arc<dyn Entity>) {
-        self.children.push(child);
+    fn get_children(&mut self) -> &mut Vec<Arc<dyn Entity>> {
+        &mut self.children
     }
 }
 

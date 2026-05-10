@@ -12,8 +12,10 @@ use crate::{
 
 pub trait Entity: Debug + Sync + Send {
     fn get_position(&self) -> Vector;
-    fn get_scene(&mut self) -> &mut Option<Weak<Scene>>;
-    fn add_child(&mut self, child: Arc<dyn Entity>) -> ();
+    fn get_children(&mut self) -> &mut Vec<Arc<dyn Entity>>;
+    fn add_child(&mut self, child: Arc<dyn Entity>) {
+        self.get_children().push(child);
+    }
     // fn get_transforms(&self) -> &Vec<Transform>;
     // fn append_transforms(&self) -> &Vec<Transform>; // add position and scale and shit to log
 }
@@ -69,17 +71,11 @@ impl Default for Object {
 
 /// this will be modified in the future to accomodate a hierarchial parent child node system
 impl Entity for Object {
-    fn get_position(&self) -> Vector
-    where
-        Self: Sized,
-    {
+    fn get_position(&self) -> Vector {
         self.position
     }
-    fn get_scene(&mut self) -> &mut Option<Weak<Scene>> {
-        &mut self.owner
-    }
-    fn add_child(&mut self, child: Arc<dyn Entity>) {
-        self.children.push(child);
+    fn get_children(&mut self) -> &mut Vec<Arc<dyn Entity>> {
+        &mut self.children
     }
 }
 
@@ -104,17 +100,11 @@ impl Default for Empty {
     }
 }
 impl Entity for Empty {
-    fn get_position(&self) -> Vector
-    where
-        Self: Sized,
-    {
+    fn get_position(&self) -> Vector {
         self.position
     }
-    fn get_scene(&mut self) -> &mut Option<Weak<Scene>> {
-        &mut self.owner
-    }
-    fn add_child(&mut self, child: Arc<dyn Entity>) {
-        self.children.push(child);
+    fn get_children(&mut self) -> &mut Vec<Arc<dyn Entity>> {
+        &mut self.children
     }
 }
 
