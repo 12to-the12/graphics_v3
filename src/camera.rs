@@ -1,12 +1,16 @@
 #![allow(nonstandard_style)]
-use std::sync::Arc;
+use std::sync::{Arc, Weak};
 
 use rand::{rngs::ThreadRng, Rng};
 
 // use crate::coordinate_space::Orientation;
 use crate::{
-    geometry::primitives::{Ray, Vector},
+    geometry::{
+        orientation::{Orientation, UP},
+        primitives::{Ray, Vector, ORIGIN},
+    },
     object::Entity,
+    scene::scene::Scene,
 };
 
 #[derive(Clone, Debug)]
@@ -20,6 +24,12 @@ pub struct Camera {
     pub _far_clipping_plane: f32,
     /// shutterspeed in seconds
     pub exposure_time: f32,
+
+    pub owner: Option<Weak<Scene>>,
+    // pub camera_space_position: Vector, // this exists in camera space
+    pub orientation: Orientation,
+    pub scale: f32,
+    pub children: Vec<Arc<dyn Entity>>,
 }
 
 impl Camera {
@@ -125,17 +135,17 @@ impl Camera {
 impl Default for Camera {
     fn default() -> Self {
         Camera {
-            position: Vector {
-                x: 0.,
-                y: 0.,
-                z: 0.,
-            },
             _parent: None,
             lens: Lens::default(),
             sensor: Sensor::default(),
             _near_clipping_plane: 1e-1,
             _far_clipping_plane: 1e6,
             exposure_time: 1.,
+            children: Vec::new(),
+            owner: None,
+            position: ORIGIN,
+            orientation: UP,
+            scale: 1.,
         }
     }
 }
@@ -147,9 +157,12 @@ impl Entity for Camera {
     {
         self.position
     }
-    // fn _get_parent(&self) -> Option<Arc<dyn Entity>> {
-    //     self._parent.clone()
-    // }
+    fn get_scene(&mut self) -> &mut Option<Weak<Scene>> {
+        &mut self.owner
+    }
+    fn add_child(&mut self, child: Arc<dyn Entity>) {
+        self.children.push(child);
+    }
 }
 
 /// models a camera lens
@@ -157,20 +170,20 @@ impl Entity for Camera {
 #[derive(Clone, Debug)]
 pub struct Lens {
     /// ƒ-stop is focal length / aperture pupil diameter <https://www.wikiwand.com/en/F-number>
-    pub _aperture: f32,
+    pub aperture: f32,
     /// the field of view, defined in meters, degrees is an alternative method
     pub focal_length: f32,
     /// how far from camera plane the focus is, in meters
     /// currently unused
-    pub _focus_distance: f32,
+    pub focus_distance: f32,
 }
 
 impl Lens {
     pub fn _new(focal_length: f32) -> Lens {
         Lens {
-            _aperture: 8.,
+            aperture: 8.,
             focal_length,
-            _focus_distance: 1.,
+            focus_distance: 1.,
         }
     }
 }
@@ -178,9 +191,9 @@ impl Lens {
 impl Default for Lens {
     fn default() -> Self {
         Lens {
-            _aperture: 12.0,
+            aperture: 12.0,
             focal_length: 50.0 / 1000.,
-            _focus_distance: 20.0,
+            focus_distance: 20.0,
         }
     }
 }

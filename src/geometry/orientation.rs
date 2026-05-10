@@ -40,7 +40,7 @@ pub const _NK: Vector = Vector {
 
 // oriented
 pub const RIGHT: Orientation = Orientation { _top: J, _front: I };
-pub const _UP: Orientation = Orientation {
+pub const UP: Orientation = Orientation {
     _top: _NK,
     _front: J,
 };

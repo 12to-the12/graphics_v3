@@ -325,9 +325,9 @@ mod tests {
     #[test]
     fn verify_projection_implementation() {
         let lens = Lens {
-            _aperture: 30.0,
+            aperture: 30.0,
             focal_length: 18.0,
-            _focus_distance: 2.0,
+            focus_distance: 2.0,
         };
         let sensor = Sensor {
             width: 36.0,

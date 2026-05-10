@@ -65,3 +65,10 @@ the object/light buffer are rebuilt each time transforms are traversed
 
 integration basically multiplies by whatever is the subject of integration
 remember that the samples are used to approximate integration via monte carlo, the idea is that we treat *all* directions and points on surfaces as receiving whatever our rays receive
+
+
+rotations and dispacements and scales are properties of entities,
+the cascade transform operation will traverse the nodes, build the transform
+that represents the entities values, add it's parents to the itself then send those transforms to it's children to deal with
+
+the inverse active camera operations are applied to the root, then again to the active camera to cancel it's personal transformations

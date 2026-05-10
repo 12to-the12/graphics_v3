@@ -2,15 +2,19 @@
 use std::{
     f32::consts::{E, PI},
     fmt::Debug,
+    sync::{Arc, Weak},
 };
 const _π: f32 = PI;
 use crate::{
     color::luminous_efficiency::luminous_efficacy,
-    geometry::{orientation::Orientation, primitives::Vector},
+    geometry::{
+        orientation::{Orientation, UP},
+        primitives::{Vector, ORIGIN},
+    },
     object::Entity,
+    scene::scene::Scene,
 };
 extern crate ndarray;
-use crate::geometry::orientation::RIGHT;
 use ndarray::prelude::*;
 
 pub trait _Spectral {}
@@ -33,15 +37,22 @@ pub trait Light: Debug + Sync + Send + Entity {
 #[derive(Clone, Debug)]
 pub struct PointLight {
     pub position: Vector, // as always, this is relative to it's parent
-    pub _orientation: Orientation,
+    pub orientation: Orientation,
     pub radiant_flux: RadiantFlux, // power in each wavelength
+    pub owner: Option<Weak<Scene>>,
+    pub scale: f32,
+    pub children: Vec<Arc<dyn Entity>>,
 }
 
 impl Default for PointLight {
     fn default() -> Self {
         PointLight {
-            position: Vector::new(0.0, 0.0, 0.0),
-            _orientation: RIGHT,
+            owner: None,
+            position: ORIGIN,
+            orientation: UP,
+            scale: 1.,
+            children: Vec::new(),
+
             radiant_flux: incandescent_spectra(2000., 1000.),
         }
     }
@@ -54,8 +65,9 @@ impl PointLight {
     ) -> PointLight {
         PointLight {
             position,
-            _orientation: orientation,
+            orientation,
             radiant_flux,
+            ..PointLight::default()
         }
     }
 }
@@ -75,6 +87,12 @@ impl Entity for PointLight {
         Self: Sized,
     {
         self.position
+    }
+    fn get_scene(&mut self) -> &mut Option<Weak<Scene>> {
+        &mut self.owner
+    }
+    fn add_child(&mut self, child: Arc<dyn Entity>) {
+        self.children.push(child);
     }
 }
 
