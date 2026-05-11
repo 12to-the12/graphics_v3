@@ -12,13 +12,13 @@ use crate::{
     ray_tracing::ray_sphere_intersection::ray_sphere_intersection,
 };
 
-pub type EntityType = Arc<RwLock<dyn Entity>>;
+pub type SafeEntityType = Arc<RwLock<dyn Entity>>;
 pub trait Entity: Debug + Sync + Send {
     fn get_position(&self) -> Vector;
     fn get_orientation(&self) -> Orientation;
     fn get_scale(&self) -> Vector;
-    fn get_children(&mut self) -> &mut Vec<EntityType>;
-    fn add_child(&mut self, child: EntityType) {
+    fn get_children(&mut self) -> &mut Vec<SafeEntityType>;
+    fn add_child(&mut self, child: SafeEntityType) {
         self.get_children().push(child);
     }
     // fn get_transforms(&self) -> &Vec<Transform>;
@@ -31,7 +31,7 @@ pub struct Object {
     // pub camera_space_position: Vector, // this exists in camera space
     pub orientation: Orientation,
     pub scale: Vector,
-    pub children: Vec<EntityType>,
+    pub children: Vec<SafeEntityType>,
     pub material: Arc<dyn BRDF>,
     pub meshes: Vec<Mesh>,
     // & links to textures associated with it
@@ -55,7 +55,7 @@ impl Object {
         ray_sphere_intersection(ray, &position, &radius)
     }
 
-    pub fn _add_child(mut self, child: EntityType) {
+    pub fn _add_child(mut self, child: SafeEntityType) {
         self.children.push(child.clone());
     }
 }
@@ -83,7 +83,7 @@ impl Entity for Object {
     fn get_scale(&self) -> Vector {
         self.scale
     }
-    fn get_children(&mut self) -> &mut Vec<EntityType> {
+    fn get_children(&mut self) -> &mut Vec<SafeEntityType> {
         &mut self.children
     }
 }
@@ -93,7 +93,7 @@ pub struct Empty {
     pub position: Vector,
     pub orientation: Orientation,
     pub scale: Vector,
-    pub children: Vec<EntityType>,
+    pub children: Vec<SafeEntityType>,
 }
 
 impl Default for Empty {
@@ -116,7 +116,7 @@ impl Entity for Empty {
     fn get_scale(&self) -> Vector {
         self.scale
     }
-    fn get_children(&mut self) -> &mut Vec<EntityType> {
+    fn get_children(&mut self) -> &mut Vec<SafeEntityType> {
         &mut self.children
     }
 }

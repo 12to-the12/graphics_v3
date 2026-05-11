@@ -4,7 +4,7 @@ use crate::camera::Camera;
 // use crate::coordinate_space::Polar;
 use crate::geometry::primitives::Mesh;
 use crate::material::BRDF;
-use crate::object::{Empty, Entity, EntityType, Object};
+use crate::object::{Empty, Object};
 // use crate::primitives::Object;
 use crate::lighting::{black_spectra, Light, Spectra};
 
@@ -21,6 +21,13 @@ pub enum Rendermode {
     _RayTrace,
     ThreadedRayTrace,
     Rasterize,
+}
+
+pub enum EntityType {
+    Camera,
+    Light,
+    Object,
+    Other,
 }
 
 /// I am not sure what the responsibilities of this construction should be
@@ -84,10 +91,4 @@ impl Default for Scene {
         scene
     }
 }
-impl Scene {
-    fn add_entity(&mut self, parent: EntityType, object: EntityType) {
-        let mut parent = parent.write().unwrap();
-        (*parent).add_child(object.clone());
-        self.entities.push(object);
-    }
-}
+impl Scene {}
