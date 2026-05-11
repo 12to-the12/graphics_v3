@@ -1,6 +1,7 @@
 use std::cmp::min;
 use std::sync::{mpsc, Arc};
 use std::thread;
+use std::time::Duration;
 
 use crate::application::application;
 use crate::camera::Camera;
@@ -245,7 +246,7 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
         }
     }
     tiles.shuffle(&mut thread_rng());
-    let tilecount = tiles.len();
+    let total_tiles = tiles.len();
 
     let handle = thread::spawn(move || {
         tiles.into_par_iter().for_each(move |mut tile| {
@@ -270,40 +271,31 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
             sender.clone().send(tile).unwrap();
         });
     });
-
-    // for i in 0..threadcount {
-    //     // sliced vertically
-
-    //     let data_clone = Arc::clone(&data);
-
-    //     // let mut mini_canvas: RgbImage = ImageBuffer::new(width, height);
-    //     let mut tile: Tile = Tile::new(i * width, 0, width, height);
-    //     // let mut tile: Tile = Tile::new(i * width, 0, data.tilesize, data.tilesize);
-
-    //     let handle = thread::spawn(move || {
-    //         shade_pixels(&mut tile, &data_clone, shadermode);
-    //         tile
-    //     });
-    //     handles.push(handle);
-    // }
-
-    // let painted_mini_canvas = handle.join().unwrap();
-    // for handle in handles {
-    //     tiles.push(handle.join().unwrap());
-    // }
-
-    // tiles.into_iter().for_each(|tile| {
-    //     let _ = canvas.copy_from(&tile.canvas, tile.x_start, tile.y_start);
-    // });
-    let mut i = 0;
+    let mut current_tile = 0;
+    let mut partial_writer = Stopwatch::start_new();
+    let disk_update_interval = Duration::from_millis(100);
+    
     for tile in receiver {
-        println!("{}/{}", i + 1, tilecount);
-        i += 1;
+
+
+
+
+
+        println!("{}/{}", current_tile + 1, total_tiles);
+        current_tile += 1;
         canvas
             .copy_from(&tile.canvas, tile.x_start, tile.y_start)
             .unwrap();
-        canvas.save("partial.png").unwrap();
+
+
+
+        if disk_update_interval < partial_writer.elapsed() {
+            partial_writer.restart();
+            canvas.save("partial.png").unwrap();
+        }
     }
+
+    canvas.save("partial.png").unwrap();
     handle.join().unwrap();
 
     render_timer.stop();

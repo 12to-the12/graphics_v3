@@ -105,10 +105,14 @@ pub fn simple_scene<'b>() -> Scene {
     scene.samples = 16;
     scene.max_trace_depth = 5;
     scene.max_render_dist = 20.;
-    scene.tilesize = 40;
+    scene.tilesize = 10;
     // @8 samples  10: 13.0 20: 4.10 40: 3.1 80: 2.87
     // @32 10: 17.22 20: 12.9 40: 13.5 80: 13.8
     // @64 samples  10: 29.2 20: 27.6 40: 28.43
+
+    // with batched disk writes
+    // @8 samples  10: 3.2 20: 2.789 40: 2.83 80: 3.39
+    // @16 10: 5.83 20: 5.91 40: 6.25 80: 6.13
     scene.hue_timer = false;
     scene
 }
