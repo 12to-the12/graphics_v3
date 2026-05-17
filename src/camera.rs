@@ -4,11 +4,11 @@ use rand::{rngs::ThreadRng, Rng};
 
 // use crate::coordinate_space::Orientation;
 use crate::{
+    entity::Entity,
     geometry::{
         orientation::{Orientation, UP},
         primitives::{Ray, Vector, ORIGIN},
     },
-    object::Entity,
     scene::scene::EntityKey,
 };
 

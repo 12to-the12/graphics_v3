@@ -4,9 +4,11 @@ use slotmap::new_key_type;
 
 use crate::camera::Camera;
 // use crate::coordinate_space::Polar;
+use crate::empty::Empty;
+use crate::entity::Entity;
 use crate::geometry::primitives::Mesh;
 use crate::material::BRDF;
-use crate::object::{Empty, Entity, Object};
+use crate::object::Object;
 // use crate::primitives::Object;
 use crate::lighting::{black_spectra, Light, Spectra};
 use crate::slotmap::SlotMap;
@@ -135,10 +137,10 @@ impl Scene {
         let child = self.get_mut(child_key);
         child.set_parent(parent_key);
     }
-    // pub fn crawl_scene_graph(&self){
+    // pub fn crawl_scene_graph(&self) {
     //     let children = self.get(self.root);
-    //     for child in children{
-    //         println!("{:?}",child)
+    //     for child in children {
+    //         println!("{:?}", child)
     //     }
     // }
 

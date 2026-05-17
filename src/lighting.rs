@@ -6,11 +6,11 @@ use std::{
 const _π: f32 = PI;
 use crate::{
     color::luminous_efficiency::luminous_efficacy,
+    entity::Entity,
     geometry::{
         orientation::{Orientation, UP},
         primitives::{Vector, ORIGIN},
     },
-    object::Entity,
     scene::scene::EntityKey,
 };
 extern crate ndarray;

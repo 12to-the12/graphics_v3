@@ -5,6 +5,8 @@ mod camera;
 mod color;
 // cie_color_matching_functions;
 // mod colorspace_conversion;
+mod empty;
+mod entity;
 mod geometry_pipeline;
 mod lighting;
 mod load_object_file;
