@@ -39,6 +39,7 @@ pub struct PointLight {
     pub orientation: Orientation,
     pub radiant_flux: RadiantFlux, // power in each wavelength
     pub children: Vec<EntityKey>,
+    pub parent: Option<EntityKey>,
 }
 
 impl Default for PointLight {
@@ -48,6 +49,7 @@ impl Default for PointLight {
             orientation: UP,
             children: Vec::new(),
 
+            parent: None,
             radiant_flux: incandescent_spectra(2000., 1000.),
         }
     }
@@ -85,6 +87,9 @@ impl Entity for PointLight {
     }
     fn get_scale(&self) -> Vector {
         Vector::ones()
+    }
+    fn set_parent(&mut self, parent: EntityKey) {
+        self.parent = Some(parent);
     }
     fn get_children(&mut self) -> &mut Vec<EntityKey> {
         &mut self.children

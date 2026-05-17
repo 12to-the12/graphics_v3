@@ -32,6 +32,24 @@ pub enum EntityType {
     Object(Object),
     Other(Box<dyn Entity>),
 }
+impl EntityType {
+    pub fn add_child(&mut self, child: EntityKey) {
+        match self {
+            EntityType::Camera(i) => i.add_child(child),
+            EntityType::Light(i) => i.add_child(child),
+            EntityType::Object(i) => i.add_child(child),
+            EntityType::Other(i) => i.add_child(child),
+        }
+    }
+    pub fn set_parent(&mut self, parent: EntityKey) {
+        match self {
+            EntityType::Camera(i) => i.set_parent(parent),
+            EntityType::Light(i) => i.set_parent(parent),
+            EntityType::Object(i) => i.set_parent(parent),
+            EntityType::Other(i) => i.set_parent(parent),
+        }
+    }
+}
 new_key_type! {pub struct EntityKey;}
 /// I am not sure what the responsibilities of this construction should be
 /// should it be concerned with intermediate rendering data?
@@ -47,7 +65,7 @@ new_key_type! {pub struct EntityKey;}
 // #[derive(Clone)]
 pub struct Scene {
     // pub struct Scene<T: Entity> {
-    pub scene_root: Empty,
+    pub root: EntityKey,
     pub active_camera: Camera,
     pub entities: SlotMap<EntityKey, EntityType>,
     pub materials: Vec<Arc<dyn BRDF>>,
@@ -70,10 +88,12 @@ pub struct Scene {
 }
 impl Default for Scene {
     fn default() -> Self {
+        let mut entities = SlotMap::with_key();
+        let root = entities.insert(EntityType::Other(Box::new(Empty::default())));
         let scene = Scene {
-            scene_root: Empty::default(),
+            root,
             active_camera: Camera::default(),
-            entities: SlotMap::with_key(),
+            entities,
             // entities: SlotMap::new<EntityKey,EntityType>(),
             materials: Vec::new(),
             simple_lights: Vec::new(),
@@ -122,22 +142,24 @@ impl Scene {
         let entity = EntityType::Light(Box::new(light));
         let key = self.entities.insert(entity);
         self.simple_lights.push(key);
+        self.add_child(self.root, key);
         key
     }
     pub fn push_object(&mut self, object: Object) -> EntityKey {
         let entity = EntityType::Object(object);
         let key = self.entities.insert(entity);
         self.objects.push(key);
+        self.add_child(self.root, key);
         key
     }
-    pub fn add_child(&mut self, parent: EntityKey, child: EntityKey) {
-        match self.entities.get_mut(parent).unwrap() {
-            EntityType::Camera(i) => i.add_child(child),
-            EntityType::Light(i) => i.add_child(child),
-            EntityType::Object(i) => i.add_child(child),
-            EntityType::Other(i) => i.add_child(child),
-        }
+    pub fn add_child(&mut self, parent_key: EntityKey, child_key: EntityKey) {
+        let parent = self.entities.get_mut(parent_key).unwrap();
+        parent.add_child(child_key);
+        let child = self.entities.get_mut(parent_key).unwrap();
+        child.set_parent(parent_key);
     }
+    // pub fn modify_transform_matrix_from_offsets_scales_and_rotations
+
     // pub fn get_objects(&mut self) -> impl Iterator<Item = &mut EntityType> {
     //     let objects = self.objects.clone();
     //     objects

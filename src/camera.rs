@@ -27,6 +27,7 @@ pub struct Camera {
     pub orientation: Orientation,
     pub scale: Vector,
     pub children: Vec<EntityKey>,
+    pub parent: Option<EntityKey>,
 }
 
 impl Default for Camera {
@@ -41,6 +42,7 @@ impl Default for Camera {
             position: ORIGIN,
             orientation: UP,
             scale: Vector::ones(),
+            parent: None,
         }
     }
 }
@@ -57,6 +59,9 @@ impl Entity for Camera {
     }
     fn get_children(&mut self) -> &mut Vec<EntityKey> {
         &mut self.children
+    }
+    fn set_parent(&mut self, parent: EntityKey) {
+        self.parent = Some(parent);
     }
 }
 

@@ -14,6 +14,7 @@ pub trait Entity: Debug + Sync + Send {
     fn get_position(&self) -> Vector;
     fn get_orientation(&self) -> Orientation;
     fn get_scale(&self) -> Vector;
+    fn set_parent(&mut self, parent: EntityKey) -> ();
     fn get_children(&mut self) -> &mut Vec<EntityKey>;
     fn add_child(&mut self, child: EntityKey) {
         self.get_children().push(child);
@@ -31,6 +32,7 @@ pub struct Object {
     pub children: Vec<EntityKey>,
     pub material: Arc<dyn BRDF>,
     pub meshes: Vec<Mesh>,
+    pub parent: Option<EntityKey>,
     // & links to textures associated with it
 }
 impl Object {
@@ -65,6 +67,7 @@ impl Default for Object {
             children: Vec::new(),
             material: Arc::new(Diffuse::default()),
             meshes: Vec::new(),
+            parent: None,
         }
     }
 }
@@ -83,6 +86,9 @@ impl Entity for Object {
     fn get_children(&mut self) -> &mut Vec<EntityKey> {
         &mut self.children
     }
+    fn set_parent(&mut self, parent: EntityKey) {
+        self.parent = Some(parent);
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -91,6 +97,7 @@ pub struct Empty {
     pub orientation: Orientation,
     pub scale: Vector,
     pub children: Vec<EntityKey>,
+    pub parent: Option<EntityKey>,
 }
 
 impl Default for Empty {
@@ -100,6 +107,7 @@ impl Default for Empty {
             orientation: UP,
             scale: Vector::ones(),
             children: Vec::new(),
+            parent: None,
         }
     }
 }
@@ -115,6 +123,9 @@ impl Entity for Empty {
     }
     fn get_children(&mut self) -> &mut Vec<EntityKey> {
         &mut self.children
+    }
+    fn set_parent(&mut self, parent: EntityKey) {
+        self.parent = Some(parent);
     }
 }
 
