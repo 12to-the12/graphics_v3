@@ -118,15 +118,25 @@ impl Scene {
     pub fn get_object_keys(&self) -> Vec<EntityKey> {
         self.objects.clone()
     }
-    pub fn push_simple_light(&mut self, light: impl Light + 'static) {
+    pub fn push_simple_light(&mut self, light: impl Light + 'static) -> EntityKey {
         let entity = EntityType::Light(Box::new(light));
         let key = self.entities.insert(entity);
         self.simple_lights.push(key);
+        key
     }
-    pub fn push_object(&mut self, object: Object) {
+    pub fn push_object(&mut self, object: Object) -> EntityKey {
         let entity = EntityType::Object(object);
         let key = self.entities.insert(entity);
         self.objects.push(key);
+        key
+    }
+    pub fn add_child(&mut self, parent: EntityKey, child: EntityKey) {
+        match self.entities.get_mut(parent).unwrap() {
+            EntityType::Camera(i) => i.add_child(child),
+            EntityType::Light(i) => i.add_child(child),
+            EntityType::Object(i) => i.add_child(child),
+            EntityType::Other(i) => i.add_child(child),
+        }
     }
     // pub fn get_objects(&mut self) -> impl Iterator<Item = &mut EntityType> {
     //     let objects = self.objects.clone();

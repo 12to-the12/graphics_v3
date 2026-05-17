@@ -10,7 +10,8 @@ use crate::{
         orientation::{Orientation, UP},
         primitives::{Vector, ORIGIN},
     },
-    object::{Entity, SafeEntityType},
+    object::Entity,
+    scene::scene::EntityKey,
 };
 extern crate ndarray;
 use ndarray::prelude::*;
@@ -37,7 +38,7 @@ pub struct PointLight {
     pub position: Vector, // as always, this is relative to it's parent
     pub orientation: Orientation,
     pub radiant_flux: RadiantFlux, // power in each wavelength
-    pub children: Vec<SafeEntityType>,
+    pub children: Vec<EntityKey>,
 }
 
 impl Default for PointLight {
@@ -85,7 +86,7 @@ impl Entity for PointLight {
     fn get_scale(&self) -> Vector {
         Vector::ones()
     }
-    fn get_children(&mut self) -> &mut Vec<SafeEntityType> {
+    fn get_children(&mut self) -> &mut Vec<EntityKey> {
         &mut self.children
     }
 }
