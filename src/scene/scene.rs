@@ -26,30 +26,7 @@ pub enum Rendermode {
     Rasterize,
 }
 
-pub enum EntityType {
-    Camera(Box<dyn Entity>),
-    Light(Box<dyn Light>),
-    Object(Object),
-    Other(Box<dyn Entity>),
-}
-impl EntityType {
-    pub fn add_child(&mut self, child: EntityKey) {
-        match self {
-            EntityType::Camera(i) => i.add_child(child),
-            EntityType::Light(i) => i.add_child(child),
-            EntityType::Object(i) => i.add_child(child),
-            EntityType::Other(i) => i.add_child(child),
-        }
-    }
-    pub fn set_parent(&mut self, parent: EntityKey) {
-        match self {
-            EntityType::Camera(i) => i.set_parent(parent),
-            EntityType::Light(i) => i.set_parent(parent),
-            EntityType::Object(i) => i.set_parent(parent),
-            EntityType::Other(i) => i.set_parent(parent),
-        }
-    }
-}
+pub type EntityType = Box<dyn Entity>;
 new_key_type! {pub struct EntityKey;}
 /// I am not sure what the responsibilities of this construction should be
 /// should it be concerned with intermediate rendering data?
@@ -88,8 +65,8 @@ pub struct Scene {
 }
 impl Default for Scene {
     fn default() -> Self {
-        let mut entities = SlotMap::with_key();
-        let root = entities.insert(EntityType::Other(Box::new(Empty::default())));
+        let mut entities: SlotMap<EntityKey, Box<dyn Entity>> = SlotMap::with_key();
+        let root = entities.insert(Box::new(Empty::default()));
         let scene = Scene {
             root,
             active_camera: Camera::default(),
@@ -126,33 +103,27 @@ impl Scene {
     pub fn objects(&self) -> impl Iterator<Item = &Object> {
         let objects = self.objects.clone();
         let iterable = objects.into_iter();
-        let mapped = iterable.map(|key: EntityKey| match self.get(key) {
-            EntityType::Object(i) => i,
-            _ => panic!(),
-        });
+        let mapped = iterable.map(|key: EntityKey| self.get(key).as_object().unwrap());
         mapped
     }
-    pub fn simple_lights(&self) -> impl Iterator<Item = &Box<dyn Light>> {
+    pub fn simple_lights(&self) -> impl Iterator<Item = &dyn Light> {
         let simple_lights = self.simple_lights.clone();
         let iterable = simple_lights.into_iter();
-        let mapped = iterable.map(|key: EntityKey| match self.get(key) {
-            EntityType::Light(i) => i,
-            _ => panic!("I am not a light"),
-        });
+        let mapped = iterable.map(|key: EntityKey| self.get(key).as_light().unwrap());
         mapped
     }
     pub fn get_object_keys(&self) -> Vec<EntityKey> {
         self.objects.clone()
     }
     pub fn push_simple_light(&mut self, light: impl Light + 'static) -> EntityKey {
-        let entity = EntityType::Light(Box::new(light));
+        let entity = Box::new(light);
         let key = self.entities.insert(entity);
         self.simple_lights.push(key);
         self.add_child(self.root, key);
         key
     }
     pub fn push_object(&mut self, object: Object) -> EntityKey {
-        let entity = EntityType::Object(object);
+        let entity: Box<dyn Entity> = Box::new(object);
         let key = self.entities.insert(entity);
         self.objects.push(key);
         self.add_child(self.root, key);
@@ -165,7 +136,10 @@ impl Scene {
         child.set_parent(parent_key);
     }
     // pub fn crawl_scene_graph(&self){
-    //     let children =
+    //     let children = self.get(self.root);
+    //     for child in children{
+    //         println!("{:?}",child)
+    //     }
     // }
 
     // pub fn modify_transform_matrix_from_offsets_scales_and_rotations

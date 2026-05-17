@@ -5,6 +5,7 @@ use crate::{
         orientation::{Orientation, UP},
         primitives::{Mesh, Ray, Vector, ORIGIN},
     },
+    lighting::Light,
     material::{Diffuse, BRDF},
     ray_tracing::ray_sphere_intersection::ray_sphere_intersection,
     scene::scene::EntityKey,
@@ -18,6 +19,15 @@ pub trait Entity: Debug + Sync + Send {
     fn get_children(&mut self) -> &mut Vec<EntityKey>;
     fn add_child(&mut self, child: EntityKey) {
         self.get_children().push(child);
+    }
+    fn as_light(&self) -> Option<&dyn Light> {
+        None
+    }
+    fn as_object(&self) -> Option<&Object> {
+        None
+    }
+    fn as_object_mut(&mut self) -> Option<&mut Object> {
+        None
     }
     // fn get_transforms(&self) -> &Vec<Transform>;
     // fn append_transforms(&self) -> &Vec<Transform>; // add position and scale and shit to log
@@ -88,6 +98,12 @@ impl Entity for Object {
     }
     fn set_parent(&mut self, parent: EntityKey) {
         self.parent = Some(parent);
+    }
+    fn as_object(&self) -> Option<&Object> {
+        Some(self)
+    }
+    fn as_object_mut(&mut self) -> Option<&mut Object> {
+        Some(self)
     }
 }
 

@@ -82,11 +82,9 @@ fn apply_transforms(scene: &mut Scene) {
     // scene.build_camera_space_mesh
     // this will recursively apply transforms to nodes, then apply them to meshes
     for key in scene.get_object_keys().clone() {
-        let entity_type: &mut EntityType = scene.entities.get_mut(key).unwrap();
-        let object: &mut Object = match entity_type {
-            EntityType::Object(i) => i,
-            _ => panic!(),
-        };
+        let entity_type: &mut EntityType = scene.get_mut(key);
+        let object: &mut Object = entity_type.as_object_mut().unwrap();
+
         let to_world_space = build_translation_transform(object.position);
         for mesh in &mut object.meshes {
             // for mesh in scene.meshes.iter_mut() {
@@ -106,11 +104,8 @@ fn apply_transforms(scene: &mut Scene) {
 
 fn wire_frame(canvas: &mut RgbImage, mut scene: Scene) {
     for key in scene.get_object_keys().clone() {
-        let entity_type: &mut EntityType = scene.entities.get_mut(key).unwrap();
-        let object: &mut Object = match entity_type {
-            EntityType::Object(i) => i,
-            _ => panic!(),
-        };
+        let entity_type: &mut EntityType = scene.get_mut(key);
+        let object: &mut Object = entity_type.as_object_mut().unwrap();
         for mesh in &object.meshes {
             // mesh.apply_transformations();
             for poly in &mesh.polygons {
@@ -128,11 +123,8 @@ fn wire_frame(canvas: &mut RgbImage, mut scene: Scene) {
 
 fn _solid(canvas: &mut RgbImage, mut scene: Scene) {
     for key in scene.get_object_keys() {
-        let entity_type: &mut EntityType = scene.entities.get_mut(key).unwrap();
-        let object: &mut Object = match entity_type {
-            EntityType::Object(i) => i,
-            _ => panic!(),
-        };
+        let entity_type: &mut EntityType = scene.get_mut(key);
+        let object: &mut Object = entity_type.as_object_mut().unwrap();
         for mesh in &mut object.meshes {
             mesh.apply_transformations();
             for poly in &mut mesh.polygons {

@@ -94,6 +94,9 @@ impl Entity for PointLight {
     fn get_children(&mut self) -> &mut Vec<EntityKey> {
         &mut self.children
     }
+    fn as_light(&self) -> Option<&dyn Light> {
+        Some(self)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
