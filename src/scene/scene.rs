@@ -1,12 +1,15 @@
 use std::sync::Arc;
 
+use slotmap::new_key_type;
+
 use crate::camera::Camera;
 // use crate::coordinate_space::Polar;
 use crate::geometry::primitives::Mesh;
 use crate::material::BRDF;
-use crate::object::{Empty, Object};
+use crate::object::{Empty, Entity, Object};
 // use crate::primitives::Object;
 use crate::lighting::{black_spectra, Light, Spectra};
+use crate::slotmap::SlotMap;
 
 #[derive(Clone)]
 pub enum ShaderMode {
@@ -24,12 +27,12 @@ pub enum Rendermode {
 }
 
 pub enum EntityType {
-    Camera,
-    Light,
-    Object,
-    Other,
+    Camera(Box<dyn Entity>),
+    Light(Box<dyn Light>),
+    Object(Object),
+    Other(Box<dyn Entity>),
 }
-
+new_key_type! {pub struct EntityKey;}
 /// I am not sure what the responsibilities of this construction should be
 /// should it be concerned with intermediate rendering data?
 /// like transformed coordinates?
@@ -40,16 +43,17 @@ pub enum EntityType {
 ///
 /// I have settled on unified
 /// To implement a unified mesh, references need to stay valid
+///
 // #[derive(Clone)]
 pub struct Scene {
     // pub struct Scene<T: Entity> {
     pub scene_root: Empty,
     pub active_camera: Camera,
-    pub entities: Vec<EntityType>,
+    pub entities: SlotMap<EntityKey, EntityType>,
     pub materials: Vec<Arc<dyn BRDF>>,
     // pub lights: Vec<&'static dyn Light>,
-    pub simple_lights: Vec<Arc<dyn Light>>,
-    pub objects: Vec<Object>,
+    pub simple_lights: Vec<EntityKey>,
+    objects: Vec<EntityKey>,
     pub _meshes: Vec<Mesh>,
     pub background: Spectra,
     pub tick: u32,
@@ -69,7 +73,8 @@ impl Default for Scene {
         let scene = Scene {
             scene_root: Empty::default(),
             active_camera: Camera::default(),
-            entities: Vec::new(),
+            entities: SlotMap::with_key(),
+            // entities: SlotMap::new<EntityKey,EntityType>(),
             materials: Vec::new(),
             simple_lights: Vec::new(),
             objects: Vec::new(),
@@ -91,4 +96,42 @@ impl Default for Scene {
         scene
     }
 }
-impl Scene {}
+impl Scene {
+    pub fn objects(&self) -> impl Iterator<Item = &Object> {
+        let objects = self.objects.clone();
+        let iterable = objects.into_iter();
+        let mapped = iterable.map(|key: EntityKey| match self.entities.get(key).unwrap() {
+            EntityType::Object(i) => i,
+            _ => panic!(),
+        });
+        mapped
+    }
+    pub fn simple_lights(&self) -> impl Iterator<Item = &Box<dyn Light>> {
+        let simple_lights = self.simple_lights.clone();
+        let iterable = simple_lights.into_iter();
+        let mapped = iterable.map(|key: EntityKey| match self.entities.get(key).unwrap() {
+            EntityType::Light(i) => i,
+            _ => panic!("I am not a light"),
+        });
+        mapped
+    }
+    pub fn get_object_keys(&self) -> Vec<EntityKey> {
+        self.objects.clone()
+    }
+    pub fn push_simple_light(&mut self, light: impl Light + 'static) {
+        let entity = EntityType::Light(Box::new(light));
+        let key = self.entities.insert(entity);
+        self.simple_lights.push(key);
+    }
+    pub fn push_object(&mut self, object: Object) {
+        let entity = EntityType::Object(object);
+        let key = self.entities.insert(entity);
+        self.objects.push(key);
+    }
+    // pub fn get_objects(&mut self) -> impl Iterator<Item = &mut EntityType> {
+    //     let objects = self.objects.clone();
+    //     objects
+    //         .into_iter()
+    //         .filter_map(move |key| {self.entities.get_mut(key)})
+    // }
+}

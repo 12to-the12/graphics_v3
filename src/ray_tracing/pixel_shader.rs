@@ -73,7 +73,7 @@ pub fn _solid_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<
     let ray = Camera::jittered_pixel_to_ray(&scene.active_camera, x, y, rng);
     let mut hit = false;
     // here we're at once per pixel
-    for object in &scene.objects {
+    for object in scene.objects() {
         // this is once per object
         if scene.spatial_acceleration_structures && !object.ray_intercept(&ray) {
             continue;
@@ -105,7 +105,7 @@ pub fn bvh_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8>
     let ray = Camera::jittered_pixel_to_ray(&scene.active_camera, x, y, rng);
     let mut hit = false;
     // here we're at once per pixel
-    for object in &scene.objects {
+    for object in scene.objects() {
         // this is once per object
         if object.ray_intercept(&ray) {
             hit = true;
@@ -231,7 +231,7 @@ pub fn integrate_direct_surface_radiance(
 ) -> Radiance {
     let mut output: Radiance = void_spectra().into();
     // let mut output: RadiantExitance = black_spectra().into();
-    'lights: for light in &scene.simple_lights {
+    'lights: for light in scene.simple_lights() {
         // our job here is to find the amount of energy transmitted to the pixel from the light
         let to_light = &intersection_point.clone().to(light.get_position());
 
@@ -281,7 +281,7 @@ pub fn shoot_ray(ray: Ray, scene: &Scene, _depth: u32) -> Option<(Object, Vector
     let mut surface_normal: Vector;
     surface_normal = Vector::new(1., 1., 1.);
     // here we're at once per pixel
-    for object in &scene.objects {
+    for object in scene.objects() {
         // this is once per object
         if scene.spatial_acceleration_structures && !object.ray_intercept(&ray) {
             continue;

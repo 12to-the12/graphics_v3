@@ -7,7 +7,8 @@ use crate::application::application;
 use crate::camera::Camera;
 use crate::geometry::primitives::{Triangle, Vector};
 // use crate::primitives::LineCollection;
-use crate::scene::scene::{Rendermode, Scene, ShaderMode};
+use crate::object::Object;
+use crate::scene::scene::{EntityType, Rendermode, Scene, ShaderMode};
 // use crate::primitives::PolygonCollection;
 use crate::geometry::transformations::{
     build_projection_transform, build_scale_transform, build_translation_transform,
@@ -80,7 +81,12 @@ fn apply_transforms(scene: &mut Scene) {
     // scene.transform_children
     // scene.build_camera_space_mesh
     // this will recursively apply transforms to nodes, then apply them to meshes
-    for object in &mut scene.objects {
+    for key in scene.get_object_keys().clone() {
+        let entity_type: &mut EntityType = scene.entities.get_mut(key).unwrap();
+        let object: &mut Object = match entity_type {
+            EntityType::Object(i) => i,
+            _ => panic!(),
+        };
         let to_world_space = build_translation_transform(object.position);
         for mesh in &mut object.meshes {
             // for mesh in scene.meshes.iter_mut() {
@@ -98,11 +104,16 @@ fn apply_transforms(scene: &mut Scene) {
     // scene.apply_transformations();
 }
 
-fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
-    for object in scene.objects {
-        for mesh in object.meshes {
+fn wire_frame(canvas: &mut RgbImage, mut scene: Scene) {
+    for key in scene.get_object_keys().clone() {
+        let entity_type: &mut EntityType = scene.entities.get_mut(key).unwrap();
+        let object: &mut Object = match entity_type {
+            EntityType::Object(i) => i,
+            _ => panic!(),
+        };
+        for mesh in &object.meshes {
             // mesh.apply_transformations();
-            for poly in mesh.polygons {
+            for poly in &mesh.polygons {
                 let a = &mesh.output_vertices[poly[0]]; // currently vertexes;
                 let b = &mesh.output_vertices[poly[1]];
                 let c = &mesh.output_vertices[poly[2]];
@@ -115,11 +126,16 @@ fn wire_frame(canvas: &mut RgbImage, scene: Scene) {
     }
 }
 
-fn _solid(canvas: &mut RgbImage, scene: Scene) {
-    for object in scene.objects {
-        for mut mesh in object.meshes {
+fn _solid(canvas: &mut RgbImage, mut scene: Scene) {
+    for key in scene.get_object_keys() {
+        let entity_type: &mut EntityType = scene.entities.get_mut(key).unwrap();
+        let object: &mut Object = match entity_type {
+            EntityType::Object(i) => i,
+            _ => panic!(),
+        };
+        for mesh in &mut object.meshes {
             mesh.apply_transformations();
-            for poly in mesh.polygons {
+            for poly in &mut mesh.polygons {
                 let a = &mesh.output_vertices[poly[0]]; // currently vertexes;
                 let b = &mesh.output_vertices[poly[1]];
                 let c = &mesh.output_vertices[poly[2]];
@@ -274,20 +290,13 @@ fn threaded_ray_trace(canvas: &mut RgbImage, mut scene: Scene) {
     let mut current_tile = 0;
     let mut partial_writer = Stopwatch::start_new();
     let disk_update_interval = Duration::from_millis(100);
-    
+
     for tile in receiver {
-
-
-
-
-
         println!("{}/{}", current_tile + 1, total_tiles);
         current_tile += 1;
         canvas
             .copy_from(&tile.canvas, tile.x_start, tile.y_start)
             .unwrap();
-
-
 
         if disk_update_interval < partial_writer.elapsed() {
             partial_writer.restart();

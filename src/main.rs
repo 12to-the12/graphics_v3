@@ -18,6 +18,7 @@ mod ray_tracing;
 
 extern crate approx;
 extern crate rand;
+extern crate slotmap;
 extern crate stopwatch;
 
 use color::draw_chromaticity_diagram::coloring_book;
@@ -26,7 +27,7 @@ use std::{thread, time::Duration};
 use stopwatch::Stopwatch;
 
 use crate::geometry_pipeline::geometry_pipeline;
-use crate::scene::scenes::{calibration_scene, cornell_scene, simple_scene};
+use crate::scene::scenes::simple_scene;
 
 fn sleep(ms: Duration) {
     thread::sleep(ms);
@@ -52,7 +53,7 @@ fn _render_animation() {
         let mut frame = Stopwatch::start_new();
 
         let mut scene;
-        scene = calibration_scene();
+        scene = simple_scene();
         scene.tick = counter;
         let canvas = geometry_pipeline(scene);
         canvas
@@ -84,7 +85,7 @@ fn main_loop() {
 }
 fn _raster_vs_raytrace() {
     let mut ray_tracing = Stopwatch::start_new();
-    let mut scene = cornell_scene();
+    let mut scene = simple_scene();
     scene.rendermode = scene::scene::Rendermode::ThreadedRayTrace;
     scene.tick = 0;
     let render = geometry_pipeline(scene);
