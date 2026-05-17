@@ -42,7 +42,7 @@ pub fn shade_pixels<F: Fn(u32, u32, &Scene, &mut ThreadRng) -> Rgb<u8>>(
 }
 
 pub fn _color_shader(x: u32, y: u32, scene: &Scene, _rng: &mut ThreadRng) -> Rgb<u8> {
-    let (hres, vres) = scene.active_camera.sensor.res();
+    let (hres, vres) = scene.active_camera().sensor.res();
     let x = x as f32 / (hres as f32);
     let y = y as f32 / (vres as f32);
     let r1 = y * 255.;
@@ -70,7 +70,7 @@ pub fn _color_shader(x: u32, y: u32, scene: &Scene, _rng: &mut ThreadRng) -> Rgb
 
 /// shades all objects as solid
 pub fn _solid_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
-    let ray = Camera::jittered_pixel_to_ray(&scene.active_camera, x, y, rng);
+    let ray = Camera::jittered_pixel_to_ray(scene.active_camera(), x, y, rng);
     let mut hit = false;
     // here we're at once per pixel
     for object in scene.objects() {
@@ -102,7 +102,7 @@ pub fn _solid_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<
 
 /// shows where bounding volume hierarchies are
 pub fn bvh_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
-    let ray = Camera::jittered_pixel_to_ray(&scene.active_camera, x, y, rng);
+    let ray = Camera::jittered_pixel_to_ray(scene.active_camera(), x, y, rng);
     let mut hit = false;
     // here we're at once per pixel
     for object in scene.objects() {
@@ -121,7 +121,7 @@ pub fn bvh_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8>
 
 /// render depth
 pub fn z_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
-    let ray = Camera::jittered_pixel_to_ray(&scene.active_camera, x, y, rng);
+    let ray = Camera::jittered_pixel_to_ray(scene.active_camera(), x, y, rng);
     let intersection = shoot_ray(ray, scene, scene.max_trace_depth);
     if intersection.is_none() {
         Rgb([0, 0, 0])
@@ -138,9 +138,9 @@ pub fn z_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
 pub fn lit_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8> {
     let sample_average = integrate_pixel_radiance(x, y, scene, rng);
     // we should take a value parameterized in radiance, not radiant exitance!
-    let joules = scene.active_camera.exposure_time
-        * scene.active_camera.sensor._pixel_area()
-        * scene.active_camera._pixel_solid_angle()
+    let joules = scene.active_camera().exposure_time
+        * scene.active_camera().sensor._pixel_area()
+        * scene.active_camera()._pixel_solid_angle()
         * sample_average.0;
 
     spectra_to_display(&joules)
@@ -148,7 +148,7 @@ pub fn lit_shader(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Rgb<u8>
 pub fn integrate_pixel_radiance(x: u32, y: u32, scene: &Scene, rng: &mut ThreadRng) -> Radiance {
     let mut radiance: Radiance = black_spectra().into();
     for _ in 0..scene.samples {
-        let ray = Camera::jittered_pixel_to_ray(&scene.active_camera, x, y, rng);
+        let ray = Camera::jittered_pixel_to_ray(scene.active_camera(), x, y, rng);
         radiance.0 = radiance.0 + dispatch_light_ray(ray, scene, scene.max_trace_depth, rng).0;
     }
 
@@ -337,37 +337,75 @@ pub fn shoot_ray(ray: Ray, scene: &Scene, _depth: u32) -> Option<(Object, Vector
 mod tests {
     use approx::assert_abs_diff_eq;
 
-    use crate::{camera::Camera, scene::scenes::simple_scene};
+    use crate::{
+        camera::{Camera, Lens, Sensor},
+        scene::scenes::cornell_scene,
+    };
 
     use super::*;
 
     /// useful table: https://www.nikonians.org/reviews/fov-tables
     #[test]
     fn pixel_rays() {
-        let mut scene = simple_scene();
+        let mut scene = cornell_scene();
         let mut ray: Ray;
         let mut rng = thread_rng();
 
-        scene.active_camera.lens.focal_length = 18.0;
-        scene.active_camera.sensor.width = 36.0;
+        let lens = Lens {
+            focal_length: 18.,
+            ..Lens::default()
+        };
+        let sensor = Sensor {
+            width: 36.0,
+            horizontal_res: 3,
+            vertical_res: 3,
+            ..Sensor::default()
+        };
+        let camera = Camera {
+            lens,
+            sensor,
+            ..Camera::default()
+        };
+        let key = scene.insert(camera);
+        scene.set_active_camera(key);
 
-        scene.active_camera.sensor.horizontal_res = 3;
-        scene.active_camera.sensor.vertical_res = 3;
-        ray = Camera::straight_pixel_to_ray(&scene.active_camera, 0, 2);
+        // scene.active_camera.lens.focal_length = 18.0;
+        // scene.active_camera.sensor.width = 36.0;
+
+        // scene.active_camera.sensor.horizontal_res = 3;
+        // scene.active_camera.sensor.vertical_res = 3;
+        ray = Camera::straight_pixel_to_ray(&scene.active_camera(), 0, 2);
 
         // println!("direction: {:?}", ray.direction);
 
         let mut foil = Vector::new(-0.3333333, -0.3333333, -0.5);
         foil.unitize();
+
+        println!("direction: {:?}", ray.direction);
         assert_eq!(ray.direction.x, foil.x); //
         assert_eq!(ray.direction.y, foil.y); //
         assert_eq!(ray.direction.z, foil.z); //
 
-        scene.active_camera.sensor.horizontal_res = 1;
-        scene.active_camera.sensor.vertical_res = 1;
-        ray = Camera::straight_pixel_to_ray(&scene.active_camera, 0, 0);
+        let lens = Lens {
+            focal_length: 18. / 1000.,
+            ..Lens::default()
+        };
+        let sensor = Sensor {
+            width: 36.0,
+            horizontal_res: 1,
+            vertical_res: 1,
+            ..Sensor::default()
+        };
+        let camera = Camera {
+            lens,
+            sensor,
+            ..Camera::default()
+        };
+        let key = scene.insert(camera);
+        scene.set_active_camera(key);
+        ray = Camera::straight_pixel_to_ray(&scene.active_camera(), 0, 0);
 
-        // println!("direction: {:?}", ray.direction);
+        println!("direction: {:?}", ray.direction);
 
         let mut foil = Vector::new(00.0, 0.0, -0.5);
         foil.unitize();

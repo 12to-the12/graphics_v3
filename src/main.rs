@@ -29,7 +29,7 @@ use std::{thread, time::Duration};
 use stopwatch::Stopwatch;
 
 use crate::geometry_pipeline::geometry_pipeline;
-use crate::scene::scenes::simple_scene;
+use crate::scene::scenes::{cornell_scene, simple_scene};
 
 fn sleep(ms: Duration) {
     thread::sleep(ms);
@@ -55,7 +55,7 @@ fn _render_animation() {
         let mut frame = Stopwatch::start_new();
 
         let mut scene;
-        scene = simple_scene();
+        scene = cornell_scene();
         scene.tick = counter;
         let canvas = geometry_pipeline(scene);
         canvas
@@ -87,7 +87,7 @@ fn main_loop() {
 }
 fn _raster_vs_raytrace() {
     let mut ray_tracing = Stopwatch::start_new();
-    let mut scene = simple_scene();
+    let mut scene = cornell_scene();
     scene.rendermode = scene::scene::Rendermode::ThreadedRayTrace;
     scene.tick = 0;
     let render = geometry_pipeline(scene);
@@ -100,7 +100,7 @@ fn _raster_vs_raytrace() {
 
     let mut rasterization = Stopwatch::start_new();
 
-    let mut scene = simple_scene();
+    let mut scene = cornell_scene();
     scene.rendermode = scene::scene::Rendermode::Rasterize;
     scene.tick = 0;
     let render = geometry_pipeline(scene);
@@ -114,6 +114,8 @@ fn _raster_vs_raytrace() {
 fn single(i: u32) {
     let mut scene;
     scene = simple_scene();
+    // scene.crawl_scene_graph();
+    // panic!();
     scene.tick = i;
 
     let mut frame = Stopwatch::start_new();

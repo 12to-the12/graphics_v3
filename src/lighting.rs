@@ -91,7 +91,10 @@ impl Entity for PointLight {
     fn set_parent(&mut self, parent: EntityKey) {
         self.parent = Some(parent);
     }
-    fn get_children(&mut self) -> &mut Vec<EntityKey> {
+    fn get_children(&self) -> Vec<EntityKey> {
+        self.children.clone()
+    }
+    fn get_mut_children(&mut self) -> &mut Vec<EntityKey> {
         &mut self.children
     }
     fn as_light(&self) -> Option<&dyn Light> {

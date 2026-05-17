@@ -72,8 +72,11 @@ impl Entity for Object {
     fn get_scale(&self) -> Vector {
         self.scale
     }
-    fn get_children(&mut self) -> &mut Vec<EntityKey> {
+    fn get_mut_children(&mut self) -> &mut Vec<EntityKey> {
         &mut self.children
+    }
+    fn get_children(&self) -> Vec<EntityKey> {
+        self.children.clone()
     }
     fn set_parent(&mut self, parent: EntityKey) {
         self.parent = Some(parent);

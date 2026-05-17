@@ -45,7 +45,7 @@ new_key_type! {pub struct EntityKey;}
 pub struct Scene {
     // pub struct Scene<T: Entity> {
     pub root: EntityKey,
-    pub active_camera: Camera,
+    active_camera: EntityKey,
     pub entities: SlotMap<EntityKey, EntityType>,
     pub materials: Vec<Arc<dyn BRDF>>,
     // pub lights: Vec<&'static dyn Light>,
@@ -69,9 +69,10 @@ impl Default for Scene {
     fn default() -> Self {
         let mut entities: SlotMap<EntityKey, Box<dyn Entity>> = SlotMap::with_key();
         let root = entities.insert(Box::new(Empty::default()));
+        let active_camera = entities.insert(Box::new(Camera::default()));
         let scene = Scene {
             root,
-            active_camera: Camera::default(),
+            active_camera,
             entities,
             // entities: SlotMap::new<EntityKey,EntityType>(),
             materials: Vec::new(),
@@ -101,6 +102,18 @@ impl Scene {
     }
     pub fn get(&self, key: EntityKey) -> &EntityType {
         self.entities.get(key).unwrap()
+    }
+    pub fn insert(&mut self, entity: impl Entity + 'static) -> EntityKey {
+        self.entities.insert(Box::new(entity))
+    }
+    pub fn active_camera(&self) -> &Camera {
+        self.get(self.active_camera).as_camera().unwrap()
+    }
+    pub fn active_camera_mut(&mut self) -> &mut Camera {
+        self.get_mut(self.active_camera).as_camera_mut().unwrap()
+    }
+    pub fn set_active_camera(&mut self, key: EntityKey) {
+        self.active_camera = key;
     }
     pub fn objects(&self) -> impl Iterator<Item = &Object> {
         let objects = self.objects.clone();
@@ -137,14 +150,16 @@ impl Scene {
         let child = self.get_mut(child_key);
         child.set_parent(parent_key);
     }
-    // pub fn crawl_scene_graph(&self) {
-    //     let children = self.get(self.root);
-    //     for child in children {
-    //         println!("{:?}", child)
-    //     }
-    // }
+    pub fn crawl_scene_graph(&self) {
+        let children = self.get(self.root).get_children();
+        for child in children {
+            println!("{child:?}");
+        }
+    }
 
-    // pub fn modify_transform_matrix_from_offsets_scales_and_rotations
+    pub fn cascade_transforms(&mut self) {
+        let _root = self.get(self.root);
+    }
 
     // pub fn get_objects(&mut self) -> impl Iterator<Item = &mut EntityType> {
     //     let objects = self.objects.clone();

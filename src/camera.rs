@@ -57,11 +57,20 @@ impl Entity for Camera {
     fn get_scale(&self) -> Vector {
         self.scale
     }
-    fn get_children(&mut self) -> &mut Vec<EntityKey> {
+    fn get_children(&self) -> Vec<EntityKey> {
+        self.children.clone()
+    }
+    fn get_mut_children(&mut self) -> &mut Vec<EntityKey> {
         &mut self.children
     }
     fn set_parent(&mut self, parent: EntityKey) {
         self.parent = Some(parent);
+    }
+    fn as_camera(&self) -> Option<&Camera> {
+        Some(self)
+    }
+    fn as_camera_mut(&mut self) -> Option<&mut Camera> {
+        Some(self)
     }
 }
 
