@@ -117,10 +117,16 @@ impl Default for Scene {
     }
 }
 impl Scene {
+    pub fn get_mut(&mut self, key: EntityKey) -> &mut EntityType {
+        self.entities.get_mut(key).unwrap()
+    }
+    pub fn get(&self, key: EntityKey) -> &EntityType {
+        self.entities.get(key).unwrap()
+    }
     pub fn objects(&self) -> impl Iterator<Item = &Object> {
         let objects = self.objects.clone();
         let iterable = objects.into_iter();
-        let mapped = iterable.map(|key: EntityKey| match self.entities.get(key).unwrap() {
+        let mapped = iterable.map(|key: EntityKey| match self.get(key) {
             EntityType::Object(i) => i,
             _ => panic!(),
         });
@@ -129,7 +135,7 @@ impl Scene {
     pub fn simple_lights(&self) -> impl Iterator<Item = &Box<dyn Light>> {
         let simple_lights = self.simple_lights.clone();
         let iterable = simple_lights.into_iter();
-        let mapped = iterable.map(|key: EntityKey| match self.entities.get(key).unwrap() {
+        let mapped = iterable.map(|key: EntityKey| match self.get(key) {
             EntityType::Light(i) => i,
             _ => panic!("I am not a light"),
         });
@@ -153,11 +159,15 @@ impl Scene {
         key
     }
     pub fn add_child(&mut self, parent_key: EntityKey, child_key: EntityKey) {
-        let parent = self.entities.get_mut(parent_key).unwrap();
+        let parent = self.get_mut(parent_key);
         parent.add_child(child_key);
-        let child = self.entities.get_mut(parent_key).unwrap();
+        let child = self.get_mut(child_key);
         child.set_parent(parent_key);
     }
+    // pub fn crawl_scene_graph(&self){
+    //     let children =
+    // }
+
     // pub fn modify_transform_matrix_from_offsets_scales_and_rotations
 
     // pub fn get_objects(&mut self) -> impl Iterator<Item = &mut EntityType> {
